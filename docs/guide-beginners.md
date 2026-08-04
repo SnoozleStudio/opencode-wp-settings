@@ -40,7 +40,7 @@ Four layers, bottom to top:
 |---|---|---|
 | **Config** | global settings every session loads | `opencode.json`, `AGENTS.md`, plugins |
 | **Agents** | specialist workers the AI can delegate to (a mapper, a coder, a reviewer…) | 8 in `agents/` |
-| **Skills** | how-to disciplines the AI loads when a task matches | 20 in `skills/` |
+| **Skills** | how-to disciplines the AI loads when a task matches | 26 in `skills/` |
 | **Commands** | `/shortcuts` that start a known workflow with a written prompt | 18 in `commands/` |
 
 You almost never touch layers 1–3. You use **commands** and **plain conversation**.

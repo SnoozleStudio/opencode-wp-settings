@@ -87,6 +87,14 @@ lenis.on("scroll", ScrollTrigger.update);
   `transform`/`will-change: transform` on ancestors of `position: fixed` elements
 - Text plugins: SplitText (`new SplitText(el, { type: 'chars,words,lines' })`, revert
   after), ScrambleTextPlugin (`gsap.to(el, { scrambleText: '...' })`)
+- **Vendored skills**: the `gsap-*` skills (greensock/gsap-skills) carry official
+  API depth. Their guidance is generic — no WordPress/Vite/Lenis/Tempus. House
+  rules in this doc and `wp-theme` override: Lenis (never ScrollSmoother — two
+  smooth-scroll libs conflict), Tempus ticker routing, reduced-motion gate,
+  manifest enqueue. Refresh them via `npx skills update -a opencode -g`, never edit.
+- All plugins (SplitText, MorphSVG, Observer, etc.) are free since the Webflow
+  acquisition — install everything from the public `gsap` npm package; no Club
+  GSAP membership, no private registry.
 
 ## Three.js
 

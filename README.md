@@ -27,8 +27,9 @@ opencode.json         Global config: permission allow/ask/deny lists, MCP server
 tui.json              TUI plugins (subagent statusline)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
-skills/               20 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
-                      review, refactor, tdd, diagnosing-bugs, grill-me, to-spec, ...)
+skills/               26 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
+                      review, refactor, tdd, gsap-core/gsap-scrolltrigger/... vendored
+                      from greensock/gsap-skills, ...)
 commands/             18 slash commands (/fix /build /review /verify /ship /audit
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
@@ -104,6 +105,10 @@ All 18 commands, with the skill/agent each invokes, are indexed in the
   `research`, `domain-modeling`
 - **Productivity**: `grill-me`, `grill-with-docs`, `to-spec`, `to-tickets`, `handoff`,
   `share-learning`
+- **Vendored (upstream)**: `gsap-core`, `gsap-timeline`, `gsap-scrolltrigger`,
+  `gsap-plugins`, `gsap-utils`, `gsap-performance` — official GSAP skills copied
+  unedited from [greensock/gsap-skills](https://github.com/greensock/gsap-skills);
+  refresh via `npx skills update -a opencode -g`, never edit
 
 Skills auto-match from their descriptions; load [docs/skill-authoring.md](docs/skill-authoring.md)
 before adding new ones.

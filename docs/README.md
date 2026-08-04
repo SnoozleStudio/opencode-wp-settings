@@ -19,7 +19,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 2. [Reference docs index](#reference-docs-index)
 3. [Component inventory](#component-inventory)
    - [Agents (8)](#agents-8)
-   - [Skills (20)](#skills-20)
+   - [Skills (26)](#skills-26)
    - [Commands (18)](#commands-18)
    - [Plugins (3)](#plugins-3)
    - [Templates (2)](#templates-2)
@@ -40,7 +40,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── tui.json                 TUI plugins (subagent statusline)
 ├── package.json / bun.lock  plugin runtime dependency (@opencode-ai/plugin)
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
-├── skills/                  20 skills (reusable disciplines; auto-matched by description)
+├── skills/                  26 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
 ├── docs/                    this hub + reference docs + the 2 guides
@@ -95,7 +95,7 @@ permission; writers edit strictly within their briefing.
 | Scaffolder | [agents/scaffolder.md](../agents/scaffolder.md) | generates projects from `templates/`, new sections | no |
 | Maestro | [agents/maestro.md](../agents/maestro.md) | orchestrates parallel subagent workstreams | no |
 
-### Skills (20)
+### Skills (26)
 
 Skills in `skills/` are the reusable disciplines. OpenCode auto-matches them from the
 frontmatter `description` — the description **is** the routing table. Category splits:
@@ -134,6 +134,22 @@ frontmatter `description` — the description **is** the routing table. Category
 | to-tickets | [skills/to-tickets/SKILL.md](../skills/to-tickets/SKILL.md) | — | plan/spec → tracer-bullet tickets |
 | handoff | [skills/handoff/SKILL.md](../skills/handoff/SKILL.md) | — | "done for today", session transfer |
 | share-learning | [skills/share-learning/SKILL.md](../skills/share-learning/SKILL.md) | — | gotcha worth a learnings-log entry |
+
+**Vendored (upstream, unedited)**
+
+Copied from [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) —
+official GSAP API depth. Generic guidance (no WordPress/Vite/Lenis/Tempus): house
+integration rules in `frontend-stack.md` override. Refresh with
+`npx skills update -a opencode -g`; never edit in place.
+
+| Skill | File | Trigger phrases |
+|---|---|---|
+| gsap-core | [skills/gsap-core/SKILL.md](../skills/gsap-core/SKILL.md) | GSAP tweens, easing, stagger, matchMedia |
+| gsap-timeline | [skills/gsap-timeline/SKILL.md](../skills/gsap-timeline/SKILL.md) | timelines, sequencing, animation order |
+| gsap-scrolltrigger | [skills/gsap-scrolltrigger/SKILL.md](../skills/gsap-scrolltrigger/SKILL.md) | scroll animation, parallax, pinning |
+| gsap-plugins | [skills/gsap-plugins/SKILL.md](../skills/gsap-plugins/SKILL.md) | SplitText, Observer, Draggable, plugins |
+| gsap-utils | [skills/gsap-utils/SKILL.md](../skills/gsap-utils/SKILL.md) | gsap.utils, clamp, snap, toArray |
+| gsap-performance | [skills/gsap-performance/SKILL.md](../skills/gsap-performance/SKILL.md) | animation performance, jank, 60fps |
 
 ### Commands (18)
 
@@ -254,7 +270,8 @@ every session    ──► session-context: git state line appended to system pr
 | You changed… | You must update… |
 |---|---|
 | An agent (`agents/`) | its `description` frontmatter + this hub's [Agents table](#agents-8) |
-| A skill (`skills/`) | its `description` frontmatter (the routing table) + [Skills table](#skills-20) + skill-authoring.md if the format changed |
+| A skill (`skills/`) | its `description` frontmatter (the routing table) + [Skills table](#skills-26) + skill-authoring.md if the format changed |
+| A vendored skill (`gsap-*`) | never edit in place — bump via `npx skills update -a opencode -g`; inventory unchanged |
 | A command (`commands/`) | its `description` + [Commands table](#commands-18) + any example walkthrough in the guides that uses it |
 | A plugin (`plugins/`) | its docblock + [Plugins table](#plugins-3) + guide-pro § Plugins |
 | A template (`templates/`) | the [Templates table](#templates-2) + guide-pro § Templates + the scaffolder agent if flow changed |

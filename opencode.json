@@ -11,6 +11,8 @@
 			"npx tsc*": "allow",
 			"npx -y @upstash/context7-mcp*": "allow",
 			"npx -y chrome-devtools-mcp*": "allow",
+			"npx skills add*": "allow",
+			"npx skills update*": "allow",
 			"bun run *": "allow",
 			"bunx *": "allow",
 			"git status*": "allow",

@@ -471,3 +471,7 @@ Keep entries terse and factual — one line each.
   must ship a WPCS-compliant stub ({Prefix}_Header_Nav_Walker extends Walker_Nav_Menu) with
   phpcs:disable WordPress.Files.FileName; the filename is fixed by the boot chain, and the
   sniff fires at line 0 so only phpcs:disable (not :ignore) suppresses it.
+- [2026-08-04] tooling: `npx skills add ... -a opencode -g` (skills CLI 1.5.x) writes to
+  `~\.agents\skills\` despite the docs' global-path table — move the skill dirs into
+  `~/.config/opencode/skills/` after install so they're git-tracked and docs-checkable.
+  Vendored gsap-* skills: never edit in place; refresh via `npx skills update -a opencode -g`.

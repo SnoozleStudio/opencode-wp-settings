@@ -314,6 +314,16 @@ Full format in [docs/skill-authoring.md](skill-authoring.md). The essentials:
 - User-invoked skills (grill-me, to-spec) hang off commands; model-invoked
   disciplines (fix, verify, wp-security-audit) hang off description matching.
 
+### Vendored upstream skills (gsap-*)
+
+Six `gsap-*` skills are copied **unedited** from
+[greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) — official API
+depth for core/timeline/ScrollTrigger/plugins/utils/performance. Refresh with
+`npx skills update -a opencode -g`; never edit them in place (updates would be
+overwritten). Their guidance is generic — house integration rules (Lenis, not
+ScrollSmoother; Tempus ticker; reduced-motion gate; manifest enqueue) live in
+`docs/frontend-stack.md` and win over vendor guidance.
+
 ### Anatomy of a good skill (wp-theme as the reference)
 
 ```markdown

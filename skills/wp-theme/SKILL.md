@@ -7,6 +7,10 @@ description: Architect, scaffold, and extend enterprise-grade WordPress classic 
 
 Classic themes (not block themes) that survive Theme Review. Load
 `docs/wordpress-theme-architecture.md` and `docs/frontend-stack.md` for full references.
+Deep GSAP API details come from the vendored `gsap-*` skills (official
+greensock/gsap-skills) on GSAP-specific requests; their guidance is generic — the
+house integration rules in `docs/frontend-stack.md` (Lenis, Tempus, reduced-motion,
+manifest enqueue) override it.
 
 ## Canonical structure
 
