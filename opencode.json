@@ -1,3 +1,147 @@
 {
-  "$schema": "https://opencode.ai/config.json"
+	"$schema": "https://opencode.ai/config.json",
+	"permission": {
+		"bash": {
+			"*": "ask",
+			"npm run *": "allow",
+			"npm run*": "allow",
+			"npm install*": "allow",
+			"npm info *": "allow",
+			"npx prettier*": "allow",
+			"npx tsc*": "allow",
+			"npx -y @upstash/context7-mcp*": "allow",
+			"npx -y chrome-devtools-mcp*": "allow",
+			"bun run *": "allow",
+			"bunx *": "allow",
+			"git status*": "allow",
+			"git diff*": "allow",
+			"git log*": "allow",
+			"git show*": "allow",
+			"git branch*": "allow",
+			"git blame*": "allow",
+			"git rev-parse*": "allow",
+			"git remote*": "allow",
+			"git stash*": "allow",
+			"git add*": "allow",
+			"git commit*": "allow",
+			"git push*": "allow",
+			"git pull*": "allow",
+			"git checkout *": "allow",
+			"git checkout -- *": "deny",
+			"git restore *": "deny",
+			"git clean *": "deny",
+			"git reset --hard*": "deny",
+			"git branch -D *": "deny",
+			"git stash drop*": "deny",
+			"git stash clear*": "deny",
+			"git push --force*": "deny",
+			"git push -f*": "deny",
+			"composer install*": "allow",
+			"composer dump-autoload*": "allow",
+			"composer validate*": "allow",
+			"composer show*": "allow",
+			"composer require*": "ask",
+			"composer update*": "ask",
+			"vendor/bin/phpcs*": "allow",
+			"vendor/bin/phpcbf*": "allow",
+			"vendor/bin/pint*": "allow",
+			"php -l *": "allow",
+			"wp *": "ask",
+			"gh repo view*": "allow",
+			"gh pr view*": "allow",
+			"gh pr checks*": "allow",
+			"gh issue view*": "allow",
+			"gh run view*": "allow",
+			"gh pr create*": "ask",
+			"gh issue create*": "ask",
+			"node -e *": "deny",
+			"node -p *": "deny",
+			"node --eval*": "deny",
+			"node --print*": "deny",
+			"npm publish*": "ask",
+			"curl * | bash": "deny",
+			"curl * | sh": "deny",
+			"curl * -o *": "deny",
+			"curl * -O*": "deny",
+			"curl * --data*": "deny",
+			"curl * -X POST*": "deny",
+			"curl * -X PUT*": "deny",
+			"curl * -X DELETE*": "deny",
+			"iwr * | iex": "deny",
+			"irm * | iex": "deny",
+			"rm -rf /*": "deny",
+			"rm -rf ~*": "deny",
+			"Remove-Item -Recurse*": "deny",
+			"Remove-Item * -Recurse*": "deny",
+			"rd /s *": "deny",
+			"sudo *": "deny",
+			"cat ~/.ssh/*": "deny",
+			"cat ~/.aws/*": "deny",
+			"cat ~/.gnupg/*": "deny",
+			"cat ~/.npmrc": "deny",
+			"cat ~/.netrc": "deny",
+			"cat ~/.docker/config.json": "deny",
+			"cat ~/.kube/config": "deny",
+			"type ~/.ssh/*": "deny",
+			"type ~/.aws/*": "deny",
+			"type ~/.gnupg/*": "deny",
+			"type ~/.npmrc": "deny",
+			"type ~/.netrc": "deny",
+			"Get-Content ~/.npmrc": "deny",
+			"Get-Content ~/.netrc": "deny",
+			"Get-Content ~/.docker/config.json": "deny",
+			"Get-Content ~/.kube/config": "deny"
+		},
+		"read": {
+			"*": "allow",
+			"~/.ssh/**": "deny",
+			"~/.aws/**": "deny",
+			"~/.gnupg/**": "deny",
+			"~/.npmrc": "deny",
+			"~/.netrc": "deny",
+			"~/.docker/config.json": "deny",
+			"~/.kube/config": "deny"
+		},
+		"edit": {
+			"*": "allow",
+			"~/.ssh/**": "deny",
+			"~/.aws/**": "deny",
+			"~/.gnupg/**": "deny",
+			"~/.npmrc": "deny",
+			"~/.netrc": "deny",
+			"~/.docker/config.json": "deny",
+			"~/.kube/config": "deny"
+		},
+		"webfetch": {
+			"*": "allow"
+		},
+		"skill": {
+			"*": "allow"
+		},
+		"task": {
+			"*": "allow"
+		}
+	},
+	"mcp": {
+		"context7": {
+			"type": "local",
+			"command": [
+				"npx",
+				"-y",
+				"@upstash/context7-mcp"
+			],
+			"enabled": true,
+			"description": "Library and framework documentation lookup, API references, usage examples, and best practices. Use for questions about external libraries, SDKs, HTTP APIs, or how to use specific functions, components, or configuration options. Always consult before implementing with or installing a library."
+		},
+		"chrome-devtools": {
+			"type": "local",
+			"command": [
+				"npx",
+				"-y",
+				"chrome-devtools-mcp@latest"
+			],
+			"enabled": false,
+			"description": "Chrome DevTools control: navigation, DOM inspection, console logs, screenshots, network inspection, and performance traces. Enable per-project when browser verification is needed."
+		}
+	}
 }

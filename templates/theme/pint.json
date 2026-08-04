@@ -1,0 +1,24 @@
+{
+  "preset": "laravel",
+  "rules": {
+    "indentation_type": false,
+    "array_indentation": false,
+    "statement_indentation": false,
+    "spaces_inside_parentheses": false,
+    "no_spaces_around_offset": false,
+    "array_syntax": false,
+    "yoda_style": false,
+    "unary_operator_spaces": false,
+    "phpdoc_no_package": false,
+    "function_declaration": false,
+    "braces_position": false,
+    "binary_operator_spaces": false,
+    "class_definition": false,
+    "new_with_parentheses": false,
+    "trim_array_spaces": false,
+    "blank_line_after_opening_tag": false,
+    "concat_space": {
+      "spacing": "one"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+@import 'tailwindcss';
+
+/*
+ * Tailwind v4 CSS-first config - no tailwind.config.js.
+ * Tokens in @theme generate utilities: --color-mint-500 -> bg-mint-500.
+ */
+
+@theme {
+  --color-ink: #111111;
+  --color-paper: #f5f3ee;
+
+  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'Geist Mono', ui-monospace, monospace;
+}
+
+/* Explicit content sources for PHP templates if auto-detection misses them */
+@source '../**/*.php';

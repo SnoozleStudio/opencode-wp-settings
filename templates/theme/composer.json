@@ -1,0 +1,20 @@
+{
+  "name": "snoozlestudio/{theme_slug}",
+  "description": "Enterprise-grade WordPress classic theme.",
+  "type": "wordpress-theme",
+  "license": "GPL-2.0-or-later",
+  "require": {
+    "php": ">=8.2"
+  },
+  "require-dev": {
+    "laravel/pint": "^1.29",
+    "php-stubs/acf-pro-stubs": "^6.8",
+    "phpcompatibility/php-compatibility": "^9.3",
+    "wp-coding-standards/wpcs": "^3.0"
+  },
+  "config": {
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+/*
+Theme Name: {theme_name}
+Theme URI: https://example.com/{theme_slug}
+Author: Snoozle Studio
+Author URI: https://snoozle.studio
+Description: Enterprise-grade WordPress classic theme. {description}
+Version: 1.0.0
+Requires at least: 6.8
+Tested up to: 6.8
+Requires PHP: 8.2
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+Text Domain: {text_domain}
+Tags: accessibility-ready, custom-menu, custom-logo, featured-images, threaded-comments, translation-ready
+Domain Path: /languages
+*/
+
+/* No styles here - all CSS is built by Vite from src/styles/main.css */

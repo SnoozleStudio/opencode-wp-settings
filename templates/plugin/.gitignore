@@ -1,0 +1,9 @@
+node_modules/
+vendor/
+languages/
+dist/
+*.log
+.DS_Store
+Thumbs.db
+.env
+.env.*

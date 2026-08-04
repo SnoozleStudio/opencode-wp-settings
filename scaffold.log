@@ -1,0 +1,29 @@
+    slug=test-theme prefix=tst_ name=Test Theme text-domain=test-theme
+==> Scaffolding from C:\Users\psnoo\.config\opencode\templates\theme
+    wrote .gitignore
+    wrote .prettierrc
+    wrote composer.json
+    wrote footer.php
+    wrote front-page.php
+    wrote functions.php
+    wrote header.php
+    wrote index.php
+    wrote package.json
+    wrote page.php
+    wrote phpcs.xml
+    wrote pint.json
+    wrote style.css
+    wrote vite.config.mjs
+    wrote .husky\pre-commit
+    wrote configure\acf.php
+    wrote configure\configure.php
+    wrote configure\js-css.php
+    wrote configure\utilities.php
+    wrote src\scripts\main.js
+    wrote src\styles\main.css
+==> Next steps
+  1. cd C:\Users\psnoo\AppData\Local\Temp\opencode\test-theme
+  2. npm install
+  3. composer install
+  4. Edit style.css/readme.txt metadata and ACF field groups
+  5. Run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
