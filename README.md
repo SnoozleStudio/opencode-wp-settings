@@ -22,7 +22,7 @@ commands/             17 slash commands (/fix /build /review /verify /ship /audi
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session context)
 docs/                 8 reference docs loaded on-demand by skills
 templates/            Scaffolding for new theme and plugin projects
-setup.ps1             Validation + project scaffolding (Windows)
+setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
 ```
 
 ## Install
@@ -85,6 +85,41 @@ new ones.
 ```
 
 Then `npm install && composer install` in the project and run the verification chain.
+
+## Scaffolding from a Local site shell
+
+Works with Local 10.x (tested on 10.1.1+6939). Open a site and click **Site Shell**
+(right-click the site → *Site Shell*): the shell starts at the site root,
+`C:\Users\<user>\Local Sites\<site>\app\public` — a WordPress root — using the shell
+from Local's Preferences (PowerShell / Windows Terminal on Windows). Scaffold straight
+into `wp-content/`:
+
+```powershell
+# From the site shell (root auto-detected by walking up for wp-load.php)
+& "$HOME\.config\opencode\setup.ps1" -Theme mytheme -Prefix mt_ -Name "My Theme"
+& "$HOME\.config\opencode\setup.ps1" -Plugin my-plugin -Install
+
+# From any directory, targeting a site by name (default sites dir: $HOME\Local Sites)
+& "$HOME\.config\opencode\setup.ps1" -Site mysite -Theme mytheme -Install
+```
+
+- `-Theme <slug>` / `-Plugin <slug>` scaffold into `wp-content\themes\<slug>` /
+  `wp-content\plugins\<slug>`; the slug becomes the folder name, text domain and
+  prefix base
+- `-Site <name>` resolves `{Local Sites}\<name>\app\public`; `-SitesDir` overrides the
+  sites folder. From the site shell no `-Site` is needed — the script walks up from
+  the current directory until it finds `wp-load.php`
+- `-Install` runs `npm install` + `composer install`. Local's bundled PHP ships with
+  openssl/mbstring disabled in its `php.ini`, so `-Install` copies the ini to a temp
+  file with both extensions enabled and runs composer against it via `PHPRC`
+  (environment restored afterwards; system PHP installs are used untouched)
+- Non-empty target dirs are refused without `-Force` (scaffold merges over existing
+  files, keeps anything extra)
+- If the shell blocks script execution:
+  `powershell -ExecutionPolicy Bypass -File "$HOME\.config\opencode\setup.ps1" -Theme ...`
+- Next: activate in wp-admin (themes: Appearance > Themes; plugins: Plugins); for
+  themes, sync ACF field groups from `acf-json/` on the ACF → Sync page, then
+  `npm run build`
 
 ## License
 

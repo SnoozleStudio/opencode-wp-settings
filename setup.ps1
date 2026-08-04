@@ -7,21 +7,47 @@
 	This repo IS the global OpenCode config (~/.config/opencode), so there is
 	nothing to install. This script:
 
-	  * Default (-Validate):   checks skill/agent/command frontmatter and structure.
-	  * -NewTheme:             scaffolds a new classic theme project from templates/theme.
-	  * -NewPlugin:            scaffolds a new plugin project from templates/plugin.
+	  * Default (-Validate):     checks skill/agent/command frontmatter and structure.
+	  * -NewTheme/-NewPlugin:    scaffolds into an explicit target directory.
+	  * -Theme/-Plugin:          scaffolds into wp-content\themes|plugins\{slug} of the
+	                             current WordPress root (Local site shell) or of -Site.
 
 .PARAMETER Validate
 	Run structural validation only (default).
 
 .PARAMETER NewTheme
-	Target directory for a new theme project.
+	Target directory for a new theme project (explicit path).
 
 .PARAMETER NewPlugin
-	Target directory for a new plugin project.
+	Target directory for a new plugin project (explicit path).
+
+.PARAMETER Theme
+	Slug for a theme scaffolded into wp-content\themes\{slug}. The WordPress root is
+	resolved by walking up from the current directory (Local's site shell starts in
+	<site>\app\public, a WordPress root) or from -Site.
+
+.PARAMETER Plugin
+	Slug for a plugin scaffolded into wp-content\plugins\{slug}. Same root resolution.
+
+.PARAMETER Site
+	Local site name; root resolves to {SitesDir}\{site}\app\public. Not needed when the
+	current directory is already inside a WordPress root.
+
+.PARAMETER SitesDir
+	Local sites directory (default: $HOME\Local Sites). Only used with -Site.
+
+.PARAMETER Install
+	After scaffolding, run npm install and composer install in the new project. When
+	the PHP on PATH is Local's bundled build (lightning-services), a temp php.ini with
+	openssl + mbstring enabled is used via PHPRC - Local ships both disabled.
+
+.PARAMETER Force
+	Allow scaffolding into an existing non-empty target directory (files are merged;
+	existing files are overwritten, extra files are kept).
 
 .PARAMETER Slug
-	Project slug (folder name + text domain, dashes allowed). Default: folder name.
+	Project slug (folder name + text domain, dashes allowed). Default: target folder
+	name (for -Theme/-Plugin: the slug itself).
 
 .PARAMETER Prefix
 	Function/class prefix (e.g. "ss_"). Default: first 4 letters of slug + "_".
@@ -36,12 +62,24 @@
 	.\setup.ps1 -Validate
 	.\setup.ps1 -NewTheme ..\wp-content\themes\ss -Slug ss -Prefix ss_ -Name "Snoozle Studio"
 	.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myp_ -Name "My Plugin"
+	# From Local's site shell (cwd = C:\Users\<user>\Local Sites\<site>\app\public):
+	.\setup.ps1 -Theme mytheme -Prefix mt_ -Name "My Theme"
+	.\setup.ps1 -Plugin my-plugin -Install
+	# From anywhere, targeting a site by name:
+	.\setup.ps1 -Site mysite -Theme mytheme -Install
+	.\setup.ps1 -Theme demo -SitesDir D:\Local\Sites -DryRun
 #>
 
 param(
 	[switch]$Validate,
 	[string]$NewTheme,
 	[string]$NewPlugin,
+	[string]$Theme,
+	[string]$Plugin,
+	[string]$Site,
+	[string]$SitesDir,
+	[switch]$Install,
+	[switch]$Force,
 	[string]$Slug = "",
 	[string]$Prefix = "",
 	[string]$Name = "",
@@ -120,7 +158,7 @@ function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Toke
 }
 
 function Resolve-Args([string]$Target, [string]$Kind) {
-	if (-not $Target) { throw "Missing target directory (use -NewTheme or -NewPlugin)." }
+	if (-not $Target) { throw "Missing target directory (use -NewTheme, -NewPlugin, -Theme or -Plugin)." }
 	$script:Target = $Target
 	if (-not $Slug) { $script:Slug = Split-Path $Target -Leaf }
 	if (-not $Prefix) {
@@ -144,27 +182,143 @@ function Resolve-Args([string]$Target, [string]$Kind) {
 	Write-Ok "slug=$Slug prefix=$Prefix name=$Name text-domain=$Slug"
 }
 
-if ($Validate -or (-not $NewTheme -and -not $NewPlugin)) {
+function Resolve-WpRoot {
+	# Walk up from the current directory until wp-load.php is found (WordPress root).
+	$dir = Get-Item (Get-Location).Path
+	while ($dir) {
+		if (Test-Path (Join-Path $dir.FullName "wp-load.php")) { return $dir.FullName }
+		$dir = $dir.Parent
+	}
+	return $null
+}
+
+function Resolve-LocalSiteRoot([string]$SiteName) {
+	$sitesRoot = if ($SitesDir) { $SitesDir } else { Join-Path $HOME "Local Sites" }
+	if (-not (Test-Path -LiteralPath $sitesRoot)) {
+		throw "Local sites directory not found: $sitesRoot (pass -SitesDir to override)."
+	}
+	$siteDir = Join-Path $sitesRoot $SiteName
+	if (-not (Test-Path -LiteralPath $siteDir)) {
+		$available = ((Get-ChildItem -LiteralPath $sitesRoot -Directory -ErrorAction SilentlyContinue).Name) -join ", "
+		throw "Local site '$SiteName' not found in $sitesRoot. Available sites: $available"
+	}
+	$public = Join-Path $siteDir "app\public"
+	if (-not (Test-Path (Join-Path $public "wp-load.php"))) {
+		throw "Site '$SiteName' root not found at $public (expected app\public containing wp-load.php)."
+	}
+	Write-Ok "Local site '$SiteName' root: $public"
+	return $public
+}
+
+function Resolve-SiteRoot {
+	if ($Site) {
+		return Resolve-LocalSiteRoot $Site
+	}
+	$root = Resolve-WpRoot
+	if (-not $root) {
+		throw "Not inside a WordPress root and no -Site given. Run from Local's site shell (app\public) or pass -Site <name>."
+	}
+	Write-Ok "Detected WordPress root: $root"
+	return $root
+}
+
+function Assert-EmptyTarget([string]$Target) {
+	if (-not (Test-Path -LiteralPath $Target)) { return }
+	$existing = Get-ChildItem -LiteralPath $Target -Force -ErrorAction SilentlyContinue
+	if (-not $existing) { return }
+	if (-not $Force) {
+		throw "Target directory already contains files: $Target (pass -Force to scaffold over it - existing files are overwritten, extra files are kept)."
+	}
+	Write-Warn "Target exists with files; -Force given, scaffolding over it."
+}
+
+function Invoke-ProjectInstall([string]$Dir) {
+	Write-Step "Installing dependencies in $Dir"
+	Push-Location $Dir
+	try {
+		if (Get-Command npm -ErrorAction SilentlyContinue) {
+			Write-Host "    npm install --no-fund --no-audit" -ForegroundColor DarkGray
+			npm install --no-fund --no-audit
+			if ($LASTEXITCODE -ne 0) { throw "npm install failed (exit code $LASTEXITCODE)." }
+		} else {
+			Write-Warn "npm not found on PATH - install Node.js, then run 'cd $Dir && npm install'"
+		}
+	} finally { Pop-Location }
+
+	if (-not (Get-Command composer -ErrorAction SilentlyContinue)) {
+		Write-Warn "composer not found on PATH - run 'cd $Dir && composer install' manually"
+		return
+	}
+	$phpExe = Get-Command php -ErrorAction SilentlyContinue
+	$envBackup = $env:PHPRC
+	$tempIni = $null
+	try {
+		if ($phpExe -and $phpExe.Source -match "lightning-services") {
+			Write-Ok "Local's bundled PHP detected - enabling openssl/mbstring via temp php.ini"
+			$phpDir = Split-Path $phpExe.Source -Parent
+			$origIni = Join-Path $phpDir "php.ini"
+			$workaround = "`r`n; setup.ps1 workaround: Local's bundled PHP ships with openssl/mbstring disabled`r`nextension=openssl`r`nextension=mbstring`r`n"
+			$content = if (Test-Path -LiteralPath $origIni) { (Get-Content -LiteralPath $origIni -Raw) + $workaround } else { $workaround }
+			$tempIni = Join-Path $env:TEMP ("local-php-" + [guid]::NewGuid().ToString("N") + ".ini")
+			[System.IO.File]::WriteAllText($tempIni, $content, (New-Object System.Text.UTF8Encoding($false)))
+			$env:PHPRC = $tempIni
+		} else {
+			Write-Ok "PHP on PATH is not Local's bundled build - plain composer install"
+		}
+		Push-Location $Dir
+		try {
+			Write-Host "    composer install" -ForegroundColor DarkGray
+			composer install
+			if ($LASTEXITCODE -ne 0) { throw "composer install failed (exit code $LASTEXITCODE)." }
+		} finally { Pop-Location }
+	} finally {
+		if ($null -eq $envBackup) { Remove-Item Env:PHPRC -ErrorAction SilentlyContinue }
+		else { $env:PHPRC = $envBackup }
+		if ($tempIni) { Remove-Item -LiteralPath $tempIni -Force -ErrorAction SilentlyContinue }
+	}
+}
+
+if ($Validate -or (-not $NewTheme -and -not $NewPlugin -and -not $Theme -and -not $Plugin)) {
 	Invoke-Validate
 	exit 0
 }
 
-if ($NewTheme) {
-	Resolve-Args $NewTheme "theme"
-	New-Item -ItemType Directory -Path $NewTheme -Force | Out-Null
-	Expand-Template "$RepoRoot\templates\theme" (Resolve-Path $NewTheme) $Tokens
+$Kind = ""
+$TargetPath = ""
+if ($NewTheme) { $TargetPath = $NewTheme; $Kind = "theme" }
+elseif ($NewPlugin) { $TargetPath = $NewPlugin; $Kind = "plugin" }
+elseif ($Theme) {
+	if (-not $Slug) { $Slug = $Theme }
+	$TargetPath = Join-Path (Resolve-SiteRoot) "wp-content\themes\$Theme"
+	$Kind = "theme"
 }
-if ($NewPlugin) {
-	Resolve-Args $NewPlugin "plugin"
-	New-Item -ItemType Directory -Path $NewPlugin -Force | Out-Null
-	Expand-Template "$RepoRoot\templates\plugin" (Resolve-Path $NewPlugin) $Tokens
+elseif ($Plugin) {
+	if (-not $Slug) { $Slug = $Plugin }
+	$TargetPath = Join-Path (Resolve-SiteRoot) "wp-content\plugins\$Plugin"
+	$Kind = "plugin"
+}
+
+Resolve-Args $TargetPath $Kind
+Assert-EmptyTarget $TargetPath
+New-Item -ItemType Directory -Path $TargetPath -Force | Out-Null
+$ResolvedTarget = (Resolve-Path -LiteralPath $TargetPath).Path
+Expand-Template "$RepoRoot\templates\$Kind" $ResolvedTarget $Tokens
+
+if ($Install -and -not $DryRun) {
+	Invoke-ProjectInstall $ResolvedTarget
 }
 
 if (-not $DryRun) {
 	Write-Step "Next steps"
-	Write-Host "  1. cd $Target"
-	Write-Host "  2. npm install"
-	Write-Host "  3. composer install"
-	Write-Host "  4. Edit style.css/readme.txt metadata and ACF field groups"
-	Write-Host "  5. Run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M"
+	Write-Host "  1. cd $ResolvedTarget"
+	if (-not $Install) {
+		Write-Host "  2. npm install"
+		Write-Host "  3. composer install"
+		Write-Host "  4. Edit style.css/readme.txt metadata and ACF field groups"
+		Write-Host "  5. Activate in wp-admin, then run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M"
+	} else {
+		Write-Host "  2. Activate in wp-admin (themes: Appearance > Themes; plugins: Plugins)"
+		Write-Host "     ACF field groups load from acf-json/ on the ACF Sync page"
+		Write-Host "  3. Run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M"
+	}
 }
