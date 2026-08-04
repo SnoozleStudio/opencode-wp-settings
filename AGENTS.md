@@ -420,3 +420,11 @@ Keep entries terse and factual — one line each.
   and hashtable keys are case-insensitive ({PREFIX} vs {Prefix} collide — use a
   Dictionary[string,string]); piping a native command to Select-Object -First kills the
   upstream process early.
+- [2026-08-04] tooling: Local's Windows "Site Shell" opens cmd.exe by default — `&` call
+  syntax dies with "& was unexpected at this time" and `$HOME` isn't expanded. Shell-
+  agnostic entry point: a .cmd wrapper forwarding %* to `powershell -NoProfile
+  -ExecutionPolicy Bypass -File`.
+- [2026-08-04] tooling: Local bundles PHP under two roots — %APPDATA%\Local\lightning-
+  services\... (site-shell PATH) and Program Files (x86)\Local\resources\extraResources\
+  lightning-services\... — detect Local's PHP by matching "lightning-services" anywhere
+  in the path, never a fixed prefix.

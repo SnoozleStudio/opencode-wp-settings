@@ -23,6 +23,7 @@ plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session c
 docs/                 8 reference docs loaded on-demand by skills
 templates/            Scaffolding for new theme and plugin projects
 setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
+scaffold.cmd          Shell-agnostic wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
 ```
 
 ## Install
@@ -90,16 +91,32 @@ Then `npm install && composer install` in the project and run the verification c
 
 Works with Local 10.x (tested on 10.1.1+6939). Open a site and click **Site Shell**
 (right-click the site → *Site Shell*): the shell starts at the site root,
-`C:\Users\<user>\Local Sites\<site>\app\public` — a WordPress root — using the shell
-from Local's Preferences (PowerShell / Windows Terminal on Windows). Scaffold straight
-into `wp-content/`:
+`C:\Users\<user>\Local Sites\<site>\app\public` — a WordPress root. On Windows Local's
+site shell opens **Command Prompt by default** (PowerShell/Windows Terminal only when
+set in Local > Preferences), so the entry point is the cmd-native `scaffold.cmd`
+wrapper — it forwards every argument to `setup.ps1` and works from cmd, Git Bash and
+PowerShell alike:
+
+```cmd
+:: From the site shell (root auto-detected by walking up for wp-load.php)
+"%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mt_ -Name "My Theme"
+"%USERPROFILE%\.config\opencode\scaffold.cmd" -Plugin my-plugin -Install
+```
+
+Optionally register the config dir on your user PATH once — then it's a bare
+`scaffold -Theme ...` from any shell. Prefer the env-var editor over `setx PATH
+"%USERPROFILE%\.config\opencode;%PATH%"` — setx truncates PATH beyond 1024 chars.
+
+Prefer PowerShell? Switch Local > Preferences → Shell to PowerShell/Windows Terminal
+and use the direct form instead:
 
 ```powershell
-# From the site shell (root auto-detected by walking up for wp-load.php)
 & "$HOME\.config\opencode\setup.ps1" -Theme mytheme -Prefix mt_ -Name "My Theme"
-& "$HOME\.config\opencode\setup.ps1" -Plugin my-plugin -Install
+```
 
-# From any directory, targeting a site by name (default sites dir: $HOME\Local Sites)
+`setup.ps1` also targets a site from any directory (no site shell needed):
+
+```powershell
 & "$HOME\.config\opencode\setup.ps1" -Site mysite -Theme mytheme -Install
 ```
 
@@ -115,11 +132,10 @@ into `wp-content/`:
   (environment restored afterwards; system PHP installs are used untouched)
 - Non-empty target dirs are refused without `-Force` (scaffold merges over existing
   files, keeps anything extra)
-- If the shell blocks script execution:
-  `powershell -ExecutionPolicy Bypass -File "$HOME\.config\opencode\setup.ps1" -Theme ...`
-- Next: activate in wp-admin (themes: Appearance > Themes; plugins: Plugins); for
-  themes, sync ACF field groups from `acf-json/` on the ACF → Sync page, then
-  `npm run build`
+- The site shell puts WP-CLI on PATH, so activation is one command:
+  `wp theme activate mytheme` / `wp plugin activate my-plugin` (or wp-admin:
+  Appearance > Themes / Plugins). For themes, sync ACF field groups from `acf-json/`
+  on the ACF → Sync page, then `npm run build`
 
 ## License
 

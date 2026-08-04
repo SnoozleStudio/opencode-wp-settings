@@ -62,9 +62,11 @@
 	.\setup.ps1 -Validate
 	.\setup.ps1 -NewTheme ..\wp-content\themes\ss -Slug ss -Prefix ss_ -Name "Snoozle Studio"
 	.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myp_ -Name "My Plugin"
-	# From Local's site shell (cwd = C:\Users\<user>\Local Sites\<site>\app\public):
+	# From Local's site shell (cmd.exe by default on Windows - use scaffold.cmd):
+	scaffold.cmd -Theme mytheme -Prefix mt_ -Name "My Theme"
+	scaffold.cmd -Plugin my-plugin -Install
+	# From Local's site shell configured to PowerShell:
 	.\setup.ps1 -Theme mytheme -Prefix mt_ -Name "My Theme"
-	.\setup.ps1 -Plugin my-plugin -Install
 	# From anywhere, targeting a site by name:
 	.\setup.ps1 -Site mysite -Theme mytheme -Install
 	.\setup.ps1 -Theme demo -SitesDir D:\Local\Sites -DryRun
