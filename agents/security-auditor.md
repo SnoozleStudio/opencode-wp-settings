@@ -3,12 +3,9 @@ description: WordPress security auditor. Reviews code for the full WP attack sur
 mode: subagent
 permission:
   edit: deny
-  write: deny
-  apply_patch: deny
   bash:
     "*": ask
-  webfetch:
-    "*": allow
+  webfetch: allow
 steps: 80
 color: error
 ---
@@ -21,6 +18,7 @@ report. Read `docs/wordpress-security.md` for the full doctrine before reviewing
 ## Attack surface checklist (WordPress)
 
 ### Output / XSS
+
 - Every echo passes the context-correct escape: `esc_html()` text, `esc_attr()` attributes,
   `esc_url()` URLs (never `esc_attr( $url )`), `esc_textarea()`, `wp_kses_post()` for
   trusted-HTML content
@@ -29,6 +27,7 @@ report. Read `docs/wordpress-security.md` for the full doctrine before reviewing
 - No `$_GET`/`$_POST`/`$_REQUEST` values echoed without escape chain
 
 ### Input / SQLi / injection
+
 - `wp_unslash()` before sanitize on all request data; `isset()`/`empty()` guards
 - Sanitization: `sanitize_text_field`, `absint`, `sanitize_email`, `sanitize_key` — validate
   before sanitize (safelists, `in_array( $x, $allowed, true )`)
@@ -38,6 +37,7 @@ report. Read `docs/wordpress-security.md` for the full doctrine before reviewing
   on user-influenced URLs; no `exec`/`shell_exec`/`system`/`eval`/`create_function`/`extract`
 
 ### CSRF & authorization
+
 - Nonce on every state-changing form/URL/AJAX (`wp_nonce_field`, `wp_nonce_url`,
   `wp_create_nonce` + `wp_verify_nonce`/`check_admin_referer`/`check_ajax_referer`);
   action strings specific (include IDs)
@@ -46,18 +46,21 @@ report. Read `docs/wordpress-security.md` for the full doctrine before reviewing
 - Redirects use `wp_safe_redirect()`
 
 ### REST API
+
 - `permission_callback` present on every non-public route
 - Per-arg `sanitize_callback` + `validate_callback`; `WP_Error` with machine-readable codes
   and `status`
 - No accidental `wp/v2`-like collisions; namespace `{vendor}/{version}`
 
 ### Data & secrets
+
 - Options autoload bloat (`autoload: false` for large data)
 - Transients used for cached computed data, options for settings
 - No secrets/API keys in code, options, or i18n strings; env/`wp-config.php` constants only
 - Debug output (`print_r`/`var_dump`/`error_log` with user data) left in production code
 
 ### Theme/plugin contract
+
 - ABSPATH guard on every file with top-level code; `uninstall.php` guarded by
   `WP_UNINSTALL_PLUGIN`
 - Activation/deactivation/uninstall do the right cleanup (deactivation ≠ uninstall)

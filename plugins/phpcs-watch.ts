@@ -1,11 +1,41 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 const isWin32 = (): boolean => process.platform === "win32";
-const wrap = (cmd: string): string => (isWin32() ? `cmd /c "${cmd}"` : cmd);
+const execFileAsync = promisify(execFile);
 
 const MAX_REPORT_LINES = 24;
+
+/**
+ * Run a command in the host shell and capture output. Uses child_process
+ * instead of Bun's shell so behavior is identical across runtimes: output is
+ * buffered (never echoed), the cwd is explicit, and non-zero exits are
+ * returned instead of thrown. On Windows the command runs through cmd.exe,
+ * which resolves .cmd shims (vendor\bin\phpcs.bat).
+ */
+const run = async (
+	cmd: string,
+	cwd: string
+): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
+	try {
+		const { stdout, stderr } = await execFileAsync(
+			isWin32() ? "cmd.exe" : "/bin/sh",
+			[isWin32() ? "/c" : "-c", cmd],
+			{ cwd, encoding: "utf8" }
+		);
+		return { stdout, stderr, exitCode: 0 };
+	} catch (error) {
+		const err = error as { stdout?: string; stderr?: string; code?: number | string };
+		return {
+			stdout: typeof err.stdout === "string" ? err.stdout : "",
+			stderr: typeof err.stderr === "string" ? err.stderr : "",
+			exitCode: typeof err.code === "number" ? err.code : 1,
+		};
+	}
+};
 
 /**
  * phpcs-watch: after every edit to a `.php` file in a gated project, run a
@@ -15,7 +45,7 @@ const MAX_REPORT_LINES = 24;
  * Results land in `output.metadata.phpcs`; the tool title is prefixed with a
  * compact status so violations are visible at a glance.
  */
-export const PhpcsWatch = async ({ directory, $ }: Parameters<Plugin>[0]) => {
+export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 	const phpcsBin = (): string | null => {
 		const candidates = isWin32()
 			? ["vendor\\bin\\phpcs.bat", "vendor\\bin\\phpcs"]
@@ -32,11 +62,12 @@ export const PhpcsWatch = async ({ directory, $ }: Parameters<Plugin>[0]) => {
 	const lintFile = async (filePath: string): Promise<{ errors: number; report: string }> => {
 		const bin = phpcsBin();
 		if (!bin) return { errors: 0, report: "" };
-		const out = await $.cwd(directory)
-			.quiet()
-			.nothrow()`${wrap(`${bin} --standard=phpcs.xml -d memory_limit=1024M ${filePath}`)}`;
+		const out = await run(
+			`${bin} --standard=phpcs.xml -d memory_limit=1024M ${filePath}`,
+			directory
+		);
 		if (out.exitCode === 0) return { errors: 0, report: "" };
-		const report = out.stdout.toString();
+		const report = out.stdout;
 		const errors = (report.match(/^\s*(\d+)\s*ERRORS?\b/im) ??
 			report.match(/ERRORS?\s+(\d+)/im) ??
 			[])[1] ?? "1";

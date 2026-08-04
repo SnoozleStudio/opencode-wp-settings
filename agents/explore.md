@@ -3,12 +3,9 @@ description: Read-only codebase explorer. Use for understanding code, tracing ca
 mode: subagent
 permission:
   edit: deny
-  write: deny
-  apply_patch: deny
   bash:
     "*": allow
-  webfetch:
-    "*": allow
+  webfetch: allow
 steps: 80
 color: info
 ---
