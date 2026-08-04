@@ -84,3 +84,13 @@ namespace container, so PHPCS loads every sniff in it — including the mutually
 exclusive `Universal.PHP.RequireExitDieParentheses` / `DisallowExitDieParentheses`
 pair. Add individual Universal sniffs only when needed. `phpcbf` auto-fixes most
 formatting; `WordPress.Utils.I18nTextDomainFixer` is opt-in.
+
+## References
+
+- [WordPress Coding Standards — PHP](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/) — the normative source
+- [WPCS on GitHub](https://github.com/WordPress/WordPress-Coding-Standards) — sniff list and phpcs.xml reference
+- [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer) — the lint engine
+- [PHPCompatibility](https://github.com/PHPCompatibility/PHPCompatibility) — cross-version sniffing (`testVersion`)
+- [Laravel Pint](https://laravel.com/docs/pint) — formatter; phpcs remains the style authority (see AGENTS.md learnings)
+- [PHP manual](https://www.php.net/manual/en/) — language reference
+- Internal: [plugin architecture](wordpress-plugin-architecture.md) · [security](wordpress-security.md) · [theme architecture](wordpress-theme-architecture.md)

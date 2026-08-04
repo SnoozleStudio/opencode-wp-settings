@@ -54,3 +54,12 @@ menus; contrast 4.5:1; 200% zoom usability.
 - When available: `chrome-devtools` MCP accessibility snapshot; Lighthouse a11y audit
   (never fake numbers — only report what you ran)
 - Keyboard walk: tab through the page, operate every interactive element
+
+## References
+
+- [WCAG 2.2 — W3C Recommendation](https://www.w3.org/TR/WCAG22/) — the normative spec; this repo targets Level AA
+- [WAI-ARIA 1.2](https://www.w3.org/TR/wai-aria-1.2/) — the ARIA specification
+- [W3C Web Accessibility Tutorials](https://www.w3.org/WAI/tutorials/) — practical how-to guidance
+- [WordPress Theme Handbook — Accessibility](https://developer.wordpress.org/themes/accessibility/) — Theme Review "accessibility-ready" minimums
+- [WordPress Accessibility team](https://make.wordpress.org/accessibility/) — community testing and standards
+- Internal: [WordPress theme minimums](wordpress-theme-architecture.md) · [front-end stack](frontend-stack.md) · [Level 1 guide](guide-beginners.md)

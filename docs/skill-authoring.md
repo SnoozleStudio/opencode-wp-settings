@@ -44,3 +44,11 @@ the reusable discipline; commands wire them; agents execute them.
 - Every skill that reviews uses file:line findings with severity
 - Update `README.md` skill index when adding/removing skills
 - Keep frontmatter descriptions fresh — they're the routing table
+
+## References
+
+- [OpenCode — Skills](https://opencode.ai/docs/skills) — the SKILL.md format and how skills load
+- [mattpocock/skills](https://github.com/mattpocock/skills) — the writing discipline this repo adapts
+- [cc-settings](https://github.com/darkroomengineering/cc-settings) — the config lineage this repo ports
+- [Level 2 Guide](guide-pro.md) — skill authoring in context, with the wp-theme anatomy walkthrough
+- Internal: [Documentation hub](README.md) — the skill inventory and the sync contract

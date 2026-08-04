@@ -96,3 +96,13 @@ XSS via escaping matrix / SQLi via prepare / CSRF via nonces / privilege escalat
 caps / REST exposure / upload safety / options autoload bloat / secrets in git history /
 debug output left in / `esc_attr( $url )` pattern / `echo $_GET` chains /
 `update_option` per request.
+
+## References
+
+- [Common APIs Handbook — Security](https://developer.wordpress.org/apis/handbook/security/) — the authoritative WP security doctrine
+- [Validating Data](https://developer.wordpress.org/apis/handbook/security/data-validation/) — validate before sanitize
+- [Sanitizing Data](https://developer.wordpress.org/apis/handbook/security/sanitizing/) — the sanitization functions
+- [Escaping Data](https://developer.wordpress.org/apis/handbook/security/escaping/) — the escaping matrix in full
+- [Nonces](https://developer.wordpress.org/apis/handbook/security/nonces/) — CSRF protection
+- [OWASP Top Ten](https://owasp.org/www-project-top-ten/) — the broader threat model
+- Internal: [php standards](wordpress-php-standards.md) · [plugin architecture](wordpress-plugin-architecture.md) · [theme architecture](wordpress-theme-architecture.md)

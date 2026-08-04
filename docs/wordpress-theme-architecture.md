@@ -86,3 +86,11 @@ npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
 ```
+
+## References
+
+- [WordPress Theme Handbook](https://developer.wordpress.org/themes/) — the theme contract
+- [Template Hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/) — first-match-wins resolution
+- [Theme Review Guidelines](https://developer.wordpress.org/themes/release/theme-review-guidelines/) — what a theme must survive
+- [Theme Check](https://wordpress.org/plugins/theme-check/) — automated theme-review plugin
+- Internal: [php standards](wordpress-php-standards.md) · [front-end stack](frontend-stack.md) · [accessibility](accessibility.md)

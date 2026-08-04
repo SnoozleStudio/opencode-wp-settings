@@ -8,23 +8,50 @@ no vibe coding, real production code.
 **This repo IS your global OpenCode config.** It lives at `~/.config/opencode/` and is
 loaded automatically in every project. Updates = `git pull`.
 
+> **Documentation** — start here, then go deeper:
+>
+> - [Level 1 Guide — AI-driven workflows with example prompts](docs/guide-beginners.md) — for beginners
+> - [Level 2 Guide — internals & extension](docs/guide-pro.md) — for developers
+> - [Documentation Hub — every component indexed](docs/README.md)
+>
+> **Every change to this repo must stay synced with the documentation** — that's a
+> binding contract, see [AGENTS.md](AGENTS.md) and the [hub](docs/README.md#documentation-contract).
+
+---
+
 ## What's inside
 
 ```
 AGENTS.md             Portable coding standards (guardrails, WP + front-end stack, git)
 opencode.json         Global config: permission allow/ask/deny lists, MCP servers
+tui.json              TUI plugins (subagent statusline)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
 skills/               20 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
                       review, refactor, tdd, diagnosing-bugs, grill-me, to-spec, ...)
-commands/             17 slash commands (/fix /build /review /verify /ship /audit
-                      /plugin /theme /section /phpcs /check /grill /spec ...)
-plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session context)
-docs/                 8 reference docs loaded on-demand by skills
+commands/             18 slash commands (/fix /build /review /verify /ship /audit
+                      /docs-check /plugin /theme /section /phpcs /check /grill ...)
+plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
+docs/                 Documentation hub + reference docs + 2 guides
 templates/            Scaffolding for new theme and plugin projects
 setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
 scaffold.cmd          Shell-agnostic wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
 ```
+
+## How it works
+
+```
+You type:  "/fix the mobile menu"
+     │
+     ▼
+commands/fix.md ──► fix skill ──► explore (maps) → implementer (edits) → verification chain
+     │
+     └─ plugins watch the pipeline: phpcs-watch lints every PHP edit,
+        proof-of-work gates git push/commit on a green chain
+```
+
+You describe the work in plain English; commands, skills, and agents handle the
+discipline. The full wiring lives in the [Documentation Hub](docs/README.md#dependency-map).
 
 ## Install
 
@@ -62,8 +89,12 @@ over the global one.
 | `ship it` | `/ship` — full proof-of-work gate, then commit |
 | `audit the codebase` | `/audit` — maintainability + security + docs drift |
 | `check this is correct` | `/verify` — adversarial finder/adversary/referee pass |
+| `is the docs synced?` | `/docs-check` — inventory vs filesystem drift check |
 | `security review` | security-auditor agent — full WP attack surface |
 | `done for today` | `/handoff` — one-page session transfer |
+
+All 18 commands, with the skill/agent each invokes, are indexed in the
+[Documentation Hub](docs/README.md#commands-18).
 
 ## Skills index
 
@@ -74,8 +105,8 @@ over the global one.
 - **Productivity**: `grill-me`, `grill-with-docs`, `to-spec`, `to-tickets`, `handoff`,
   `share-learning`
 
-Skills auto-match from their descriptions; load `docs/skill-authoring.md` before adding
-new ones.
+Skills auto-match from their descriptions; load [docs/skill-authoring.md](docs/skill-authoring.md)
+before adding new ones.
 
 ## Scaffolding new projects
 
@@ -136,6 +167,19 @@ and use the direct form instead:
   `wp theme activate mytheme` / `wp plugin activate my-plugin` (or wp-admin:
   Appearance > Themes / Plugins). For themes, sync ACF field groups from `acf-json/`
   on the ACF → Sync page, then `npm run build`
+
+## Reference docs
+
+| Doc | Read it when |
+|---|---|
+| [wordpress-php-standards.md](docs/wordpress-php-standards.md) | writing or reviewing PHP |
+| [wordpress-security.md](docs/wordpress-security.md) | anything touching input, output, auth |
+| [wordpress-plugin-architecture.md](docs/wordpress-plugin-architecture.md) | building plugins |
+| [wordpress-theme-architecture.md](docs/wordpress-theme-architecture.md) | building themes |
+| [frontend-stack.md](docs/frontend-stack.md) | Vite/Tailwind/GSAP/Lenis/Tempus/Three |
+| [accessibility.md](docs/accessibility.md) | WCAG 2.2 AA |
+| [performance.md](docs/performance.md) | page speed, web vitals |
+| [skill-authoring.md](docs/skill-authoring.md) | writing new skills |
 
 ## License
 

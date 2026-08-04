@@ -344,6 +344,38 @@ No AI fingerprints in git history, PRs, or descriptions. Ever.
 
 ---
 
+## Documentation Contract (This Repo)
+
+**Every change to THIS repo (agents/, skills/, commands/, plugins/, templates/,
+opencode.json, tui.json, setup.ps1, scaffold.cmd) must update the documentation in the
+same change.** A change without its doc sync is incomplete — do not report it done.
+
+Documentation lives in: `README.md` (front door), `docs/README.md` (hub + inventory),
+`docs/guide-beginners.md` (Level 1), `docs/guide-pro.md` (Level 2), and the reference
+docs in `docs/`. The full contract with per-component targets: `docs/README.md`
+"Documentation Contract".
+
+Mandatory sync targets (summary):
+
+| Changed | Also update |
+|---|---|
+| agent / skill | its `description` frontmatter (the routing table) + hub inventory row |
+| command | its `description` + hub inventory row + guide examples that use it |
+| plugin | its docblock + hub inventory row + guide-pro § Plugins |
+| template | hub inventory row + guide-pro § Templates + scaffolder agent if flow changed |
+| setup.ps1 / scaffold.cmd | hub scripts table + README scaffolding section + guide-pro § Scaffolding |
+| opencode.json / tui.json | README "What's inside" + guide-pro § Permissions/MCP |
+| anything user-facing | Level 1 guide examples (they must not lie) |
+
+**New components are not done until listed in**: the hub inventory, README "What's
+inside" (and skills/commands indexes), and a guide if a human invokes it.
+
+**Verification**: run `/docs-check` (inventory vs filesystem drift) or `/audit` pass 3
+before committing documentation-affecting changes to this repo. Drift is a finding,
+not a nit. `setup.ps1 -Validate` additionally enforces frontmatter/name rules.
+
+---
+
 ## External Libraries
 
 **Search before building** — does WP core, an installed dependency, or a one-liner cover
@@ -428,3 +460,14 @@ Keep entries terse and factual — one line each.
   services\... (site-shell PATH) and Program Files (x86)\Local\resources\extraResources\
   lightning-services\... — detect Local's PHP by matching "lightning-services" anywhere
   in the path, never a fixed prefix.
+- [2026-08-04] tooling: templates/theme package.json must call `php vendor/bin/pint` — a
+  bare `vendor/bin/pint` (forward slash) fails under npm scripts on Windows cmd, breaking
+  format:all:check and the pre-commit gate.
+- [2026-08-04] tooling: templates/theme pint.json must disable phpdoc_align +
+  no_blank_lines_after_phpdoc, and docblocks must use single-space @param with exactly one
+  blank line after the file comment — the template's aligned style failed its own phpcs
+  (Squiz.Commenting.FileComment.SpacingAfterComment).
+- [2026-08-04] wordpress: functions.php requires configure/nav-walker.php — the template
+  must ship a WPCS-compliant stub ({Prefix}_Header_Nav_Walker extends Walker_Nav_Menu) with
+  phpcs:disable WordPress.Files.FileName; the filename is fixed by the boot chain, and the
+  sniff fires at line 0 so only phpcs:disable (not :ignore) suppresses it.

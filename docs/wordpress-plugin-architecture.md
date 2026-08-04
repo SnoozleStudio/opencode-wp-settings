@@ -98,3 +98,12 @@ npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
 ```
+
+## References
+
+- [WordPress Plugin Handbook](https://developer.wordpress.org/plugins/) — the plugin contract: header, lifecycle, admin, security
+- [WordPress Coding Standards — PHP](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/) — PHP rules
+- [REST API Handbook](https://developer.wordpress.org/rest-api/) — route registration, per-arg callbacks, `WP_Error`
+- [WP-CLI](https://wp-cli.org) — install and activation automation
+- [Composer](https://getcomposer.org) — dev tooling (WPCS, Pint)
+- Internal: [php standards](wordpress-php-standards.md) · [security](wordpress-security.md) · [performance](performance.md)

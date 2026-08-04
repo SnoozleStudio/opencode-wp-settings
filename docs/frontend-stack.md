@@ -127,3 +127,15 @@ export function initComponent() {
 
 Registered in `main.js`: init on DOMContentLoaded, cleanups collected; IntersectionObserver
 for lazy/heavy inits; `navigator.hardwareConcurrency <= 4` frame-skipping for heavy loops.
+
+## References
+
+- [Vite — Guide](https://vitejs.dev/guide/) · [Vite — Config reference](https://vitejs.dev/config/) (Rolldown, `rolldownOptions`)
+- [Tailwind CSS v4](https://tailwindcss.com/docs) — CSS-first configuration: `@theme`, `@utility`, `@source`
+- [GSAP docs](https://gsap.com/docs/) — `gsap.context()`, `matchMedia()`, ScrollTrigger
+- [Lenis](https://github.com/darkroomengineering/lenis/blob/main/README.md) — smooth scroll (official README)
+- [Tempus](https://github.com/darkroomengineering/tempus/blob/main/README.md) — single rAF manager (official README)
+- [Three.js docs](https://threejs.org/docs/) — renderer, textures, disposal
+- [swup](https://swup.js.org) — page transitions
+- [Node.js](https://nodejs.org) — Vite requires Node ≥ 20.19
+- Internal: [theme architecture](wordpress-theme-architecture.md) · [performance](performance.md) · [accessibility](accessibility.md)

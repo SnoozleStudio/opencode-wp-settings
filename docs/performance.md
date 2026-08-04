@@ -65,3 +65,11 @@ request) and browser (every frame).
    count, DOM mutations per frame (devtools)
 3. Report measured findings only — never fabricate Lighthouse/bundle numbers; flag what
    needs browser profiling
+
+## References
+
+- [web.dev — Core Web Vitals](https://web.dev/vitals) — the metrics (LCP, INP, CLS) these rules serve
+- [WordPress Core Performance team](https://make.wordpress.org/performance/) — core performance work and the Performance Lab plugin
+- [Query Monitor](https://wordpress.org/plugins/query-monitor/) — request-path instrumentation (enqueues, options, queries)
+- [Vite — Build options](https://vitejs.dev/config/build-options.html) — chunk splitting, `chunkSizeWarningLimit`
+- Internal: [front-end stack](frontend-stack.md) · [theme architecture](wordpress-theme-architecture.md) · [plugin architecture](wordpress-plugin-architecture.md)
