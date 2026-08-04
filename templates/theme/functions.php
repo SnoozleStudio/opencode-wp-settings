@@ -7,6 +7,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }

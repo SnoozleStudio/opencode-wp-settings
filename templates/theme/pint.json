@@ -10,6 +10,8 @@
     "yoda_style": false,
     "unary_operator_spaces": false,
     "phpdoc_no_package": false,
+    "phpdoc_align": false,
+    "no_blank_lines_after_phpdoc": false,
     "function_declaration": false,
     "braces_position": false,
     "binary_operator_spaces": false,

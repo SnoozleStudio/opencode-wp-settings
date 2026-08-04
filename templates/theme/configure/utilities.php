@@ -4,6 +4,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
@@ -12,7 +13,7 @@ if ( ! function_exists( '{prefix}_get_vite_manifest' ) ) {
 	/**
 	 * Read the Vite build manifest, static-cached per request.
 	 *
-	 * @param  string  $entry  Entry name from vite.config (e.g. 'src/scripts/main.js').
+	 * @param string $entry Entry name from vite.config (e.g. 'src/scripts/main.js').
 	 * @return array<string, array<string, mixed>>|null
 	 */
 	function {prefix}_get_vite_manifest( $entry = 'src/scripts/main.js' ) {
@@ -51,7 +52,7 @@ if ( ! function_exists( '{prefix}_add_li_class' ) ) {
 	/**
 	 * Add a class to every nav menu <li>.
 	 *
-	 * @param  string[]  $classes  List of classes.
+	 * @param string[] $classes List of classes.
 	 * @return string[]
 	 */
 	function {prefix}_add_li_class( $classes ) {
@@ -65,7 +66,7 @@ if ( ! function_exists( '{prefix}_add_link_class' ) ) {
 	/**
 	 * Add classes to every nav menu <a>.
 	 *
-	 * @param  string[]  $attrs  List of attributes.
+	 * @param string[] $attrs List of attributes.
 	 * @return string[]
 	 */
 	function {prefix}_add_link_class( $attrs ) {

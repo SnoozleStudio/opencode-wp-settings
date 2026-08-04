@@ -4,6 +4,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
@@ -20,7 +21,7 @@ if ( ! function_exists( '{prefix}_acf_json_save_point' ) ) {
 	/**
 	 * Save ACF field groups to acf-json/ for version control.
 	 *
-	 * @param  string  $path  Save path (filter contract; unused).
+	 * @param string $path Save path (filter contract; unused).
 	 * @return string
 	 */
 	function {prefix}_acf_json_save_point( $path ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
@@ -33,7 +34,7 @@ if ( ! function_exists( '{prefix}_acf_json_load_point' ) ) {
 	/**
 	 * Load ACF field groups from acf-json/.
 	 *
-	 * @param  string[]  $paths  Load paths.
+	 * @param string[] $paths Load paths.
 	 * @return string[]
 	 */
 	function {prefix}_acf_json_load_point( $paths ) {

@@ -4,6 +4,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
@@ -58,8 +59,8 @@ if ( ! function_exists( '{prefix}_script_module_type' ) ) {
 	/**
 	 * Rewrite the main script tag to type="module" (Vite ES module output).
 	 *
-	 * @param  string  $tag  The script tag.
-	 * @param  string  $handle  The script handle.
+	 * @param string $tag The script tag.
+	 * @param string $handle The script handle.
 	 * @return string
 	 */
 	function {prefix}_script_module_type( $tag, $handle ) {

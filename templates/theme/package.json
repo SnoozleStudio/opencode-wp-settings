@@ -9,8 +9,8 @@
     "build": "vite build",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "format:php": "vendor/bin/pint",
-    "format:php:check": "vendor/bin/pint --test",
+    "format:php": "php vendor/bin/pint",
+    "format:php:check": "php vendor/bin/pint --test",
     "format:all": "npm run format && npm run format:php",
     "format:all:check": "npm run format:check && npm run format:php:check"
   },
