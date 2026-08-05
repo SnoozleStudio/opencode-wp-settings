@@ -153,7 +153,7 @@ docs sync in the same change as the code.
   all four steps incl. `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`;
   no copy loses the phpstan line.
 
-## T14. Canonicalize the verification chain
+## [x] T14. Canonicalize the verification chain
 
 - **Blocked by**: none
 - **Blocks**: T17
@@ -166,8 +166,14 @@ docs sync in the same change as the code.
   `verification-chain.md` row. Do NOT touch `plugins/proof-of-work.ts` (the gate
   inlines the chain deliberately).
 - **Acceptance**: canonical doc exists and is indexed; ≤3 inline full-chain copies
-  remain repo-wide (the gate + the canonical doc + README diagram); all others
-  reference the doc; `/docs-check` green.
+  remain repo-wide (the gate + the canonical doc + setup.ps1's "Next steps" UX
+  output); all others reference the doc; `/docs-check` green.
+- **Recorded deviations**: setup.ps1 keeps its chain text — it is runtime UX output
+  to a scaffolded project that does not have this repo's docs (not a doc copy);
+  docs/README.md:240 shorthand kept (wiring diagram, not a copy). Scope grew to the
+  4 skill code blocks (tdd/wp-plugin/wp-security-audit/wp-theme), commands/ship.md,
+  skills/refactor.md, and guide-beginners (/ship walkthrough + glossary) — the
+  "≤3 copies" acceptance demanded it.
 
 ## [x] T15. Doc-drift micro-fixes (4 one-liners)
 
@@ -194,7 +200,7 @@ docs sync in the same change as the code.
   an example prompt per skill (model-invoked skills get one line each); the
   guide-reference check in `/docs-check` passes.
 
-## T17. Cross-link fix ↔ diagnosing-bugs
+## [x] T17. Cross-link fix ↔ diagnosing-bugs
 
 - **Blocked by**: T14
 - **Blocks**: none
@@ -203,18 +209,19 @@ docs sync in the same change as the code.
   loop; diagnosing-bugs references the fix workflow for standard bugs; neither
   carries a verification-chain copy (references the canonical doc).
 
-## T18. run() helper duplication — extract or document
+## [x] T18. run() helper duplication — extract or document
 
 - **Blocked by**: T3, T5, T8
 - **Blocks**: none
-- **Files**: `plugins/proof-of-work.ts`, `plugins/phpcs-watch.ts`,
-  `plugins/session-context.ts` (+ `plugins/lib/run.ts` if extraction), `docs/guide-pro.md` § Plugins
-- **Acceptance**: EITHER the ~20-line `run()`/`execFileAsync` wrapper extracted to a
-  shared module imported by all three plugins with no behavior change, OR an
-  explicit "plugin isolation is intentional — each plugin is self-contained"
-  note in guide-pro § Plugins. No silent third option.
+- **Files**: `plugins/lib/run.ts` (new), `plugins/proof-of-work.ts`,
+  `plugins/phpcs-watch.ts`, `plugins/session-context.ts`, `docs/guide-pro.md` § Plugins,
+  hub Plugins table, README "What's inside"
+- **Acceptance**: decision taken = **extract**. `run()` + `isWin32()` moved to
+  `plugins/lib/run.ts`; all three plugins import it; behavior unchanged
+  (tsc strict + bun build green); docblock, hub note, guide-pro § Plugins, and
+  README tree synced in the same change.
 
-## T19. Final verification gate
+## [x] T19. Final verification gate
 
 - **Blocked by**: all of T1-T18
 - **Blocks**: none
