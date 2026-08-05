@@ -1,12 +1,17 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
-import { run } from "./lib/run";
+import { isWin32, run } from "./lib/run";
 
 const GATE_CACHE_TTL_MS = 120_000;
 
-/** `git commit` / `git push` — also the Windows `git.exe` form. */
-const GIT_OP = /\bgit(\.exe)?\s+(push|commit)\b/i;
+/**
+ * `git commit` / `git push` — also the Windows `git.exe` form and the
+ * `git -C <path> …` form (the option precedes the verb; without the optional
+ * clause, `-C` in between would swallow the trigger and the gate would never
+ * fire for the documented multi-repo path).
+ */
+const GIT_OP = /\bgit(\.exe)?(\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+))?\s+(push|commit)\b/i;
 
 /**
  * Opt-out tokens only count as standalone, unquoted arguments. Quoted segments
@@ -51,24 +56,32 @@ const isGatedProject = (dir: string): boolean =>
  * - the command changes the working directory (`cd` / `Set-Location` / `pushd`) —
  *   the gate is scoped to the session directory; use `git -C <repo>` to gate
  *   another repo explicitly
- * - the chain passed within the cache window for the same working tree state
+ * - the chain passed within the cache window for the same target repo at the
+ *   same HEAD and working-tree state (per-target — one repo's green cache
+ *   never green-lights another)
  */
 export const ProofOfWork = async ({ directory }: Parameters<Plugin>[0]) => {
-	let lastGreen = 0;
-	let lastState = "";
+	const gateCache = new Map<string, { at: number; state: string }>();
 
+	/**
+	 * Canonical chain commands (verbatim from docs/verification-chain.md — the
+	 * consistency check enforces this). Composer bins are PHP proxies; POSIX
+	 * runs `vendor/bin/x` directly, Windows cannot — cmd.exe splits the
+	 * executable token at the `/` (`vendor/bin/phpcs` parses as the command
+	 * `vendor` plus a switch) — so win32 rewrites them to the `.bat` shim at
+	 * exec time.
+	 */
 	const runChain = async (cwd: string): Promise<{ ok: boolean; step: string; detail: string }> => {
 		const steps: Array<[string, string]> = [
 			["build", "npm run build"],
 			["format:all:check", "npm run format:all:check"],
-			[
-				"phpcs",
-				"vendor\\bin\\phpcs --standard=phpcs.xml -d memory_limit=1024M",
-			],
-			["phpstan", "vendor\\bin\\phpstan analyse --no-progress --memory-limit=1G"],
+			["phpcs", "vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M"],
+			["phpstan", "vendor/bin/phpstan analyse --no-progress --memory-limit=1G"],
 		];
+		const win32Shim = (cmd: string): string =>
+			cmd.replace(/^vendor\/bin\/(\S+)/, "vendor\\bin\\$1.bat");
 		for (const [name, cmd] of steps) {
-			const out = await run(cmd, cwd);
+			const out = await run(isWin32() ? win32Shim(cmd) : cmd, cwd);
 			if (out.exitCode !== 0) {
 				const raw = out.stdout.length > 0 ? out.stdout : out.stderr;
 				return { ok: false, step: name, detail: raw.split("\n").slice(0, 30).join("\n") };
@@ -97,20 +110,22 @@ export const ProofOfWork = async ({ directory }: Parameters<Plugin>[0]) => {
 
 		if (!isGatedProject(target)) return;
 
-		const state = (await run("git status --porcelain", target)).stdout.trim();
+		const head = (await run("git rev-parse HEAD", target)).stdout.trim();
+		const tree = (await run("git status --porcelain", target)).stdout.trim();
+		const state = `${head}\n${tree}`;
 		const now = Date.now();
-		if (now - lastGreen < GATE_CACHE_TTL_MS && state === lastState) return;
+		const cached = gateCache.get(target);
+		if (cached && now - cached.at < GATE_CACHE_TTL_MS && cached.state === state) return;
 
 		const result = await runChain(target);
 		if (!result.ok) {
-			lastGreen = 0;
+			gateCache.delete(target);
 			throw new Error(
 				`proof-of-work: verification chain failed at "${result.step}". ` +
 					`Run the checks and fix before committing/pushing.\n\n${result.detail}`
 			);
 		}
-		lastGreen = now;
-		lastState = state;
+		gateCache.set(target, { at: now, state });
 	};
 
 	return {
