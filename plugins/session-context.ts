@@ -4,6 +4,13 @@ import { promisify } from "node:util";
 
 const CACHE_TTL_MS = 30_000;
 
+/**
+ * Branch names are interpolated into the system prompt — strip anything that
+ * is not a safe branch character (control chars, quotes, prompt-injection
+ * text) before it gets there.
+ */
+const SAFE_BRANCH = /[^A-Za-z0-9_\-\/.]/g;
+
 const isWin32 = (): boolean => process.platform === "win32";
 const execFileAsync = promisify(execFile);
 
@@ -49,9 +56,10 @@ export const SessionContext = async ({ directory }: Parameters<Plugin>[0]) => {
 		if (now - cachedAt < CACHE_TTL_MS && cached !== "") return cached;
 		const branch = (await run("git branch --show-current", directory)).stdout.trim();
 		if (!branch) return "";
+		const safeBranch = branch.replace(SAFE_BRANCH, "_");
 		const status = (await run("git status --porcelain", directory)).stdout.trim();
 		const changed = status === "" ? 0 : status.split("\n").length;
-		cached = `Git state: branch ${branch}, ${changed} uncommitted file(s).`;
+		cached = `Git state: branch ${safeBranch}, ${changed} uncommitted file(s).`;
 		cachedAt = now;
 		return cached;
 	};
