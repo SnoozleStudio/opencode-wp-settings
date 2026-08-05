@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="{theme_slug}">
-	<description>Enterprise WordPress theme standards: WordPress-Extra + Docs + PHPCompatibilityWP</description>
+	<description>Enterprise WordPress theme standards: WordPress-Extra + Docs + PHPCompatibility</description>
 
 	<file>.</file>
 	<exclude-pattern>node_modules/*</exclude-pattern>
