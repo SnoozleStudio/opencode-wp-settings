@@ -265,3 +265,11 @@ and use the direct form instead:
 ## License
 
 MIT. Fork freely; keep the stealth-mode rule — the history belongs to the engineers.
+
+## 🤝 Contributing & Feedback
+
+This config is built for real-world production setups. If you find edge cases in
+WordPress Coding Standards or have ideas for improving the subagent workflows:
+
+1. Open an [Issue](https://github.com/SnoozleStudio/opencode-wp-settings/issues) for discussion.
+2. Submit a PR with updated skills or docs (ensure docs remain synced per `AGENTS.md`).
