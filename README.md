@@ -54,7 +54,7 @@ This repo closes that gap with engineering discipline, not hope:
 - **Scaffolding that starts right** — templates ship WPCS-compliant from the first
   file, so the AI never writes from a blank slate
 
-## At a Glance
+## At a glance
 
 ### 🔄 How OpenCode enforces quality in your workflow
 
