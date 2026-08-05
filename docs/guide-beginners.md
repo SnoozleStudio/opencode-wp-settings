@@ -292,6 +292,22 @@ too.
 **You say:**
 
 ```
+/refactor the checkout module
+```
+
+**What happens:** the refactor skill explores the module and its callers, states the
+target shape, then moves in small behavior-preserving steps — verification chain
+after every step. If a step changes behavior, it stops and flags it instead of
+covering it up.
+
+**What you get:** what moved, what stayed, and anything flagged for later. Behavior
+is identical before and after.
+
+---
+
+**You say:**
+
+```
 my site is slow, /audit performance
 ```
 
@@ -316,7 +332,8 @@ fixes. Read-only: nothing gets edited without your say-so.
 ```
 
 **What happens:** the full gate, in order, stopping at the first red: `npm run build`
-→ `npm run format:all:check` → phpcs. Then a two-axis review of the diff. Then (only
+→ `npm run format:all:check` → `vendor/bin/phpcs` → `vendor/bin/phpstan`. Then a
+two-axis review of the diff. Then (only
 when everything is green) staging the intended files and a conventional commit —
 no AI fingerprints.
 
@@ -386,6 +403,21 @@ continuation commands. A fresh session can resume without making you re-explain.
 
 ---
 
+### Disciplines the AI invokes on its own
+
+No slash needed — these skills auto-match from plain-language requests:
+
+| You say | Skill that fires |
+|---|---|
+| "research the current best practice for X against official docs" | `research` — cited answers, no guessing |
+| "record this gotcha in the learnings log" | `share-learning` — one dated line in AGENTS.md |
+| "write this test-first, red-green-refactor" | `tdd` |
+| "audit this form for accessibility (WCAG 2.2 AA)" | `wp-accessibility` |
+| "make these strings translation-ready" | `wp-i18n` — text domain, escaping matrix |
+| "profile the front page — web vitals, bundle size" | `wp-performance` |
+
+---
+
 ## 4. How to write prompts that work
 
 The same request, two ways:
@@ -395,6 +427,7 @@ The same request, two ways:
 | "fix the menu" | `/fix the mobile menu doesn't open on iPhone 14, only Safari — sticky header, Lenis enabled` |
 | "add a section" | `/section pricing, 3 tiers, ACF repeater with title+price+features, matching the services section style` |
 | "check my code" | `/review` (after staging changes) |
+| "clean up a module" | `/refactor` — behavior-preserving steps, chain after every step |
 | "make it faster" | `/audit` — then point at the page: "front page, biggest CLS offender" |
 | "I need a form" | "I want a booking form on the home page" (the AI will grill you) |
 
