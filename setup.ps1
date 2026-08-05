@@ -158,6 +158,17 @@ function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Toke
 	}
 }
 
+function Assert-SafePathValues {
+	# -Site/-Theme/-Plugin are slugs/names, never paths: reject traversal up
+	# front, BEFORE any site-root resolution or path construction. -Target stays
+	# unvalidated (it is a real path, e.g. "..\wp-content\themes\mytheme").
+	foreach ($v in @($Site, $Theme, $Plugin)) {
+		if ($v -and $v -match '[\\/:"]|\.\.') {
+			throw "Invalid value for -Site/-Theme/-Plugin: '$v' (no path separators, quotes or '..' allowed)."
+		}
+	}
+}
+
 function Resolve-Args([string]$Target, [string]$Kind) {
 	if (-not $Target) { throw "Missing target directory (use -NewTheme, -NewPlugin, -Theme or -Plugin)." }
 	$script:Target = $Target
@@ -168,19 +179,17 @@ function Resolve-Args([string]$Target, [string]$Kind) {
 	}
 	if (-not $Name) { $script:Name = (Get-Culture).TextInfo.ToTitleCase(($Slug -replace '-', ' ')) }
 
-	# Validate inputs before they reach paths or generated identifiers. -Target
-	# stays unvalidated (it is a real path, e.g. "..\wp-content\themes\mytheme");
-	# -Site/-Theme/-Plugin are slugs/names and must never smuggle traversal.
-	foreach ($v in @($Site, $Theme, $Plugin)) {
-		if ($v -and $v -match '[\\/:"]|\.\.') {
-			throw "Invalid value for -Site/-Theme/-Plugin: '$v' (no path separators, quotes or '..' allowed)."
-		}
-	}
+	# Validate before values reach paths or generated identifiers. The
+	# Site/Theme/Plugin traversal check already ran in Assert-SafePathValues
+	# (before site-root resolution); here we validate the generated identifiers.
 	if ($script:Slug -notmatch '^[a-z0-9][a-z0-9-]*$') {
 		throw "Invalid slug '$script:Slug' - use lowercase letters, digits and hyphens only."
 	}
 	if ($script:Prefix -notmatch '^[a-z_][a-z0-9_]*$') {
 		throw "Invalid prefix '$script:Prefix' - use lowercase letters, digits and underscores only."
+	}
+	if ($script:Name -notmatch '^[\w .\-]+$') {
+		throw "Invalid name '$script:Name' - use letters, digits, spaces, dots and hyphens only."
 	}
 
 	# The prefix token carries no trailing underscore: templates use
@@ -298,6 +307,8 @@ if ($Validate -or (-not $NewTheme -and -not $NewPlugin -and -not $Theme -and -no
 	Invoke-Validate
 	exit 0
 }
+
+Assert-SafePathValues
 
 $Kind = ""
 $TargetPath = ""
