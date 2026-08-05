@@ -1,31 +1,27 @@
 # OpenCode WordPress Settings
 
-Production-ready WordPress development settings for OpenCode.
+Production-focused OpenCode workflow for WordPress plugins and classic themes.
 
-A structured OpenCode configuration for building and maintaining custom WordPress
-themes and plugins with coding standards, automated checks, and project-specific
-instructions.
+A structured configuration for building and maintaining custom WordPress
+projects with project-specific instructions, coding standards, automated
+verification, and reusable development workflows.
 
 ![CI](https://github.com/SnoozleStudio/opencode-wp-settings/actions/workflows/ci.yml/badge.svg)
 ![Checks](https://img.shields.io/badge/checks-4-green.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+![MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
+![WordPress](https://img.shields.io/badge/WordPress-7.0-blue.svg)
 
-## Repository quality
+Start with the [Level 1 Guide](docs/guide-beginners.md) →
 
-Every push to `main` and every pull request runs:
+## Why this exists
 
-- JSON and configuration structure
-- repository frontmatter (`setup.ps1 -Validate`)
-- documentation inventory and internal links (`scripts/docs-inventory.ps1`)
-- lockfile integrity (`bun install --frozen-lockfile --dry-run`)
-- scaffold smoke tests (theme + plugin dry runs)
+Generic AI coding agents can produce valid PHP without following the
+architecture, conventions, security practices, and verification workflow
+of an existing WordPress project.
 
-**What this solves.** Generic AI models are trained on a sea of WordPress code — and
-most of that sea is legacy, unmaintained, and unsafe. This config encodes the WordPress
-engineering discipline — WPCS, strict PHPStan typing, the escaping matrix, automated
-verification — so OpenCode follows an established workflow instead of generating
-generic PHP.
+This repository encodes those constraints into OpenCode through
+instructions, skills, agents, commands, hooks, and automated checks.
 
 **Who it's for.** Developers and agencies building custom WordPress themes and plugins.
 This repo IS your global OpenCode config: it lives at `~/.config/opencode/` and is
@@ -42,6 +38,16 @@ with engineering discipline from [mattpocock/skills](https://github.com/mattpoco
 >
 > **Every change to this repo must stay synced with the documentation** — that's a
 > binding contract, see [AGENTS.md](AGENTS.md) and the [hub](docs/README.md#documentation-contract).
+
+## Repository quality
+
+Every push to `main` validates:
+
+- JSON well-formedness
+- repository structure and frontmatter
+- documentation inventory and internal links
+- lockfile integrity
+- scaffold dry-run smoke tests
 
 ---
 
@@ -85,13 +91,13 @@ configs merge over the global one.
 
 ## Why?
 
-Generic AI models are trained on a sea of WordPress code — and most of that sea is
-legacy, unmaintained, and unsafe. Left to its own devices, an AI will happily produce:
+Generic AI models are exposed to a large amount of legacy, inconsistent, and
+outdated WordPress code. Left to its own devices, an AI will happily produce:
 
 - **Escaping that isn't** — unescaped output, or the wrong escaping function for the
   context, because the escaping matrix is a dense contract
-- **Raw SQL and missing nonces** — code that works on your laptop and gets a client's
-  site hacked in production
+- **Raw SQL and missing nonces** — code that passes locally but reaches production
+  without verification
 - **Unprefixed globals and hooks** — functions, options, and hooks that collide with
   other plugins, or that WordPress core already provides
 - **"It works on my machine" fixes** — no build, no lint, no verification, so broken

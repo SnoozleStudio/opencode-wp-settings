@@ -192,7 +192,7 @@ Default stack for Snoozle Studio WordPress work. Framework depth lives in the
 `wp-plugin` / `wp-theme` skills and `docs/`.
 
 ### Core
-- **WordPress 6.8+** — classic themes and plugins (not block themes unless asked)
+- **WordPress 6.8+ (7.0 verified)** — classic themes and plugins (not block themes unless asked)
 - **PHP 8.2+** — typed where possible, PHP 8.0+ compatible syntax
 - **ACF Pro** — field groups, option pages, `acf-json/` sync
 - **Composer** — dev tooling only (WPCS, Pint, stubs)
