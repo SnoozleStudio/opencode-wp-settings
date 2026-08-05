@@ -91,7 +91,21 @@
 			"Get-Content ~/.npmrc": "deny",
 			"Get-Content ~/.netrc": "deny",
 			"Get-Content ~/.docker/config.json": "deny",
-			"Get-Content ~/.kube/config": "deny"
+			"Get-Content ~/.kube/config": "deny",
+			"Get-Content $env:USERPROFILE/.ssh/*": "deny",
+			"Get-Content $env:USERPROFILE/.npmrc": "deny",
+			"Get-Content $env:USERPROFILE/.netrc": "deny",
+			"Get-Content $HOME/.ssh/*": "deny",
+			"Get-Content $HOME/.npmrc": "deny",
+			"type $env:USERPROFILE/.ssh/*": "deny",
+			"type $env:USERPROFILE/.npmrc": "deny",
+			"type $HOME/.ssh/*": "deny",
+			"type $HOME/.npmrc": "deny",
+			"cat $env:USERPROFILE/.ssh/*": "deny",
+			"cat $HOME/.ssh/*": "deny",
+			"cat C:/Users/*/.ssh/*": "deny",
+			"type C:/Users/*/.ssh/*": "deny",
+			"Get-Content C:/Users/*/.ssh/*": "deny"
 		},
 		"read": {
 			"*": "allow",
@@ -101,7 +115,14 @@
 			"~/.npmrc": "deny",
 			"~/.netrc": "deny",
 			"~/.docker/config.json": "deny",
-			"~/.kube/config": "deny"
+			"~/.kube/config": "deny",
+			"*\\.ssh\\*": "deny",
+			"*\\.aws\\*": "deny",
+			"*\\.gnupg\\*": "deny",
+			"*\\.npmrc": "deny",
+			"*\\.netrc": "deny",
+			"*\\.docker\\config.json": "deny",
+			"*\\.kube\\config": "deny"
 		},
 		"edit": {
 			"*": "allow",
@@ -111,7 +132,14 @@
 			"~/.npmrc": "deny",
 			"~/.netrc": "deny",
 			"~/.docker/config.json": "deny",
-			"~/.kube/config": "deny"
+			"~/.kube/config": "deny",
+			"*\\.ssh\\*": "deny",
+			"*\\.aws\\*": "deny",
+			"*\\.gnupg\\*": "deny",
+			"*\\.npmrc": "deny",
+			"*\\.netrc": "deny",
+			"*\\.docker\\config.json": "deny",
+			"*\\.kube\\config": "deny"
 		},
 		"webfetch": "allow",
 		"skill": {
