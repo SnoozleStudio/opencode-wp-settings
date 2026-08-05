@@ -52,6 +52,7 @@ the doctrine; this skill is the procedure.
 npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 Secrets additionally: `git log -p --all` grep for key material, `.env*` in repo.

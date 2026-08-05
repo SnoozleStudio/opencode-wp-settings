@@ -56,6 +56,7 @@ plugin-slug/
 npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 ## Scaffolding

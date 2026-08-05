@@ -27,7 +27,7 @@ theme-slug/
 ├── languages/               # load_theme_textdomain path
 ├── vendor/                  # composer dev tooling (phpcs, pint) — never runtime deps
 ├── package.json / vite.config.mjs / composer.json / phpcs.xml
-└── .husky/pre-commit        # format:all:check + phpcs gate
+└── .husky/pre-commit        # format:all:check + phpcs + phpstan gate
 ```
 
 ## style.css header (required fields)
@@ -97,6 +97,7 @@ Heavy work (Three.js, QR): dynamic `import()` + IntersectionObserver.
 npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 ## Scaffolding

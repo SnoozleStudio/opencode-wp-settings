@@ -37,7 +37,7 @@ Smallest fix that addresses the named mechanism — scope confined to the bug's 
 
 ## 6. Regression-test
 The repro passes; the verification chain is green
-(`npm run build` → `npm run format:all:check` → phpcs). Record the cause + fix in the
+(`npm run build` → `npm run format:all:check` → phpcs → phpstan). Record the cause + fix in the
 project's self-evolving learnings log if non-obvious.
 
 ## Rules

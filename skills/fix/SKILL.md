@@ -21,7 +21,8 @@ Bugs get fixed immediately — no "should I?" questions. But never stack unteste
    scope). Scope confinement: only files directly related to the bug; no adjacent
    refactors; no dependency upgrades
 5. **Verify** — run the verification chain: `npm run build` →
-   `npm run format:all:check` → `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M`.
+   `npm run format:all:check` → `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` →
+   `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`.
    Build after EVERY fix attempt, confirm green before moving on
 6. **Learn** — non-obvious fix? Append a dated entry to the project's AGENTS.md
    self-evolving learnings log
