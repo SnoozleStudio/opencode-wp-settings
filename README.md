@@ -75,6 +75,7 @@ This repo closes that gap with engineering discipline, not hope:
      │  2. npm run format:all:check               │
      │  3. vendor/bin/phpcs --standard=phpcs.xml  │
      │  4. vendor/bin/phpstan analyse             │
+     │     --no-progress --memory-limit=1G        │
      └────────────────────────────────────────────┘
                            │
                  [ ❌ FAIL? Block Commit / Push ]
@@ -91,8 +92,14 @@ This repo closes that gap with engineering discipline, not hope:
    ```
 
 2. **Restart OpenCode** — the config loads for every session automatically
-3. **Try it** — open a WordPress project and say `fix the mobile menu` or
-   `create a new plugin`; commands, skills, and the verification chain handle the rest
+3. **Try it** — open any WordPress theme or plugin project and invoke a command:
+   - `/theme` — Scaffold a WPCS-compliant classic theme
+   - `/fix` — Fix an issue with mandatory WPCS + escaping verification
+   - `/audit` — Run a full security & code quality pass
+
+   Classic-theme first — the config targets classic themes (not block themes):
+   WPCS templates, the template-hierarchy boot chain, and Vite/Tailwind — all
+   scaffolded from day one.
 
 Updates = `git pull`. Non-destructive: project-level `opencode.json` / `.opencode/`
 configs merge over the global one.
@@ -232,8 +239,8 @@ and use the direct form instead:
   sites folder. From the site shell no `-Site` is needed — the script walks up from
   the current directory until it finds `wp-load.php`
 - `-Install` runs `npm install` + `composer install`. Local's bundled PHP ships with
-  openssl/mbstring disabled in its `php.ini`, so `-Install` copies the ini to a temp
-  file with both extensions enabled and runs composer against it via `PHPRC`
+  openssl not enabled in its `php.ini` (composer TLS fails), so `-Install` copies the
+  ini to a temp file with openssl enabled and runs composer against it via `PHPRC`
   (environment restored afterwards; system PHP installs are used untouched)
 - Non-empty target dirs are refused without `-Force` (scaffold merges over existing
   files, keeps anything extra)
