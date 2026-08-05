@@ -17,3 +17,8 @@ Thumbs.db
 # Temp / backups
 *.bak
 .tmp/
+
+# Logs / env
+*.log
+.env*
+.env.*
