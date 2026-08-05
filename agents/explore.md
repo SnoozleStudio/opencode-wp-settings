@@ -4,7 +4,19 @@ mode: subagent
 permission:
   edit: deny
   bash:
-    "*": allow
+    "*": ask
+    "rg*": allow
+    "grep*": allow
+    "Get-ChildItem*": allow
+    "Test-Path*": allow
+    "Select-String*": allow
+    "git status*": allow
+    "git log*": allow
+    "git diff*": allow
+    "git show*": allow
+    "git branch*": allow
+    "git rev-parse*": allow
+    "git ls-files*": allow
   webfetch: allow
 steps: 80
 color: info
