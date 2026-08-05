@@ -486,6 +486,7 @@ stuck — it's applying the stop-and-replan rule.** Answer it.
 
 - [OpenCode docs](https://opencode.ai/docs) — the tool itself (agents, skills, commands, plugins)
 - [Level 2 Guide](guide-pro.md) — how it all works under the hood
+- [Level 3 Guide](guide-advanced.md) — tuning agents, skills, and plugins
 - [Documentation hub](README.md) — every component indexed
 - [WordPress Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/) — what phpcs enforces
 - [WordPress Plugin Handbook](https://developer.wordpress.org/plugins/) — plugin contract

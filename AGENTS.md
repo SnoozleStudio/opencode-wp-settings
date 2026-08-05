@@ -351,8 +351,9 @@ must update the documentation in the
 same change.** A change without its doc sync is incomplete — do not report it done.
 
 Documentation lives in: `README.md` (front door), `docs/README.md` (hub + inventory),
-`docs/guide-beginners.md` (Level 1), `docs/guide-pro.md` (Level 2), and the reference
-docs in `docs/`. The full contract with per-component targets: `docs/README.md`
+`docs/guide-beginners.md` (Level 1), `docs/guide-pro.md` (Level 2),
+`docs/guide-advanced.md` (Level 3), and the reference docs in `docs/`. The full
+contract with per-component targets: `docs/README.md`
 "Documentation Contract".
 
 Mandatory sync targets (summary):

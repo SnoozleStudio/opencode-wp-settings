@@ -12,8 +12,9 @@ Read-only verification for THIS repo (~/.config/opencode). Verify:
    must match.
 2. **README "What's inside"** — the file tree and component counts in README.md must
    match reality (agents, skills, commands, plugins, docs).
-3. **Guide references** — every command/skill/agent named in docs/guide-beginners.md
-   and docs/guide-pro.md must exist; every internal link must resolve.
+3. **Guide references** — every command/skill/agent named in docs/guide-beginners.md,
+   docs/guide-pro.md, and docs/guide-advanced.md must exist; every internal link
+   must resolve.
 4. **Descriptions** — each component's frontmatter description is present (routing
    table rule).
 

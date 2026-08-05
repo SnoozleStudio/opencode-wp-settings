@@ -1,6 +1,6 @@
 ---
 name: wp-security-audit
-description: Run a WordPress-specific security review of a plugin, theme, or code change. Use when auditing code for XSS, SQL injection, CSRF, privilege escalation, REST exposure, secret leaks, or before shipping security-sensitive changes. Produces proven findings with file:line, severity, and fixes — never fabricated.
+description: WordPress attack-surface security audit of a plugin, theme, or code change. Use when auditing for XSS, SQL injection, CSRF, privilege escalation, REST exposure, secret leaks, or before shipping security-sensitive changes. Produces proven findings with file:line, severity, and fixes - never fabricated. Not for general standards review (use review) or logic correctness proof (use verify).
 ---
 
 # WordPress Security Audit

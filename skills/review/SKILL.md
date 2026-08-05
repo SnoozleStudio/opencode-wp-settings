@@ -1,6 +1,6 @@
 ---
 name: review
-description: Two-axis code review of a diff since a fixed point: Standards (repo conventions, WordPress best practices, Fowler smell baseline) and Spec (faithful implementation of the originating ask). Use before commit or PR. Delegates to the reviewer agent.
+description: Two-axis code review of a diff since a fixed point: Standards (repo conventions, WordPress best practices, Fowler smell baseline) and Spec (faithful implementation of the originating ask). Use for "review my changes", "is this ready to commit/PR". Not for security deep-dives (use wp-security-audit) or adversarial logic proof (use verify). Delegates to the reviewer agent.
 ---
 
 # Code Review
