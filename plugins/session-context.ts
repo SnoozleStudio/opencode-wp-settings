@@ -1,6 +1,5 @@
 import type { Plugin } from "@opencode-ai/plugin";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
+import { run } from "./lib/run";
 
 const CACHE_TTL_MS = 30_000;
 
@@ -10,36 +9,6 @@ const CACHE_TTL_MS = 30_000;
  * text) before it gets there.
  */
 const SAFE_BRANCH = /[^A-Za-z0-9_\-\/.]/g;
-
-const isWin32 = (): boolean => process.platform === "win32";
-const execFileAsync = promisify(execFile);
-
-/**
- * Run a command in the host shell and capture output. Uses child_process
- * instead of Bun's shell so behavior is identical across runtimes: output is
- * buffered (never echoed), the cwd is explicit, and non-zero exits are
- * returned instead of thrown.
- */
-const run = async (
-	cmd: string,
-	cwd: string
-): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
-	try {
-		const { stdout, stderr } = await execFileAsync(
-			isWin32() ? "cmd.exe" : "/bin/sh",
-			[isWin32() ? "/c" : "-c", cmd],
-			{ cwd, encoding: "utf8" }
-		);
-		return { stdout, stderr, exitCode: 0 };
-	} catch (error) {
-		const err = error as { stdout?: string; stderr?: string; code?: number | string };
-		return {
-			stdout: typeof err.stdout === "string" ? err.stdout : "",
-			stderr: typeof err.stderr === "string" ? err.stderr : "",
-			exitCode: typeof err.code === "number" ? err.code : 1,
-		};
-	}
-};
 
 /**
  * Session context: appends a compact git state line (branch + uncommitted

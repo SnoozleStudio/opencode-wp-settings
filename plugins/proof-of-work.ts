@@ -1,8 +1,7 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { existsSync, readFileSync } from "node:fs";
 import { isAbsolute, join } from "node:path";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
+import { run } from "./lib/run";
 
 const GATE_CACHE_TTL_MS = 120_000;
 
@@ -24,37 +23,6 @@ const GIT_C = /\bgit(\.exe)?\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+)/i;
  * cannot be resolved reliably, so the gate skips with a warning.
  */
 const DIR_CHANGE = /(^|[;&|]\s*)(cd|Set-Location|pushd)\s+/i;
-
-const isWin32 = (): boolean => process.platform === "win32";
-const execFileAsync = promisify(execFile);
-
-/**
- * Run a command in the host shell and capture output. Uses child_process
- * instead of Bun's shell so behavior is identical across runtimes: output is
- * buffered (never echoed), the cwd is explicit, and non-zero exits are
- * returned instead of thrown. On Windows the command runs through cmd.exe,
- * which resolves .cmd shims (npm, vendor\bin\phpcs.bat).
- */
-const run = async (
-	cmd: string,
-	cwd: string
-): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
-	try {
-		const { stdout, stderr } = await execFileAsync(
-			isWin32() ? "cmd.exe" : "/bin/sh",
-			[isWin32() ? "/c" : "-c", cmd],
-			{ cwd, encoding: "utf8" }
-		);
-		return { stdout, stderr, exitCode: 0 };
-	} catch (error) {
-		const err = error as { stdout?: string; stderr?: string; code?: number | string };
-		return {
-			stdout: typeof err.stdout === "string" ? err.stdout : "",
-			stderr: typeof err.stderr === "string" ? err.stderr : "",
-			exitCode: typeof err.code === "number" ? err.code : 1,
-		};
-	}
-};
 
 const hasBuildScript = (dir: string): boolean => {
 	try {

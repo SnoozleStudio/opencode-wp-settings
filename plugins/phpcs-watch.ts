@@ -1,11 +1,7 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { existsSync } from "node:fs";
 import { join } from "node:path";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
-const isWin32 = (): boolean => process.platform === "win32";
-const execFileAsync = promisify(execFile);
+import { isWin32, run } from "./lib/run";
 
 const MAX_REPORT_LINES = 24;
 
@@ -15,34 +11,6 @@ const MAX_REPORT_LINES = 24;
  * reach the shell. Spaces are rejected too (they would split the argument).
  */
 const SAFE_FILE_PATH = /^[\w\-./\\]+$/;
-
-/**
- * Run a command in the host shell and capture output. Uses child_process
- * instead of Bun's shell so behavior is identical across runtimes: output is
- * buffered (never echoed), the cwd is explicit, and non-zero exits are
- * returned instead of thrown. On Windows the command runs through cmd.exe,
- * which resolves .cmd shims (vendor\bin\phpcs.bat).
- */
-const run = async (
-	cmd: string,
-	cwd: string
-): Promise<{ stdout: string; stderr: string; exitCode: number }> => {
-	try {
-		const { stdout, stderr } = await execFileAsync(
-			isWin32() ? "cmd.exe" : "/bin/sh",
-			[isWin32() ? "/c" : "-c", cmd],
-			{ cwd, encoding: "utf8" }
-		);
-		return { stdout, stderr, exitCode: 0 };
-	} catch (error) {
-		const err = error as { stdout?: string; stderr?: string; code?: number | string };
-		return {
-			stdout: typeof err.stdout === "string" ? err.stdout : "",
-			stderr: typeof err.stderr === "string" ? err.stderr : "",
-			exitCode: typeof err.code === "number" ? err.code : 1,
-		};
-	}
-};
 
 /**
  * phpcs-watch: after every edit to a `.php` file in a gated project, run a
