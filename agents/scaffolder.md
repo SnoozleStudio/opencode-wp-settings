@@ -14,7 +14,8 @@ adapt, don't reinvent) and new front-end sections inside existing themes.
 
 Source: `templates/plugin/`. Copy the tree, then substitute the placeholder slug:
 
-1. Rename all files and directories containing `PLUGIN_SLUG` → the plugin slug (dashes)
+1. Rename files/directories containing `{plugin-slug}` (and `{plugin_slug}` in file
+   contents) → the plugin slug (dashes)
 2. Replace text-domain, prefix (`plg_`-style, ≥4 chars), namespace, class names
 3. Ensure the main file header is complete (Plugin Name, Description, Version,
    Requires at least, Requires PHP, Author, License, Text Domain, Domain Path)

@@ -363,6 +363,8 @@ does semantic substitution (namespaces, class names, text domains).
 |---|---|---|
 | `{plugin_slug}` / `{plugin-slug}` | slug | `my-plugin` |
 | `{plugin_name}` | display name | `My Plugin` |
+| `{theme_slug}` / `{theme-slug}` | slug (theme scaffolds) | `my-theme` |
+| `{theme_name}` | display name (theme scaffolds) | `My Theme` |
 | `{text_domain}` | slug (text domain must match slug) | `my-plugin` |
 | `{prefix}` | prefix, trailing `_` stripped | `myp` |
 | `{PREFIX}` | prefix upper | `MYP` |
