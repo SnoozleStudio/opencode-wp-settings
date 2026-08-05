@@ -54,6 +54,33 @@ This repo closes that gap with engineering discipline, not hope:
 - **Scaffolding that starts right** — templates ship WPCS-compliant from the first
   file, so the AI never writes from a blank slate
 
+## At a Glance
+
+### 🔄 How OpenCode enforces quality in your workflow
+
+```text
+[ User Request ] ──► [ /fix or /build Command ]
+                           │
+                           ▼
+            [ Subagent Maps & Plans ]
+                           │
+                           ▼
+         [ PHP Edits via WPCS & Escaping Matrix ]
+                           │
+                           ▼
+     ┌────────────────────────────────────────────┐
+     │  Proof-of-Work Gate (Automatic Hook)       │
+     ├────────────────────────────────────────────┤
+     │  1. npm run build                          │
+     │  2. npm run format:all:check               │
+     │  3. vendor/bin/phpcs --standard=phpcs.xml  │
+     │  4. vendor/bin/phpstan analyse             │
+     └────────────────────────────────────────────┘
+                           │
+                 [ ❌ FAIL? Block Commit / Push ]
+                 [ ✅ PASS? Clean Git Push ]
+```
+
 ## Quick start in 3 steps
 
 1. **Install** — clone into your OpenCode config dir (or copy the files in; if the
