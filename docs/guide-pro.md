@@ -83,10 +83,10 @@ What's allowed/asked/denied and why:
 
 | Pattern | Verdict | Rationale |
 |---|---|---|
-| `npm run *`, `npm install*`, `npm info *`, `npx prettier*`, `npx tsc*` | allow | the verification chain and tooling must never friction-block |
-| `bun run *`, `bunx *` | allow | same, for the Bun runtime |
+| `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*` | allow | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
+| `bun run *` | allow | same, for the Bun runtime (`bunx *` removed — unscoped remote code execution) |
 | `git status/diff/log/show/branch/blame/rev-parse/remote/stash/add/commit/push/pull/checkout <branch>` | allow | read + normal workflow |
-| `git checkout -- *`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny** | irreversible history/work-tree damage |
+| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny** | irreversible history/work-tree damage |
 | `composer install/dump-autoload/validate/show` | allow | toolchain |
 | `composer require/update` | ask | dependency changes need your eyes |
 | `vendor/bin/phpcs/phpcbf/pint/phpstan`, `php -l` | allow | lint gates |
@@ -101,6 +101,15 @@ What's allowed/asked/denied and why:
 
 > Extending: add patterns by specificity. Broad `*` denies must come after the
 > specific allows — the most specific pattern wins per command.
+
+**Known residual — compound commands.** Patterns are whole-string globs: a command
+starting with an allowed prefix matches that allow even when it chains more
+(`npm run build && curl …` matches `npm run *`). This is a documented trade-off — the
+chained tail patterns (`curl … | bash`, `-o` writes) only apply when they match the
+whole string. Agents are instructed to keep compound commands minimal, and the
+destructive denies still fire when the chain itself starts with a denied form. Do
+not "fix" this with trailing-wildcard denies on every allow — they break legitimate
+compound commands (`npm run build && npm run format:all:check`).
 
 ---
 
