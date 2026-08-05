@@ -19,3 +19,9 @@ Read-only verification for THIS repo (~/.config/opencode). Verify:
 
 Report each drift item as: inventory location (docs/README.md section + file:line)
 vs actual filesystem path. Do not edit anything — the caller fixes, you find.
+
+The mechanical subset (hub inventory vs filesystem, README/hub counts, internal
+link resolution) is already scripted in scripts/docs-inventory.ps1 and runs in
+CI. Focus this command on what the script cannot judge: description wording,
+guide references by name, and drift reasoning. If the script reports findings,
+fold them into your report rather than re-deriving them.

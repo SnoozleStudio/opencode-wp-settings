@@ -6,9 +6,16 @@ A structured OpenCode configuration for building and maintaining custom WordPres
 themes and plugins with coding standards, automated checks, and project-specific
 instructions.
 
+![CI](https://github.com/SnoozleStudio/opencode-wp-settings/actions/workflows/ci.yml/badge.svg)
 ![WordPress CS](https://img.shields.io/badge/WPCS-Compliant-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
+
+The CI badge is the proof of this repo's own discipline: every push to `main`
+validates JSON well-formedness, repo structure and frontmatter
+(`setup.ps1 -Validate`), the docs inventory and internal links
+(`scripts/docs-inventory.ps1`), lockfile integrity (`bun install
+--frozen-lockfile --dry-run`), and scaffold dry-run smoke tests.
 
 **What this solves.** Generic AI models are trained on a sea of WordPress code — and
 most of that sea is legacy, unmaintained, and unsafe. This config encodes the WordPress
@@ -149,6 +156,8 @@ tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
 setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
 scaffold.cmd          Shell-agnostic wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
+scripts/              docs-inventory.ps1 — deterministic docs-sync check (CI + local)
+.github/              CI workflow (ci.yml): JSON, structure, docs inventory, smoke tests
 ```
 
 ## How it works

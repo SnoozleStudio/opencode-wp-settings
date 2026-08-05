@@ -465,6 +465,18 @@ exclusive sniffs pair), PHPCompatibilityWP is gone in phpcompatibility 9.x (use
 `tester` is the agent that proves "green" honestly — and the only thing that may
 claim it.
 
+This repo runs its own server-side backstop for the same discipline:
+`.github/workflows/ci.yml` validates JSON well-formedness, repo structure and
+frontmatter (`setup.ps1 -Validate`), the docs inventory
+(`scripts/docs-inventory.ps1` — the mechanical subset of `/docs-check`),
+lockfile integrity (`bun install --frozen-lockfile --dry-run`), and
+scaffold dry runs, on every push to `main` and every pull request. The README
+badge is the visible proof; the semantic gate stays local in `proof-of-work.ts`.
+
+`/docs-check` remains the semantic companion to the script: description wording,
+guide references by name, drift reasoning — things a deterministic script cannot
+judge.
+
 ---
 
 ## 11. The Documentation Contract in practice

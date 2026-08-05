@@ -48,7 +48,9 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
 ├── templates/               scaffolding sources (theme/, plugin/)
 ├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
-└── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
+├── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
+├── scripts/                 docs-inventory.ps1 — deterministic docs-sync check (CI + local)
+└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, smoke tests
 ```
 
 ### Tickets
@@ -225,8 +227,10 @@ truth — adapt, don't reinvent.**
 | [scaffold.cmd](../scaffold.cmd) | shell-agnostic wrapper (cmd/Git Bash/PowerShell) forwarding to setup.ps1 — the entry point from Local's site shell |
 | [opencode.json](../opencode.json) | permission matrix (bash allowlist/ask/deny, secrets deny, `node -e` deny), MCP servers: context7 (enabled), chrome-devtools (disabled) |
 | [tui.json](../tui.json) | TUI plugin `opencode-subagent-statusline` |
-| [package.json](../package.json) / [bun.lock](../bun.lock) | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts` |
+| [package.json](../package.json) / [bun.lock](../bun.lock) | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq) |
 | [.gitignore](../.gitignore) | repo hygiene (never commit `node_modules/`, `.env*`, local dumps) |
+| [docs-inventory.ps1](../scripts/docs-inventory.ps1) | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links; exit 1 on drift — runs in CI and locally |
+| [ci.yml](../.github/workflows/ci.yml) | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, scaffold dry-run smoke tests |
 
 ---
 
@@ -291,6 +295,7 @@ every session    ──► session-context: git state line appended to system pr
 | A plugin (`plugins/`) | its docblock + [Plugins table](#plugins-3) + guide-pro § Plugins |
 | A template (`templates/`) | the [Templates table](#templates-2) + guide-pro § Templates + the scaffolder agent if flow changed |
 | `setup.ps1` / `scaffold.cmd` | the [Scripts table](#scripts--config) + README scaffolding section + guide-pro § Scaffolding |
+| `scripts/` / `.github/workflows/` | the [Scripts table](#scripts--config) + README "What's inside" (the CI runs them — a listed-but-untracked file fails CI) |
 | `opencode.json` / `tui.json` | README "What's inside" + guide-pro § Permissions/MCP |
 | `README.md` "What's inside" | keep counts and file list truthful — they are verified by `/docs-check` |
 | Anything user-facing | the [Level 1 guide](guide-beginners.md) (example prompts must stay accurate) |
@@ -322,7 +327,10 @@ Two on-demand checks (read-only, both report drift without editing):
 
 | Check | Command | Verifies |
 |---|---|---|
-| Docs sync | `/docs-check` | inventory tables vs filesystem (every file listed, every listed file exists), README counts, guide references |
+| Docs sync | `/docs-check` | inventory tables vs filesystem (every file listed, every listed file exists), README counts, guide references — including the semantic pass: description wording, references by name, drift reasoning |
 | Full audit | `/audit` | pass 1 structure (explore), pass 2 security, pass 3 docs drift (AGENTS.md vs code, README vs reality, this hub vs filesystem) |
+| CI (every push/PR) | `scripts/docs-inventory.ps1` | the mechanical subset automatically: inventory both directions, counts, internal links — plus JSON, structure and smoke tests (`.github/workflows/ci.yml`) |
 
-A green `/docs-check` is the pre-commit gate for documentation changes to this repo.
+A green `/docs-check` is the pre-commit gate for documentation changes to this repo;
+the same mechanical subset runs in CI on every push to `main` and pull request (the
+README badge reflects it).

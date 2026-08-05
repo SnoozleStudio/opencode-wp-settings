@@ -346,7 +346,8 @@ No AI fingerprints in git history, PRs, or descriptions. Ever.
 ## Documentation Contract (This Repo)
 
 **Every change to THIS repo (agents/, skills/, commands/, plugins/, templates/,
-opencode.json, tui.json, setup.ps1, scaffold.cmd) must update the documentation in the
+scripts/, .github/workflows/, opencode.json, tui.json, setup.ps1, scaffold.cmd)
+must update the documentation in the
 same change.** A change without its doc sync is incomplete — do not report it done.
 
 Documentation lives in: `README.md` (front door), `docs/README.md` (hub + inventory),
@@ -474,3 +475,7 @@ Keep entries terse and factual — one line each.
   `~\.agents\skills\` despite the docs' global-path table — move the skill dirs into
   `~/.config/opencode/skills/` after install so they're git-tracked and docs-checkable.
   Vendored gsap-* skills: never edit in place; refresh via `npx skills update -a opencode -g`.
+- [2026-08-05] tooling: bun's text bun.lock is JSON-with-trailing-commas by design in
+  every bun version — never strict JSON; validate it with bun itself
+  (`bun install --frozen-lockfile --dry-run`), never jq. Resync a stale lockfile with
+  `bun install --lockfile-only` (no --frozen-lockfile — frozen rejects the rewrite).
