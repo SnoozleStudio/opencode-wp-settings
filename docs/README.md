@@ -70,7 +70,7 @@ lives here.
 
 | Doc | Governs | Loaded by | Read it when |
 |---|---|---|---|
-| [wordpress-php-standards.md](wordpress-php-standards.md) | PHP syntax, naming, OOP, phpcs config, PHPStan config | `wp-plugin`, `wp-theme` | writing or reviewing any PHP |
+| [wordpress-php-standards.md](wordpress-php-standards.md) | PHP syntax, naming, OOP, phpcs config, PHPStan config | `wp-plugin` (+ AGENTS.md global) | writing or reviewing any PHP |
 | [wordpress-security.md](wordpress-security.md) | escaping matrix, sanitization, nonces, auth, SQLi, REST | `wp-security-audit`, `security-auditor` | anything touching input, output, or auth |
 | [wordpress-plugin-architecture.md](wordpress-plugin-architecture.md) | plugin structure, lifecycle, REST, data | `wp-plugin` | building plugins |
 | [wordpress-theme-architecture.md](wordpress-theme-architecture.md) | theme structure, template hierarchy, boot chain, enqueue | `wp-theme` | building themes |
@@ -178,7 +178,7 @@ See [guide-pro.md § Commands](guide-pro.md#commands-18) for authoring.
 | `/review` | [commands/review.md](../commands/review.md) | review skill → reviewer agent | before commit/PR |
 | `/verify` | [commands/verify.md](../commands/verify.md) | verify skill (finder/adversary/referee) | adversarial proof of correctness |
 | `/audit` | [commands/audit.md](../commands/audit.md) | explore + security-auditor + docs drift | whole-codebase audit |
-| `/docs-check` | [commands/docs.md](../commands/docs.md) | inventory vs filesystem comparison | docs sync verification |
+| `/docs-check` | [commands/docs-check.md](../commands/docs-check.md) | inventory vs filesystem comparison | docs sync verification |
 | `/refactor` | [commands/refactor.md](../commands/refactor.md) | refactor skill → reviewer | behavior-preserving restructure |
 | `/grill` | [commands/grill.md](../commands/grill.md) | grill-me skill | align scope before starting |
 | `/spec` | [commands/spec.md](../commands/spec.md) | to-spec skill | turn the conversation into a spec |
