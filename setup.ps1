@@ -152,7 +152,6 @@ function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Toke
 		foreach ($key in $Tokens.Keys) {
 			$content = $content.Replace($key, $Tokens[$key])
 		}
-		Set-Content -LiteralPath $dest -Value $content -Encoding UTF8 -NoNewline
 		$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 		[System.IO.File]::WriteAllText($dest, $content, $utf8NoBom)
 		Write-Ok "wrote $relative"
@@ -168,6 +167,21 @@ function Resolve-Args([string]$Target, [string]$Kind) {
 		$script:Prefix = $letters.Substring(0, [Math]::Min(4, $letters.Length)) + "_"
 	}
 	if (-not $Name) { $script:Name = (Get-Culture).TextInfo.ToTitleCase(($Slug -replace '-', ' ')) }
+
+	# Validate inputs before they reach paths or generated identifiers. -Target
+	# stays unvalidated (it is a real path, e.g. "..\wp-content\themes\mytheme");
+	# -Site/-Theme/-Plugin are slugs/names and must never smuggle traversal.
+	foreach ($v in @($Site, $Theme, $Plugin)) {
+		if ($v -and $v -match '[\\/:"]|\.\.') {
+			throw "Invalid value for -Site/-Theme/-Plugin: '$v' (no path separators, quotes or '..' allowed)."
+		}
+	}
+	if ($script:Slug -notmatch '^[a-z0-9][a-z0-9-]*$') {
+		throw "Invalid slug '$script:Slug' - use lowercase letters, digits and hyphens only."
+	}
+	if ($script:Prefix -notmatch '^[a-z_][a-z0-9_]*$') {
+		throw "Invalid prefix '$script:Prefix' - use lowercase letters, digits and underscores only."
+	}
 
 	# The prefix token carries no trailing underscore: templates use
 	# {prefix}_function_name, so prefix "tst_" yields "tst_function_name".
