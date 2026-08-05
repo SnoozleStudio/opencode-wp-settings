@@ -36,11 +36,13 @@ Verify the hypothesis with evidence before editing:
 Smallest fix that addresses the named mechanism — scope confined to the bug's files.
 
 ## 6. Regression-test
-The repro passes; the verification chain is green
-(`npm run build` → `npm run format:all:check` → phpcs → phpstan). Record the cause + fix in the
+The repro passes; the canonical verification chain is green (build → format:all:check
+→ phpcs → phpstan, see `docs/verification-chain.md`). Record the cause + fix in the
 project's self-evolving learnings log if non-obvious.
 
 ## Rules
+- Standard bugs that don't need this depth → the **fix** skill workflow (this loop is
+  for hard/intermittent cases); this skill is the escalation, not the default
 - 2-attempt limit per hypothesis; after 2 failed fixes, stop and re-instrument
 - Never "fix" by masking symptoms (adding a delay, hiding the element, swallowing the
   error) without naming what it's masking

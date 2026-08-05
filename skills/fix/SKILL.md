@@ -7,6 +7,11 @@ description: Debug and fix bugs, errors, and failures — including merge confli
 
 Bugs get fixed immediately — no "should I?" questions. But never stack untested fixes.
 
+Hard bugs (intermittent, environment-specific, resistant to the loop below) escalate
+to the **diagnosing-bugs** skill: reproduce → minimize → hypothesize → instrument →
+fix → regression-test. This workflow covers standard bugs; use it unless the symptoms
+say otherwise.
+
 ## Workflow
 
 1. **Explore** — spawn `explore` to map the affected area (neutral prompts:
@@ -20,9 +25,8 @@ Bugs get fixed immediately — no "should I?" questions. But never stack unteste
 4. **Implement** — spawn `implementer` with a complete briefing (verbatim ask, file paths,
    scope). Scope confinement: only files directly related to the bug; no adjacent
    refactors; no dependency upgrades
-5. **Verify** — run the verification chain: `npm run build` →
-   `npm run format:all:check` → `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` →
-   `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`.
+5. **Verify** — run the canonical verification chain (build → format:all:check →
+   phpcs → phpstan, see `docs/verification-chain.md`).
    Build after EVERY fix attempt, confirm green before moving on
 6. **Learn** — non-obvious fix? Append a dated entry to the project's AGENTS.md
    self-evolving learnings log
