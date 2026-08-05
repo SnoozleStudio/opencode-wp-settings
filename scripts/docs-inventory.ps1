@@ -183,6 +183,21 @@ foreach ($k in $patterns.Keys) {
 	}
 }
 
+# --- 2b. Checks badge is measured: the count must match the CI jobs ---
+$wfPath = Join-Path $RepoRoot ".github\workflows\ci.yml"
+if (Test-Path $wfPath) {
+	$wfContent = Get-Content -LiteralPath $wfPath -Raw
+	$jobsSection = ""
+	if ($wfContent -match "(?ms)^jobs:\r?\n(.*?)(?=^\S|\z)") { $jobsSection = $Matches[1] }
+	$jobCount = @([regex]::Matches($jobsSection, '(?m)^  [a-z0-9_-]+:$')).Count
+	$badge = [regex]::Match($readmeContent, 'img\.shields\.io/badge/checks-(\d+)')
+	if (-not $badge.Success) {
+		Add-Failure "count: README.md has no checks badge (img.shields.io/badge/checks-N)"
+	} elseif ([int]$badge.Groups[1].Value -ne $jobCount) {
+		Add-Failure "count: README.md checks badge says $($badge.Groups[1].Value) but .github/workflows/ci.yml has $jobCount job(s)"
+	}
+}
+
 # --- 3. Internal markdown links ---
 $mdFiles = @()
 foreach ($dir in (Get-ChildItem -LiteralPath $RepoRoot -Directory -Recurse | Where-Object {

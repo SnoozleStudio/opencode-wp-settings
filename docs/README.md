@@ -229,7 +229,7 @@ truth — adapt, don't reinvent.**
 | [tui.json](../tui.json) | TUI plugin `opencode-subagent-statusline` |
 | [package.json](../package.json) / [bun.lock](../bun.lock) | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq) |
 | [.gitignore](../.gitignore) | repo hygiene (never commit `node_modules/`, `.env*`, local dumps) |
-| [docs-inventory.ps1](../scripts/docs-inventory.ps1) | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links; exit 1 on drift — runs in CI and locally |
+| [docs-inventory.ps1](../scripts/docs-inventory.ps1) | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally |
 | [ci.yml](../.github/workflows/ci.yml) | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, scaffold dry-run smoke tests |
 
 ---

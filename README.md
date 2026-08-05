@@ -7,15 +7,19 @@ themes and plugins with coding standards, automated checks, and project-specific
 instructions.
 
 ![CI](https://github.com/SnoozleStudio/opencode-wp-settings/actions/workflows/ci.yml/badge.svg)
-![WordPress CS](https://img.shields.io/badge/WPCS-Compliant-blue.svg)
+![Checks](https://img.shields.io/badge/checks-4-green.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
 
-The CI badge is the proof of this repo's own discipline: every push to `main`
-validates JSON well-formedness, repo structure and frontmatter
-(`setup.ps1 -Validate`), the docs inventory and internal links
-(`scripts/docs-inventory.ps1`), lockfile integrity (`bun install
---frozen-lockfile --dry-run`), and scaffold dry-run smoke tests.
+## Repository quality
+
+Every push to `main` and every pull request runs:
+
+- JSON and configuration structure
+- repository frontmatter (`setup.ps1 -Validate`)
+- documentation inventory and internal links (`scripts/docs-inventory.ps1`)
+- lockfile integrity (`bun install --frozen-lockfile --dry-run`)
+- scaffold smoke tests (theme + plugin dry runs)
 
 **What this solves.** Generic AI models are trained on a sea of WordPress code — and
 most of that sea is legacy, unmaintained, and unsafe. This config encodes the WordPress
@@ -46,9 +50,9 @@ with engineering discipline from [mattpocock/skills](https://github.com/mattpoco
 - **No vibe coding, enforced** — a hook plugin blocks `git commit` and `git push`
   until build, format, phpcs, and PHPStan are all green (escape hatch:
   `--no-verify` / `SKIP_GATE=1` — never the norm)
-- **WordPress code that ships safe** — escaping at output, sanitization, nonces +
-  capability checks, `$wpdb->prepare()` — encoded as rules, with a dedicated
-  security-auditor agent covering the full attack surface
+- **WordPress security practices encoded as workflow rules** — escaping at
+  output, sanitization, nonces + capability checks, `$wpdb->prepare()`, with a
+  dedicated security-auditor agent covering the full attack surface
 - **Scaffolding that starts compliant** — one command scaffolds a classic theme or
   plugin that passes Theme/Plugin Review from the first file: WPCS templates, the
   template-hierarchy boot chain, and Vite/Tailwind wired in
