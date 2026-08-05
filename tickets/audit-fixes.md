@@ -45,7 +45,7 @@ docs sync in the same change as the code.
   a clear message) and passed to `cmd.exe` as a quoted single token (line 66); a
   file named `x.php & <cmd>` cannot inject; normal `.php` edits still lint.
 
-## T4. Wire up the plugin template's dead classes + activation hook
+## [x] T4. Wire up the plugin template's dead classes + activation hook
 
 - **Blocked by**: none
 - **Blocks**: none
@@ -69,7 +69,7 @@ docs sync in the same change as the code.
   resolves the target repo (`git -C`) or warns + skips with a visible message;
   normal gated flow and standalone `SKIP_GATE=1` still work.
 
-## T6. Validate setup.ps1 inputs
+## [x] T6. Validate setup.ps1 inputs
 
 - **Blocked by**: none
 - **Blocks**: T7
@@ -79,7 +79,7 @@ docs sync in the same change as the code.
   containing `..`, `\`, `/`, `:`, or quotes — each with a clear FAIL message and
   exit 1; valid inputs behave exactly as before.
 
-## T7. Remove the dead double-write in setup.ps1
+## [x] T7. Remove the dead double-write in setup.ps1
 
 - **Blocked by**: T6
 - **Blocks**: none
@@ -116,7 +116,7 @@ docs sync in the same change as the code.
   learnings log (`AGENTS.md`) and the historical note in guide-pro — both of which
   document the gotcha and stay.
 
-## T11. Rename commands/docs.md → commands/docs-check.md
+## [x] T11. Rename commands/docs.md → commands/docs-check.md
 
 - **Blocked by**: none
 - **Blocks**: none
@@ -127,17 +127,21 @@ docs sync in the same change as the code.
   `grep -r "commands/docs.md"` returns zero; opencode docs confirm filename = name
   (no `name` frontmatter for commands); `setup.ps1 -Validate` passes.
 
-## T12. Add win32 secret-deny patterns
+## [x] T12. Add win32 secret-deny patterns
 
 - **Blocked by**: T2
 - **Blocks**: none
 - **Files**: `opencode.json`
-- **Acceptance**: deny list gains win32 shapes (`C:/Users/**/.ssh/**`,
-  `Get-Content $env:USERPROFILE\*`, `type $HOME\*`); empirically verified: a live
-  `read` of `C:\Users\psnoo\.ssh\id_rsa` and a `type "$HOME\.npmrc"` both prompt
-  instead of passing on `read: "*": "allow"`; POSIX patterns untouched.
+- **Acceptance**: deny list gains win32 shapes; empirically verified via probe:
+  the first out-of-workspace read (`C:\Users\psnoo\.ssh\*`) prompted at the
+  `external_directory` layer (default `ask` — confirmed in opencode.log, action=ask),
+  and bash-layer deny patterns match command strings literally (`Get-Content
+  $env:USERPROFILE/.ssh/*` etc.). Read-layer patterns (`*\\.ssh\\*` backslash forms —
+  the matcher receives relative backslash paths on win32) added as defense-in-depth;
+  their match was not conclusively provable in a running session (config hot-reload
+  unverified) — confirm once in a fresh session. POSIX `~` patterns untouched.
 
-## T13. Add phpstan to the 10 abbreviated chain copies
+## [x] T13. Add phpstan to the 10 abbreviated chain copies
 
 - **Blocked by**: none
 - **Blocks**: none
@@ -165,7 +169,7 @@ docs sync in the same change as the code.
   remain repo-wide (the gate + the canonical doc + README diagram); all others
   reference the doc; `/docs-check` green.
 
-## T15. Doc-drift micro-fixes (4 one-liners)
+## [x] T15. Doc-drift micro-fixes (4 one-liners)
 
 - **Blocked by**: none
 - **Blocks**: none
@@ -179,7 +183,7 @@ docs sync in the same change as the code.
   `setup.ps1:176-183`; wp-theme comment matches `.husky/pre-commit`; scaffolder.md
   names the tokens that actually exist in `templates/`.
 
-## T16. Guide coverage for 6 skills + /refactor
+## [x] T16. Guide coverage for 6 skills + /refactor
 
 - **Blocked by**: none
 - **Blocks**: none
