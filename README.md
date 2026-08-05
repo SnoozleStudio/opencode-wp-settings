@@ -1,18 +1,27 @@
-# OpenCode WordPress Settings — Snoozle Studio
+# OpenCode WordPress Settings
+
+Production-ready WordPress development settings for OpenCode.
+
+A structured OpenCode configuration for building and maintaining custom WordPress
+themes and plugins with coding standards, automated checks, and project-specific
+instructions.
 
 ![WordPress CS](https://img.shields.io/badge/WPCS-Compliant-blue.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
 
-> **Enterprise-grade OpenCode configuration for WordPress plugin and classic theme development.**
-> Eliminates AI "vibe coding" by enforcing WPCS, strict PHPStan typing, and automated
-> verification chains.
->
-> A port of [darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings)
-> with engineering discipline from [mattpocock/skills](https://github.com/mattpocock/skills).
+**What this solves.** Generic AI models are trained on a sea of WordPress code — and
+most of that sea is legacy, unmaintained, and unsafe. This config encodes the WordPress
+engineering discipline — WPCS, strict PHPStan typing, the escaping matrix, automated
+verification — so OpenCode follows an established workflow instead of generating
+generic PHP.
 
-**This repo IS your global OpenCode config.** It lives at `~/.config/opencode/` and is
+**Who it's for.** Developers and agencies building custom WordPress themes and plugins.
+This repo IS your global OpenCode config: it lives at `~/.config/opencode/` and is
 loaded automatically in every project. Updates = `git pull`.
+
+A port of [darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings)
+with engineering discipline from [mattpocock/skills](https://github.com/mattpocock/skills).
 
 > **Documentation** — start here, then go deeper:
 >
@@ -22,6 +31,44 @@ loaded automatically in every project. Updates = `git pull`.
 >
 > **Every change to this repo must stay synced with the documentation** — that's a
 > binding contract, see [AGENTS.md](AGENTS.md) and the [hub](docs/README.md#documentation-contract).
+
+---
+
+## What you get
+
+- **No vibe coding, enforced** — a hook plugin blocks `git commit` and `git push`
+  until build, format, phpcs, and PHPStan are all green (escape hatch:
+  `--no-verify` / `SKIP_GATE=1` — never the norm)
+- **WordPress code that ships safe** — escaping at output, sanitization, nonces +
+  capability checks, `$wpdb->prepare()` — encoded as rules, with a dedicated
+  security-auditor agent covering the full attack surface
+- **Scaffolding that starts compliant** — one command scaffolds a classic theme or
+  plugin that passes Theme/Plugin Review from the first file: WPCS templates, the
+  template-hierarchy boot chain, and Vite/Tailwind wired in
+- **An AI that knows your stack** — GSAP, Lenis, Tempus, and Tailwind discipline
+  loaded on demand via skills, so the front end meets the same bar as the back end
+
+## Quick start in 3 steps
+
+1. **Install** — clone into your OpenCode config dir (or copy the files in; if the
+   directory already exists, clone into a temp folder and merge):
+
+   ```powershell
+   git clone https://github.com/SnoozleStudio/opencode-wp-settings.git "$HOME\.config\opencode"
+   ```
+
+2. **Restart OpenCode** — the config loads for every session automatically
+3. **Try it** — open any WordPress theme or plugin project and invoke a command:
+   - `/theme` — Scaffold a WPCS-compliant classic theme
+   - `/fix` — Fix an issue with mandatory WPCS + escaping verification
+   - `/audit` — Run a full security & code quality pass
+
+   Classic-theme first — the config targets classic themes (not block themes):
+   WPCS templates, the template-hierarchy boot chain, and Vite/Tailwind — all
+   scaffolded from day one.
+
+Updates = `git pull`. Non-destructive: project-level `opencode.json` / `.opencode/`
+configs merge over the global one.
 
 ---
 
@@ -82,34 +129,13 @@ This repo closes that gap with engineering discipline, not hope:
                  [ ✅ PASS? Clean Git Push ]
 ```
 
-## Quick start in 3 steps
-
-1. **Install** — clone into your OpenCode config dir (or copy the files in; if the
-   directory already exists, clone into a temp folder and merge):
-
-   ```powershell
-   git clone https://github.com/SnoozleStudio/opencode-wp-settings.git "$HOME\.config\opencode"
-   ```
-
-2. **Restart OpenCode** — the config loads for every session automatically
-3. **Try it** — open any WordPress theme or plugin project and invoke a command:
-   - `/theme` — Scaffold a WPCS-compliant classic theme
-   - `/fix` — Fix an issue with mandatory WPCS + escaping verification
-   - `/audit` — Run a full security & code quality pass
-
-   Classic-theme first — the config targets classic themes (not block themes):
-   WPCS templates, the template-hierarchy boot chain, and Vite/Tailwind — all
-   scaffolded from day one.
-
-Updates = `git pull`. Non-destructive: project-level `opencode.json` / `.opencode/`
-configs merge over the global one.
-
 ---
 
 ## What's inside
 
 ```
 AGENTS.md             Portable coding standards (guardrails, WP + front-end stack, git)
+LICENSE               MIT license (incl. upstream attribution: cc-settings, mattpocock/skills)
 opencode.json         Global config: permission allow/ask/deny lists, MCP servers
 tui.json              TUI plugins (subagent statusline)
 agents/               8 subagents (explore, implementer, planner, reviewer,

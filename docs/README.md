@@ -34,7 +34,8 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 
 ```
 ~/.config/opencode/          ← THIS REPO (your global OpenCode config)
-├── README.md                front door: install, quick start, links to the guides
+├── README.md                front door: value prop, install, quick start, links to the guides
+├── LICENSE                  MIT license (incl. upstream attribution: cc-settings, mattpocock/skills)
 ├── AGENTS.md                portable coding standards + guardrails (bound every session)
 ├── opencode.json            permission allow/ask/deny matrix + MCP server config
 ├── tui.json                 TUI plugins (subagent statusline)
