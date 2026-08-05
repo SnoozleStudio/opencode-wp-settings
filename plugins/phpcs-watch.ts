@@ -10,6 +10,13 @@ const execFileAsync = promisify(execFile);
 const MAX_REPORT_LINES = 24;
 
 /**
+ * Paths are interpolated into a `cmd.exe /c` string. Reject anything carrying
+ * cmd metacharacters or quotes up front — a hostile file name must never
+ * reach the shell. Spaces are rejected too (they would split the argument).
+ */
+const SAFE_FILE_PATH = /^[\w\-./\\]+$/;
+
+/**
  * Run a command in the host shell and capture output. Uses child_process
  * instead of Bun's shell so behavior is identical across runtimes: output is
  * buffered (never echoed), the cwd is explicit, and non-zero exits are
@@ -63,7 +70,7 @@ export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 		const bin = phpcsBin();
 		if (!bin) return { errors: 0, report: "" };
 		const out = await run(
-			`${bin} --standard=phpcs.xml -d memory_limit=1024M ${filePath}`,
+			`${bin} --standard=phpcs.xml -d memory_limit=1024M "${filePath}"`,
 			directory
 		);
 		if (out.exitCode === 0) return { errors: 0, report: "" };
@@ -88,6 +95,13 @@ export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 				input.args?.filePath ?? input.args?.path ?? input.args?.file ?? ""
 			);
 			if (!filePath.endsWith(".php")) return;
+			if (!SAFE_FILE_PATH.test(filePath)) {
+				output.metadata.phpcs = {
+					status: "skipped",
+					reason: "unsafe path (rejected before reaching the shell)",
+				};
+				return;
+			}
 			const result = await lintFile(filePath);
 			if (result.errors === 0) {
 				output.metadata.phpcs = { status: "clean" };
