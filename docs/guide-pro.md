@@ -161,8 +161,10 @@ Behavioral details that matter:
 - **Gating only applies to WordPress theme/plugin projects** — `isGatedProject` requires
   a `build` script in `package.json` AND `phpcs.xml` or `composer.json`. Plain repos
   are untouched.
-- **Cache window:** a green chain is cached 120s per working-tree state (`git status
-  --porcelain`); unchanged tree + recent green = no re-run.
+- **Cache window:** a green chain is cached 120s **per target repo**, keyed by
+  `git rev-parse HEAD` + `git status --porcelain`. Two repos — or two branches of
+  the same repo — can never share a green cache; an unchanged tree at the same
+  commit is the only thing that skips a re-run.
 - **Escapes:** `--no-verify`, `HUSKY=0`, `SKIP_GATE=1` are explicit opt-outs — the
   escape hatch, not the norm (README guardrails). They only count as standalone,
   unquoted arguments — quoted segments are stripped first, so a commit message that
@@ -171,9 +173,11 @@ Behavioral details that matter:
   and gates `<repo>`; commands that `cd` / `Set-Location` / `pushd` out of the session
   directory are exempt (target unresolvable) and skip with a warning — gate those repos
   with `git -C` explicitly.
-- **Windows:** commands run through `cmd.exe /c`, which resolves `.cmd` shims
-  (`vendor\bin\phpcs.bat`); output is buffered, never echoed. `git.exe` is gated
-  identically to `git`.
+- **Windows:** commands run through `cmd.exe /c`, which parses `/` as a switch
+  separator — the canonical `vendor/bin/phpcs` form cannot execute there (it splits
+  into the command `vendor` plus a switch). The gate rewrites `vendor/bin/<tool>` to
+  `vendor\bin\<tool>.bat` at exec time on win32; POSIX runs the canonical form
+  directly. Output is buffered, never echoed. `git.exe` is gated identically to `git`.
 - **PHPStan step:** whole-project analysis, run after phpcs with
   `--no-progress --memory-limit=1G`; per-edit "phpstan-watch" is deliberately not
   wired up — partial-file analysis on a half-saved tree produces false positives.

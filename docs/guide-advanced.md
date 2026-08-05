@@ -91,7 +91,7 @@ The three hook plugins each cache so they don't burn I/O on every tool call:
 
 | Plugin | Cache | Effect |
 |---|---|---|
-| proof-of-work | 120s per working-tree state | a green chain is not re-run if the tree is unchanged |
+| proof-of-work | 120s per target repo (HEAD + tree state) | a green cache is scoped to one repo at one commit; another repo or branch always re-runs |
 | session-context | 30s | git state line refreshed at most every 30s |
 | phpcs-watch | 2s per file (clean only) | rapid re-edits of a clean file skip the inline lint |
 

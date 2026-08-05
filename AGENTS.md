@@ -480,3 +480,12 @@ Keep entries terse and factual — one line each.
   every bun version — never strict JSON; validate it with bun itself
   (`bun install --frozen-lockfile --dry-run`), never jq. Resync a stale lockfile with
   `bun install --lockfile-only` (no --frozen-lockfile — frozen rejects the rewrite).
+- [2026-08-05] tooling: cmd.exe splits an executable token at `/` — `vendor/bin/phpcs`
+  parses as the command `vendor` plus a switch; composer bins must run as
+  `vendor\bin\<tool>.bat` on win32 (backslash extensionless forms DO resolve via
+  PATHEXT — probe-verified — but the forward-slash canonical form never does).
+- [2026-08-05] tooling: a trigger regex `git(\.exe)?\s+(push|commit)` silently misses
+  `git -C <path> push/commit` — the option precedes the verb. Gate/trigger patterns
+  need an optional `-C <path>` clause; verified end-to-end by driving
+  proof-of-work.ts via bun against fake gated repos (per-target cache keyed by
+  HEAD + porcelain, cache hits within 120s, invalidation on new HEAD).

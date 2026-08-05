@@ -318,3 +318,41 @@ docs sync in the same change as the code.
 - **Acceptance**: T19's record says what the repo's formatting gate actually is
   (docs-check + -Validate) instead of claiming a prettier check that cannot run
   here.
+
+## [x] T29. Gate phpcs/phpstan steps are Windows-only
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `plugins/proof-of-work.ts`, `docs/guide-pro.md` §4, hub Plugins row
+- **Cause**: the steps array hardcoded `vendor\\bin\\phpcs` / `vendor\\bin\\phpstan`
+  (backslashes, unconditional). On POSIX `/bin/sh`, `\b` is a literal `b` →
+  `vendorbinphpcs` → "command not found" — the gate could never go green
+  off-Windows. The only unconditional backslash in the repo (phpcs-watch branches
+  on `isWin32()`; docs, commands, opencode.json, templates all use `vendor/bin/`).
+- **Acceptance**: steps array carries the canonical doc commands verbatim
+  (`vendor/bin/phpcs`, `vendor/bin/phpstan` — `verify-chain-consistency.ps1` still
+  green); win32 rewrites them to `vendor\bin\<tool>.bat` at exec time. Probe
+  results on win32: backslash forms resolve via PATHEXT (exit 0), the forward-
+  slash canonical form fails in cmd (`'vendor' is not recognized` — split at `/`),
+  end-to-end gate run via bun passes all 4 steps. POSIX correctness is by
+  construction (canonical form is the one every other repo file uses) — no POSIX
+  machine to prove it on (fail-loud).
+
+## [x] T30. Gate cache not scoped to target repo + git -C never triggers the gate
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `plugins/proof-of-work.ts`, `docs/guide-pro.md` §4, `docs/guide-advanced.md` §5
+- **Cause A**: `lastGreen`/`lastState` were single-slot plugin state but `target`
+  varies per call (session dir vs resolved `git -C <repo>`); two repos with
+  identical `git status --porcelain` (e.g. both clean = `""`) within 120s shared a
+  green cache — repo B's chain never ran.
+- **Cause B** (found while testing A): `GIT_OP = /\bgit(\.exe)?\s+(push|commit)\b/`
+  cannot see the verb past `git -C <path> …` — every documented multi-repo form
+  returned early, ungated, and the `GIT_C` resolution branch was dead code.
+- **Acceptance**: cache is a `Map` keyed by resolved target; state includes
+  `git rev-parse HEAD` so a branch switch invalidates; failure deletes the
+  target's entry. `GIT_OP` gains an optional `-C <path>` clause. Verified
+  end-to-end via bun against two fake gated repos: `git -C` reaches the gate,
+  same-repo repeat is a cache hit (no re-run), repo B with identical porcelain
+  still runs, new HEAD invalidates.
