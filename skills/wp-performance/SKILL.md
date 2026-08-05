@@ -1,6 +1,6 @@
 ---
 name: wp-performance
-description: Optimize and audit WordPress plugin/theme performance: server-side (enqueue discipline, options autoload, transients, query caching) and front-end (bundle splitting, dynamic imports, rAF budget, animation cost). Use when improving page speed, web vitals, or when writing any code that runs on every request.
+description: Optimize and audit WordPress plugin/theme performance — server-side (enqueue discipline, options autoload, transients, query caching) and front-end (bundle splitting, dynamic imports, rAF budget, animation cost). Use when improving page speed, web vitals, or when writing any code that runs on every request.
 ---
 
 # Performance — WordPress + Front-End

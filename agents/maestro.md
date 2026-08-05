@@ -1,5 +1,5 @@
 ---
-description: Maestro orchestration agent. Coordinates multiple subagents for complex multi-step work: parallel fan-out across independent workstreams and phased long-running execution with verification gates between phases.
+description: Maestro orchestration agent. Coordinates multiple subagents for complex multi-step work — parallel fan-out across independent workstreams and phased long-running execution with verification gates between phases.
 mode: subagent
 steps: 200
 color: primary

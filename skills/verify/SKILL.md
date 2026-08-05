@@ -1,6 +1,6 @@
 ---
 name: verify
-description: Adversarial verification that code, logic, or a completed task is CORRECT. Use for "double check this logic", "prove it", "is this bug really fixed". Three-agent pattern: finder finds issues, adversary tries to disprove them, referee judges. For high-stakes correctness. Not for standards/spec review (use review) or attack-surface security (use wp-security-audit).
+description: Adversarial verification that code, logic, or a completed task is CORRECT. Use for "double check this logic", "prove it", "is this bug really fixed". Three-agent pattern — finder finds issues, adversary tries to disprove them, referee judges. For high-stakes correctness. Not for standards/spec review (use review) or attack-surface security (use wp-security-audit).
 ---
 
 # Adversarial Verification

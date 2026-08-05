@@ -1,6 +1,6 @@
 ---
 name: diagnosing-bugs
-description: Disciplined diagnosis loop for hard bugs and performance regressions: reproduce → minimize → hypothesize → instrument → fix → regression-test. Use for "hard to debug", "only happens sometimes", "works locally but not on the server", "slow page", "memory leak", "strange behavior".
+description: Disciplined diagnosis loop for hard bugs and performance regressions — reproduce → minimize → hypothesize → instrument → fix → regression-test. Use for "hard to debug", "only happens sometimes", "works locally but not on the server", "slow page", "memory leak", "strange behavior".
 ---
 
 # Diagnosing Bugs — The Loop

@@ -101,6 +101,13 @@ function Test-Frontmatter([string]$File, [string]$Kind, [string]$DirName) {
 	if (-not $content) { Write-Fail "${Kind} $File is empty or unreadable"; return $false }
 	if ($content -notmatch '^---\r?\n') { Write-Fail "${Kind} $File has no frontmatter"; return $false }
 	if ($content -notmatch '(?m)^description:\s*.+') { Write-Fail "${Kind} $File has no description"; return $false }
+	# Plain YAML scalars cannot contain ': ' (colon+space) - it starts a mapping
+	# and the frontmatter fails to parse, silently killing the component's
+	# routing. Quoted values (starting with ' or ") are exempt.
+	if ($content -match '(?m)^description:\s*[^\s''"][^\r\n]*: ') {
+		Write-Fail "${Kind} $File - description contains ': ' (colon+space) - invalid in a plain YAML scalar, breaks frontmatter parsing"
+		return $false
+	}
 	if ($Kind -eq "skill" -and $content -notmatch "(?m)^name:\s*$([regex]::Escape($DirName))\s*$") {
 		Write-Fail "skill ${File}: frontmatter name must match directory name '$DirName'"
 		return $false

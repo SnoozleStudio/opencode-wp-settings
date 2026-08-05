@@ -1,5 +1,5 @@
 ---
-description: Reviewer subagent that reviews diffs on two axes: Standards (does it follow the repo's coding standards and WordPress best practices) and Spec (does it faithfully implement the requested change). Use before committing or opening PRs.
+description: Reviewer subagent that reviews diffs on two axes — Standards (does it follow the repo's coding standards and WordPress best practices) and Spec (does it faithfully implement the requested change). Use before committing or opening PRs.
 mode: subagent
 permission:
   edit: deny

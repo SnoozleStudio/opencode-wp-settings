@@ -1,6 +1,6 @@
 ---
 name: tdd
-description: Test-driven development discipline adapted for WordPress: write a failing check first, watch it fail, implement, watch it pass, refactor. Use for "TDD", "test-first", "red-green-refactor". Lint and build are the fastest feedback loops when a PHPUnit harness isn't present.
+description: Test-driven development discipline adapted for WordPress — write a failing check first, watch it fail, implement, watch it pass, refactor. Use for "TDD", "test-first", "red-green-refactor". Lint and build are the fastest feedback loops when a PHPUnit harness isn't present.
 ---
 
 # TDD — Red-Green-Refactor (WordPress-Adapted)

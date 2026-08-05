@@ -1,5 +1,5 @@
 ---
-description: Tester/verification agent. Runs the project's proof-of-work: build, format checks, phpcs, and phpstan — and confirms results are genuinely green. Use for verifying changes, reproducing failures, and running the verification chain.
+description: Tester/verification agent. Runs the project's proof-of-work — build, format checks, phpcs, and phpstan — and confirms results are genuinely green. Use for verifying changes, reproducing failures, and running the verification chain.
 mode: subagent
 steps: 60
 color: secondary

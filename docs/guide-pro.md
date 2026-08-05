@@ -453,7 +453,7 @@ known trap).
 
 | Parameter | Behavior |
 |---|---|
-| `-Validate` | structure check: AGENTS.md/opencode.json present; every agent/skill/command has frontmatter + description; skill `name` matches directory. Exit 1 on failure |
+| `-Validate` | structure check: AGENTS.md/opencode.json present; every agent/skill/command has frontmatter + description; skill `name` matches directory; no plain-scalar description contains `: ` (colon+space — would break YAML parsing and kill the component's routing). Exit 1 on failure |
 | `-NewTheme <dir>` / `-NewPlugin <dir>` | scaffold into an explicit local directory (no WP root needed) |
 | `-Theme <slug>` / `-Plugin <slug>` | scaffold into a WordPress root: walked-up root (site shell) or `-Site <name>` |
 | `-Site <name>` / `-SitesDir <dir>` | resolve `{Local Sites}\<name>\app\public`; `-SitesDir` overrides the sites root |

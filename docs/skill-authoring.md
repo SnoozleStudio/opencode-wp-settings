@@ -11,6 +11,10 @@ the reusable discipline; commands wire them; agents execute them.
   `description` (1–1024 chars). **The description is the selector** — the model sees
   only name + description until it loads the skill. Rich, trigger-phrase-dense
   descriptions are the difference between a skill that fires and one that doesn't
+- **YAML trap:** descriptions are plain YAML scalars — a `: ` (colon+space) inside
+  the value fails frontmatter parsing and silently kills the skill's routing (the
+  model never sees it). Reword, or quote the whole value (`description: "…"`).
+  `setup.ps1 -Validate` enforces this
 - Other frontmatter fields are ignored by OpenCode (kept for Claude compat: license,
   metadata)
 

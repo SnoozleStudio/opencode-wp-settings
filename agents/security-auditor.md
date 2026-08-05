@@ -1,5 +1,5 @@
 ---
-description: WordPress security auditor. Reviews code for the full WP attack surface: XSS via escaping matrix, SQL injection, CSRF/nonces, privilege escalation, REST exposure, insecure file handling, secrets. Use for security reviews and audits.
+description: WordPress security auditor. Reviews code for the full WP attack surface — XSS via escaping matrix, SQL injection, CSRF/nonces, privilege escalation, REST exposure, insecure file handling, secrets. Use for security reviews and audits.
 mode: subagent
 permission:
   edit: deny

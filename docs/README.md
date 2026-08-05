@@ -225,7 +225,7 @@ truth — adapt, don't reinvent.**
 
 | File | Purpose |
 |---|---|
-| [setup.ps1](../setup.ps1) | `-Validate` repo structure/frontmatter; `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into a Local site (walks up for `wp-load.php`, or `-Site <name>`); `-Install` npm+composer (Local PHP openssl workaround); `-Force`, `-DryRun` |
+| [setup.ps1](../setup.ps1) | `-Validate` repo structure/frontmatter (incl. the YAML colon-space guard — `: ` in a plain-scalar description breaks parsing); `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into a Local site (walks up for `wp-load.php`, or `-Site <name>`); `-Install` npm+composer (Local PHP openssl workaround); `-Force`, `-DryRun` |
 | [scaffold.cmd](../scaffold.cmd) | shell-agnostic wrapper (cmd/Git Bash/PowerShell) forwarding to setup.ps1 — the entry point from Local's site shell |
 | [opencode.json](../opencode.json) | permission matrix (bash allowlist/ask/deny, secrets deny, `node -e` deny), MCP servers: context7 (enabled), chrome-devtools (disabled) |
 | [tui.json](../tui.json) | TUI plugin `opencode-subagent-statusline` |
