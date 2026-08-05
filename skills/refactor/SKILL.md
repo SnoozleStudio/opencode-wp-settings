@@ -15,10 +15,8 @@ Refactoring changes shape, not behavior. Every step must keep the code green.
    before/after call graph looks like. The plan is the contract; a wrong plan means
    rollback
 3. **Small steps** — one behavior-preserving step at a time: rename → extract → move →
-   simplify. Run the verification chain after each step:
-   `npm run build` → `npm run format:all:check` →
-   `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` →
-   `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+   simplify. Run the canonical verification chain after each step (build →
+   format:all:check → phpcs → phpstan, see `docs/verification-chain.md`)
 4. **No behavior change** — if a step changes output, ordering, or edge-case handling,
    it's not a refactor, it's a feature/bug — stop and flag it
 5. **Review** — two-axis review on the final diff (Standards + Spec: spec here = "shape

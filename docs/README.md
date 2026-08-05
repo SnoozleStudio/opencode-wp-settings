@@ -43,7 +43,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
 ├── skills/                  26 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
-├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
+├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper
 ├── docs/                    this hub + reference docs + the 2 guides
 ├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
 ├── templates/               scaffolding sources (theme/, plugin/)
@@ -77,6 +77,7 @@ lives here.
 | [frontend-stack.md](frontend-stack.md) | Vite, Tailwind v4, GSAP, Lenis, Tempus, Three.js, swup | `wp-theme` | writing or reviewing JS/CSS |
 | [accessibility.md](accessibility.md) | WCAG 2.2 AA + Theme Review minimums | `wp-accessibility` | building or reviewing any UI |
 | [performance.md](performance.md) | server-side + browser perf doctrine | `wp-performance` | optimizing or writing request-path code |
+| [verification-chain.md](verification-chain.md) | the canonical proof-of-work chain (build → format:all:check → phpcs → phpstan) | all code-writing agents + commands | running or citing the chain — never inline a copy |
 | [skill-authoring.md](skill-authoring.md) | how to write skills for this repo | anyone authoring skills | adding or editing a skill |
 | [guide-beginners.md](guide-beginners.md) | Level 1: AI-driven workflows with example prompts | humans | starting out |
 | [guide-pro.md](guide-pro.md) | Level 2: internals, authoring, orchestration | humans | extending the config |
@@ -200,6 +201,9 @@ are TS files built against `@opencode-ai/plugin` (see
 | Proof of work | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts) | `tool.execute.before` (bash) | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only; session-directory scoped — `git -C <repo>` honored, bare `cd` chains exempt) |
 | phpcs-watch | [plugins/phpcs-watch.ts](../plugins/phpcs-watch.ts) | `tool.execute.after` (edit/write/apply_patch) | single-file phpcs pass after every `.php` edit; surfaces findings inline |
 | Session context | [plugins/session-context.ts](../plugins/session-context.ts) | `experimental.chat.system.transform` | appends "Git state: branch, N uncommitted file(s)" to the system prompt |
+
+All three import the shared shell runner [plugins/lib/run.ts](../plugins/lib/run.ts)
+(`run()` + `isWin32()`) — change exec behavior there, not per plugin.
 
 ### Templates (2)
 

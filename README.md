@@ -118,11 +118,8 @@ This repo closes that gap with engineering discipline, not hope:
      ┌────────────────────────────────────────────┐
      │  Proof-of-Work Gate (Automatic Hook)       │
      ├────────────────────────────────────────────┤
-     │  1. npm run build                          │
-     │  2. npm run format:all:check               │
-     │  3. vendor/bin/phpcs --standard=phpcs.xml  │
-     │  4. vendor/bin/phpstan analyse             │
-     │     --no-progress --memory-limit=1G        │
+     │  4-step verification chain, stop at red    │
+     │  (docs/verification-chain.md)              │
      └────────────────────────────────────────────┘
                            │
                  [ ❌ FAIL? Block Commit / Push ]
@@ -146,6 +143,7 @@ skills/               26 skills (wp-plugin, wp-theme, wp-security-audit, fix, ve
 commands/             18 slash commands (/fix /build /review /verify /ship /audit
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
+                      + plugins/lib/run.ts (shared shell runner)
 docs/                 Documentation hub + reference docs + 2 guides
 tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
@@ -170,9 +168,9 @@ discipline. The full wiring lives in the [Documentation Hub](docs/README.md#depe
 
 ## Guardrails at a glance
 
-- **Verification chain** — `npm run build` → `npm run format:all:check` →
-  `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` →
-  `vendor/bin/phpstan analyse --no-progress --memory-limit=1G` before every commit.
+- **Verification chain** — build → format:all:check → phpcs → phpstan, in order,
+  stopping at the first red, enforced before every commit
+  ([docs/verification-chain.md](docs/verification-chain.md)).
   The `proof-of-work` plugin blocks `git push`/`git commit` on a red chain (skip with
   `--no-verify` or `SKIP_GATE=1` — but that's the escape hatch, not the norm; the gate is
   scoped to the session directory — `git -C <repo>` is honored, bare `cd` chains are exempt)
@@ -288,6 +286,7 @@ and use the direct form instead:
 | [frontend-stack.md](docs/frontend-stack.md) | Vite/Tailwind/GSAP/Lenis/Tempus/Three |
 | [accessibility.md](docs/accessibility.md) | WCAG 2.2 AA |
 | [performance.md](docs/performance.md) | page speed, web vitals |
+| [verification-chain.md](docs/verification-chain.md) | the canonical proof-of-work chain |
 | [skill-authoring.md](docs/skill-authoring.md) | writing new skills |
 
 ## License

@@ -128,6 +128,9 @@ Plugins observe and intercept the tool-execution pipeline. The SDK surface used 
 - `experimental.chat.system.transform` — inject into the system prompt
   (session-context status line)
 
+All three import the shared shell runner from `plugins/lib/run.ts` (`run()` +
+`isWin32()`); keep exec-behavior changes there, not in the plugins.
+
 ### proof-of-work.ts — the commit gate
 
 The heart of the "never ship red" rule:
@@ -288,10 +291,9 @@ prompt. `$ARGUMENTS` is replaced by what you type after the slash.
 description: Run the full lint + format + build + static-analysis verification chain and report status.
 ---
 
-Run the verification chain: npm run build, npm run format:all:check,
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M,
-vendor/bin/phpstan analyse --no-progress --memory-limit=1G — in order, stopping at
-the first red. Report each step's actual result (exit code + first error line)…
+Run the canonical verification chain ([verification-chain.md](verification-chain.md)) —
+in order, stopping at the first red. Report each step's actual result (exit code +
+first error line)…
 ```
 
 Authoring rules distilled from the 18 existing commands:
@@ -301,7 +303,8 @@ Authoring rules distilled from the 18 existing commands:
    diagnoses, implements, verifies").
 2. **Body = complete briefing** — the command must be enough on its own; it names the
    skill to use, the order of operations, the quality bar, and the report format.
-3. **State the verification chain** in every command that touches code.
+3. **Point to the canonical verification chain** ([verification-chain.md](verification-chain.md))
+   in every command that touches code — never inline a full copy.
 4. **Fail-loud language** — "Never report green without running", "never commit a
    failing gate", "do not edit anything".
 5. New command → update the [hub's command table](README.md#commands-18) + README
@@ -431,14 +434,8 @@ known trap).
 
 ## 10. The verification chain & proof-of-work gate
 
-The chain (in order, stop at first red):
-
-```
-npm run build
-npm run format:all:check
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
-vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-```
+The chain is defined once in [verification-chain.md](verification-chain.md) — build →
+format:all:check → phpcs → phpstan, in order, stop at first red. What each step does:
 
 - **build** — Vite production build (the `dist/` output your PHP enqueues via the
   manifest)

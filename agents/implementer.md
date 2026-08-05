@@ -35,8 +35,9 @@ ask the caller for it — never infer scope:
      gates, dynamic `import()` for heavy work
 4. When a change crosses 3+ files or touches security-sensitive paths, state the plan
    before editing, then proceed.
-5. After each complete unit of work, run the verification chain for the project:
-   `npm run build` → `npm run format:all:check` → `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` → `vendor/bin/phpstan analyse --no-progress --memory-limit=1G`
+5. After each complete unit of work, run the verification chain for the project
+   (build → format:all:check → phpcs → phpstan — see
+   [docs/verification-chain.md](../docs/verification-chain.md)).
    Fix what it surfaces before reporting done. Never stack untested fixes.
 
 ## 2-Iteration Limit

@@ -94,16 +94,10 @@ Run the verification chain after any fix and confirm it passes **before moving o
 stack untested fixes — cascading errors eat context and compound regressions.
 
 ### Pre-Commit Verification Chain (WordPress)
-**Never commit code that fails the verification chain.** For theme/plugin projects, in order:
-
-```
-npm run build                       # Vite production build (assets compile)
-npm run format:all:check            # Prettier (JS/CSS/JSON) + Pint (PHP) dry-run
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
-vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-```
-
-Run all four and fix what they surface before committing — not after. The
+**Never commit code that fails the verification chain.** The chain — build →
+format:all:check → phpcs → phpstan, in order, stopping at the first red — is defined
+once in [docs/verification-chain.md](docs/verification-chain.md). Run it and fix what
+it surfaces before committing — not after. The
 `proof-of-work` plugin gates `git commit`/`git push` on these checks; never bypass it.
 The gate is scoped to the session directory: `git -C <repo>` is honored, `cd`-style
 command chains are exempt (use `git -C` to gate another repo explicitly).

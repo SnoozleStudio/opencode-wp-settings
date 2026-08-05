@@ -12,14 +12,8 @@ never claim a check passed unless you ran it and saw the exit code.
 
 ## Verification chain (WordPress theme/plugin projects)
 
-Run in order; stop at the first red:
-
-```
-npm run build
-npm run format:all:check
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
-vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-```
+Run the canonical chain — build → format:all:check → phpcs → phpstan, in order,
+stopping at the first red (see [docs/verification-chain.md](../docs/verification-chain.md)):
 
 - If `phpcs.xml` doesn't exist or is weak (e.g. only the I18n sniff), note it as a
   finding — do not relax the standard

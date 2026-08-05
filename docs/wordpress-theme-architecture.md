@@ -81,12 +81,8 @@ visible; content usable with JS disabled (`<noscript>` fallbacks).
 
 ## Verification chain
 
-```
-npm run build
-npm run format:all:check
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
-vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-```
+The canonical 4-step chain (build → format:all:check → phpcs → phpstan) lives in
+[verification-chain.md](verification-chain.md) — run it, stop at the first red.
 
 ## References
 

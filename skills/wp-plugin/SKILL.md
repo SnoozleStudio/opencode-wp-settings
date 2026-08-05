@@ -52,12 +52,8 @@ plugin-slug/
 
 ## Verification chain
 
-```
-npm run build
-npm run format:all:check
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
-vendor/bin/phpstan analyse --no-progress --memory-limit=1G
-```
+Run the canonical 4-step chain — build → format:all:check → phpcs → phpstan, in
+order, stopping at the first red (see `docs/verification-chain.md`).
 
 ## Scaffolding
 

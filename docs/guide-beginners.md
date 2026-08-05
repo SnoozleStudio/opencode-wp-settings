@@ -49,9 +49,9 @@ say *"spawn the explore subagent"*, you say *"figure out why my menu is broken"*
 
 Two rules that protect you, always:
 
-- **The verification chain** — before any commit, the AI must run `npm run build` →
-  `npm run format:all:check` → `vendor/bin/phpcs` → `vendor/bin/phpstan`. The
-  `proof-of-work` plugin blocks commits when it's red. You never ship broken code
+- **The verification chain** — before any commit, the AI must run the canonical chain
+  (build → format:all:check → phpcs → phpstan, see [verification-chain.md](verification-chain.md)).
+  The `proof-of-work` plugin blocks commits when it's red. You never ship broken code
   because the gate physically won't let it through.
 - **Stealth mode** — no "generated with AI" fingerprints ever appear in commits.
 
@@ -331,8 +331,8 @@ fixes. Read-only: nothing gets edited without your say-so.
 /ship
 ```
 
-**What happens:** the full gate, in order, stopping at the first red: `npm run build`
-→ `npm run format:all:check` → `vendor/bin/phpcs` → `vendor/bin/phpstan`. Then a
+**What happens:** the full gate, in order, stopping at the first red — the canonical
+verification chain ([verification-chain.md](verification-chain.md)). Then a
 two-axis review of the diff. Then (only
 when everything is green) staging the intended files and a conventional commit —
 no AI fingerprints.
@@ -470,7 +470,7 @@ stuck — it's applying the stop-and-replan rule.** Answer it.
 | **Skill** | a how-to discipline the AI loads on demand; matched by its description |
 | **Command** | a `/shortcut` — a well-written prompt for a known workflow |
 | **Plugin** | code that hooks into OpenCode itself (commit gate, lint watcher, status line) |
-| **Verification chain** | `npm run build` → `npm run format:all:check` → `vendor/bin/phpcs` → `vendor/bin/phpstan` — the proof-of-work before any commit |
+| **Verification chain** | the canonical proof-of-work chain — build → format:all:check → phpcs → phpstan, see [verification-chain.md](verification-chain.md) |
 | **phpcs** | PHP_CodeSniffer — the PHP lint gate against the WordPress Coding Standards |
 | **PHPStan** | static analysis of PHP types (level 8) — catches type bugs phpcs can't see |
 | **ACF** | Advanced Custom Fields Pro — where content fields live (`get_field()`) |
