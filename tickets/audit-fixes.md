@@ -227,6 +227,94 @@ docs sync in the same change as the code.
 - **Blocks**: none
 - **Files**: none (verification only)
 - **Acceptance**: `/docs-check` green (inventory, README counts, guide references,
-  descriptions); `setup.ps1 -Validate` green; prettier check green on all changed
-  files; `opencode debug skill` + `opencode debug agent` show the expected set;
-  every ticket above closed with a conventional commit (no AI fingerprints).
+  descriptions); `setup.ps1 -Validate` green; `opencode debug skill` +
+  `opencode debug agent` show the expected set; every ticket above closed with a
+  conventional commit (no AI fingerprints).
+- **Correction (2026-08-05, re-audit)**: the original "prettier check green on all
+  changed files" line was unverifiable — this repo has no root `.prettierrc` and
+  prettier is not a dependency (prettier runs inside scaffolded projects, not here).
+  The repo's formatting gate is `/docs-check` + `setup.ps1 -Validate`.
+
+---
+
+## Re-audit batch 2 (2026-08-05) — findings from the post-fix re-audit
+
+## [x] T20. check.md chain copy → canonical reference
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `commands/check.md`
+- **Acceptance**: the full 4-command copy (the 4th survivor of the dedupe) replaced
+  with a reference to `docs/verification-chain.md`; repo-wide full-chain census
+  returns only the gate + canonical doc + setup.ps1 UX strings.
+
+## [x] T21. Untrack package-lock.json, standardize on bun
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: repo root `package-lock.json`, `.gitignore`, hub map + README tree
+- **Acceptance**: `package-lock.json` untracked and ignored with a bun-only comment;
+  `bun.lock` stays the single lockfile; inventory already lists `package.json /
+  bun.lock` (no doc change needed).
+
+## [x] T22. Validate setup.ps1 -Name
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `setup.ps1`
+- **Acceptance**: `-Name` rejected unless it matches `^[\w .\-]+$` — a hostile name
+  (`x */ eval(...); /*`) can no longer break out of the generated plugin header
+  docblock or i18n strings; valid names (`My Plugin`, `T4 Test`) unchanged.
+
+## [x] T23. Deny branch deletion in explore agent
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `agents/explore.md`
+- **Acceptance**: `git branch -D *` and `git branch -d *` denied after the
+  `git branch*` allow in the explore agent; the read-only agent can no longer
+  silently delete branches.
+
+## [x] T24. Deny `git checkout .` in the global matrix
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `opencode.json`
+- **Acceptance**: `"git checkout .*": "deny"` added after the `git checkout *` allow
+  (last-match-wins) — the discard-all form is no longer silently allowed.
+
+## [x] T25. Forward-slash absolute secret denies
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `opencode.json`
+- **Acceptance**: `C:/Users/*/.ssh/**` etc. added to read + edit layers (belt-and-
+  braces for the fresh-session verification of T12's backslash forms).
+
+## [x] T26. Document the compound-command permission residual
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `docs/guide-pro.md` §2
+- **Acceptance**: the whole-string glob trade-off (an allowed prefix matches a
+  chained command) documented as a known residual with the explicit reason why
+  trailing-wildcard denies are not the fix; the stale matrix rows from T2
+  (`npm install*`, `bunx *`) corrected in the same pass.
+
+## [x] T27. Traversal check before site-root resolution
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `setup.ps1`
+- **Acceptance**: the `-Site/-Theme/-Plugin` traversal check extracted to
+  `Assert-SafePathValues` and called before any `Resolve-SiteRoot`/path
+  construction; rejection precedes probing; behavior unchanged otherwise.
+
+## [x] T28. Correct T19's unverifiable prettier claim
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `tickets/audit-fixes.md`
+- **Acceptance**: T19's record says what the repo's formatting gate actually is
+  (docs-check + -Validate) instead of claiming a prettier check that cannot run
+  here.
