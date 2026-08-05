@@ -28,6 +28,7 @@
 			"git pull*": "allow",
 			"git checkout *": "allow",
 			"git checkout -- *": "deny",
+			"git checkout .*": "deny",
 			"git restore *": "deny",
 			"git clean *": "deny",
 			"git reset --hard*": "deny",
@@ -122,7 +123,14 @@
 			"*\\.npmrc": "deny",
 			"*\\.netrc": "deny",
 			"*\\.docker\\config.json": "deny",
-			"*\\.kube\\config": "deny"
+			"*\\.kube\\config": "deny",
+			"C:/Users/*/.ssh/**": "deny",
+			"C:/Users/*/.aws/**": "deny",
+			"C:/Users/*/.gnupg/**": "deny",
+			"C:/Users/*/.npmrc": "deny",
+			"C:/Users/*/.netrc": "deny",
+			"C:/Users/*/.docker/config.json": "deny",
+			"C:/Users/*/.kube/config": "deny"
 		},
 		"edit": {
 			"*": "allow",
@@ -139,7 +147,14 @@
 			"*\\.npmrc": "deny",
 			"*\\.netrc": "deny",
 			"*\\.docker\\config.json": "deny",
-			"*\\.kube\\config": "deny"
+			"*\\.kube\\config": "deny",
+			"C:/Users/*/.ssh/**": "deny",
+			"C:/Users/*/.aws/**": "deny",
+			"C:/Users/*/.gnupg/**": "deny",
+			"C:/Users/*/.npmrc": "deny",
+			"C:/Users/*/.netrc": "deny",
+			"C:/Users/*/.docker/config.json": "deny",
+			"C:/Users/*/.kube/config": "deny"
 		},
 		"webfetch": "allow",
 		"skill": {
