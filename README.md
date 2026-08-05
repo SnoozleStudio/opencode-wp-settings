@@ -19,6 +19,53 @@ loaded automatically in every project. Updates = `git pull`.
 
 ---
 
+## Why?
+
+Generic AI models are trained on a sea of WordPress code — and most of that sea is
+legacy, unmaintained, and unsafe. Left to its own devices, an AI will happily produce:
+
+- **Escaping that isn't** — unescaped output, or the wrong escaping function for the
+  context, because the escaping matrix is a dense contract
+- **Raw SQL and missing nonces** — code that works on your laptop and gets a client's
+  site hacked in production
+- **Unprefixed globals and hooks** — functions, options, and hooks that collide with
+  other plugins, or that WordPress core already provides
+- **"It works on my machine" fixes** — no build, no lint, no verification, so broken
+  code ships
+
+The root cause is that WPCS (WordPress Coding Standards) is exactly the kind of
+opinionated contract generic models get wrong: the average plugin violates it, so the
+average generated code violates it too.
+
+This repo closes that gap with engineering discipline, not hope:
+
+- **Written-down conventions** — `AGENTS.md` + reference docs encode the house rules
+  every session must follow
+- **Skills that teach** — `wp-plugin`, `wp-theme`, `wp-security-audit`… load the
+  discipline at the moment it's needed
+- **Verification you can't skip** — the `proof-of-work` plugin physically blocks
+  commits/pushes until build + format + phpcs are green
+- **Scaffolding that starts right** — templates ship WPCS-compliant from the first
+  file, so the AI never writes from a blank slate
+
+## Quick start in 3 steps
+
+1. **Install** — clone into your OpenCode config dir (or copy the files in; if the
+   directory already exists, clone into a temp folder and merge):
+
+   ```powershell
+   git clone https://github.com/SnoozleStudio/opencode-wp-settings.git "$HOME\.config\opencode"
+   ```
+
+2. **Restart OpenCode** — the config loads for every session automatically
+3. **Try it** — open a WordPress project and say `fix the mobile menu` or
+   `create a new plugin`; commands, skills, and the verification chain handle the rest
+
+Updates = `git pull`. Non-destructive: project-level `opencode.json` / `.opencode/`
+configs merge over the global one.
+
+---
+
 ## What's inside
 
 ```
@@ -53,18 +100,6 @@ commands/fix.md ──► fix skill ──► explore (maps) → implementer (ed
 
 You describe the work in plain English; commands, skills, and agents handle the
 discipline. The full wiring lives in the [Documentation Hub](docs/README.md#dependency-map).
-
-## Install
-
-Nothing to install — clone/copy into `~/.config/opencode/`:
-
-```powershell
-git clone <this-repo> "$HOME\.config\opencode"
-```
-
-The config loads for every OpenCode session automatically. Restart OpenCode after
-updating. Non-destructive: project-level `opencode.json` / `.opencode/` configs merge
-over the global one.
 
 ## Guardrails at a glance
 
