@@ -45,10 +45,20 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
 ├── docs/                    this hub + reference docs + the 2 guides
+├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
 ├── templates/               scaffolding sources (theme/, plugin/)
 ├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
 └── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
 ```
+
+### Tickets
+
+Working ticket lists live in `tickets/` — one markdown file per initiative (e.g.
+`audit-fixes.md`), written in the to-tickets format (blocked-by/blocks/files/
+acceptance). They are tracking artifacts, not shipped components: a ticket file must
+be listed in the repository map above, but it needs no hub inventory row and no
+guide entry. Close tickets in the file with `- [x]` as they land; delete the file
+when the initiative is done.
 
 ---
 
@@ -187,7 +197,7 @@ are TS files built against `@opencode-ai/plugin` (see
 
 | Plugin | File | Hooks | Behavior |
 |---|---|---|---|
-| Proof of work | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts) | `tool.execute.before` (bash) | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only) |
+| Proof of work | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts) | `tool.execute.before` (bash) | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only; session-directory scoped — `git -C <repo>` honored, bare `cd` chains exempt) |
 | phpcs-watch | [plugins/phpcs-watch.ts](../plugins/phpcs-watch.ts) | `tool.execute.after` (edit/write/apply_patch) | single-file phpcs pass after every `.php` edit; surfaces findings inline |
 | Session context | [plugins/session-context.ts](../plugins/session-context.ts) | `experimental.chat.system.transform` | appends "Git state: branch, N uncommitted file(s)" to the system prompt |
 
@@ -254,7 +264,7 @@ Plugin wiring (run inside the OpenCode process):
 
 ```
 edit a .php file ──► phpcs-watch: single-file phpcs pass, inline findings
-git push/commit  ──► proof-of-work: chain gate (skips non-WP projects, --no-verify, SKIP_GATE=1)
+git push/commit  ──► proof-of-work: chain gate (skips non-WP projects; --no-verify/SKIP_GATE=1 as standalone tokens; git -C honored, bare cd chains exempt)
 every session    ──► session-context: git state line appended to system prompt
 ```
 

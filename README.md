@@ -147,6 +147,7 @@ commands/             18 slash commands (/fix /build /review /verify /ship /audi
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
 docs/                 Documentation hub + reference docs + 2 guides
+tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
 setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
 scaffold.cmd          Shell-agnostic wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
@@ -173,7 +174,8 @@ discipline. The full wiring lives in the [Documentation Hub](docs/README.md#depe
   `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` →
   `vendor/bin/phpstan analyse --no-progress --memory-limit=1G` before every commit.
   The `proof-of-work` plugin blocks `git push`/`git commit` on a red chain (skip with
-  `--no-verify` or `SKIP_GATE=1` — but that's the escape hatch, not the norm)
+  `--no-verify` or `SKIP_GATE=1` — but that's the escape hatch, not the norm; the gate is
+  scoped to the session directory — `git -C <repo>` is honored, bare `cd` chains are exempt)
 - **WordPress contract** — escaping at output, `wp_unslash` before sanitize, nonces +
   capabilities, `$wpdb->prepare`, i18n everywhere, prefixed names, ABSPATH guards
 - **Front-end discipline** — ES modules, Tempus-driven rAF, reduced-motion gates,

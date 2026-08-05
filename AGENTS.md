@@ -105,6 +105,8 @@ vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 
 Run all four and fix what they surface before committing — not after. The
 `proof-of-work` plugin gates `git commit`/`git push` on these checks; never bypass it.
+The gate is scoped to the session directory: `git -C <repo>` is honored, `cd`-style
+command chains are exempt (use `git -C` to gate another repo explicitly).
 
 ### Failing Tests: Regression vs. Contract Change
 A failing check after your change is a fork in the road:

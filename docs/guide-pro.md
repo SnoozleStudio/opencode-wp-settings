@@ -135,10 +135,11 @@ The heart of the "never ship red" rule:
 ```ts
 // plugins/proof-of-work.ts (essence)
 const gate = async (command: string): Promise<void> => {
-    if (!/\bgit\s+(push|commit)\b/i.test(command)) return;   // only gate push/commit
-    if (/(--no-verify|HUSKY=0|SKIP_GATE=1)/i.test(command)) return;  // documented escapes
-    if (!isGatedProject(directory)) return;   // needs build script + phpcs.xml/composer.json
-    const result = await runChain();          // build → format:all:check → phpcs → phpstan
+    if (!/\bgit(\.exe)?\s+(push|commit)\b/i.test(command)) return; // only gate push/commit
+    if (/(^|\s)(--no-verify|HUSKY=0|SKIP_GATE=1)(\s|$)/i.test(command)) return; // documented escapes
+    const target = resolveTarget(command); // git -C <repo> honored; bare cd chains exempt
+    if (!isGatedProject(target)) return;    // needs build script + phpcs.xml/composer.json
+    const result = await runChain(target);  // build → format:all:check → phpcs → phpstan
     if (!result.ok) throw new Error(/* "proof-of-work: verification chain failed at …" */);
 };
 ```
@@ -151,9 +152,16 @@ Behavioral details that matter:
 - **Cache window:** a green chain is cached 120s per working-tree state (`git status
   --porcelain`); unchanged tree + recent green = no re-run.
 - **Escapes:** `--no-verify`, `HUSKY=0`, `SKIP_GATE=1` are explicit opt-outs — the
-  escape hatch, not the norm (README guardrails).
+  escape hatch, not the norm (README guardrails). They only count as standalone,
+  unquoted arguments — quoted segments are stripped first, so a commit message that
+  merely mentions `SKIP_GATE=1` still gets gated.
+- **Scope:** the gate verifies the repo the command targets. `git -C <repo> …` resolves
+  and gates `<repo>`; commands that `cd` / `Set-Location` / `pushd` out of the session
+  directory are exempt (target unresolvable) and skip with a warning — gate those repos
+  with `git -C` explicitly.
 - **Windows:** commands run through `cmd.exe /c`, which resolves `.cmd` shims
-  (`vendor\bin\phpcs.bat`); output is buffered, never echoed.
+  (`vendor\bin\phpcs.bat`); output is buffered, never echoed. `git.exe` is gated
+  identically to `git`.
 - **PHPStan step:** whole-project analysis, run after phpcs with
   `--no-progress --memory-limit=1G`; per-edit "phpstan-watch" is deliberately not
   wired up — partial-file analysis on a half-saved tree produces false positives.
