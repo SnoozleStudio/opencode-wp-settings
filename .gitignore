@@ -22,3 +22,7 @@ Thumbs.db
 *.log
 .env*
 .env.*
+
+# Lockfiles — bun is the package manager (bun.lock is the single source of truth)
+package-lock.json
+npm-shrinkwrap.json
