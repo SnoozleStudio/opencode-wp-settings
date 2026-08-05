@@ -6,6 +6,14 @@ import { isWin32, run } from "./lib/run";
 const MAX_REPORT_LINES = 24;
 
 /**
+ * Rapid repeated edits of the same file only get one lint pass per window: a
+ * clean file is not re-linted within LINT_COOLDOWN_MS (the inline hint is
+ * suppressed, never the commit gate). A failed lint is always re-linted, so
+ * the agent gets immediate "fixed" feedback after an edit.
+ */
+const LINT_COOLDOWN_MS = 2_000;
+
+/**
  * Paths are interpolated into a `cmd.exe /c` string. Reject anything carrying
  * cmd metacharacters or quotes up front — a hostile file name must never
  * reach the shell. Spaces are rejected too (they would split the argument).
@@ -21,6 +29,7 @@ const SAFE_FILE_PATH = /^[\w\-./\\]+$/;
  * compact status so violations are visible at a glance.
  */
 export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
+	const lastLint = new Map<string, { at: number; clean: boolean }>();
 	const phpcsBin = (): string | null => {
 		const candidates = isWin32()
 			? ["vendor\\bin\\phpcs.bat", "vendor\\bin\\phpcs"]
@@ -70,7 +79,10 @@ export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 				};
 				return;
 			}
+			const previous = lastLint.get(filePath);
+			if (previous && previous.clean && Date.now() - previous.at < LINT_COOLDOWN_MS) return;
 			const result = await lintFile(filePath);
+			lastLint.set(filePath, { at: Date.now(), clean: result.errors === 0 });
 			if (result.errors === 0) {
 				output.metadata.phpcs = { status: "clean" };
 				if (!output.title.startsWith("phpcs")) {

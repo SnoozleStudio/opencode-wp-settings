@@ -44,6 +44,15 @@ jobs:
         shell: pwsh
         run: pwsh -NoProfile -File scripts/docs-inventory.ps1
 
+  chain:
+    name: Verification-chain consistency
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Chain consistency
+        shell: pwsh
+        run: pwsh -NoProfile -File scripts/verify-chain-consistency.ps1
+
   smoke:
     name: Scaffold smoke test
     runs-on: ubuntu-latest

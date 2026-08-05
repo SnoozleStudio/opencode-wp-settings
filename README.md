@@ -7,7 +7,7 @@ projects with project-specific instructions, coding standards, automated
 verification, and reusable development workflows.
 
 ![CI](https://github.com/SnoozleStudio/opencode-wp-settings/actions/workflows/ci.yml/badge.svg)
-![Checks](https://img.shields.io/badge/checks-4-green.svg)
+![Checks](https://img.shields.io/badge/checks-5-green.svg)
 ![MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-7.0-blue.svg)
@@ -34,6 +34,7 @@ with engineering discipline from [mattpocock/skills](https://github.com/mattpoco
 >
 > - [Level 1 Guide — AI-driven workflows with example prompts](docs/guide-beginners.md) — for beginners
 > - [Level 2 Guide — internals & extension](docs/guide-pro.md) — for developers
+> - [Level 3 Guide — tuning agents, skills & plugins](docs/guide-advanced.md) — for tuning the config
 > - [Documentation Hub — every component indexed](docs/README.md)
 >
 > **Every change to this repo must stay synced with the documentation** — that's a
@@ -46,6 +47,7 @@ Every push to `main` validates:
 - JSON well-formedness
 - repository structure and frontmatter
 - documentation inventory and internal links
+- verification-chain consistency (docs vs gate plugin)
 - lockfile integrity
 - scaffold dry-run smoke tests
 
@@ -161,13 +163,13 @@ commands/             18 slash commands (/fix /build /review /verify /ship /audi
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
                       + plugins/lib/run.ts (shared shell runner)
-docs/                 Documentation hub + reference docs + 2 guides
+docs/                 Documentation hub + reference docs + 3 guides
 tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
 setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
 scaffold.cmd          Shell-agnostic wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
-scripts/              docs-inventory.ps1 — deterministic docs-sync check (CI + local)
-.github/              CI workflow (ci.yml): JSON, structure, docs inventory, smoke tests
+scripts/              docs-inventory.ps1 (docs sync) + verify-chain-consistency.ps1 (chain vs gate)
+.github/              CI workflow (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests
 ```
 
 ## How it works
@@ -307,6 +309,9 @@ and use the direct form instead:
 | [performance.md](docs/performance.md) | page speed, web vitals |
 | [verification-chain.md](docs/verification-chain.md) | the canonical proof-of-work chain |
 | [skill-authoring.md](docs/skill-authoring.md) | writing new skills |
+| [guide-beginners.md](docs/guide-beginners.md) | starting out — Level 1 |
+| [guide-pro.md](docs/guide-pro.md) | extending the config — Level 2 |
+| [guide-advanced.md](docs/guide-advanced.md) | tuning agents, skills, plugins — Level 3 |
 
 ## License
 

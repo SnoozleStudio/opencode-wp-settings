@@ -146,7 +146,39 @@ function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Toke
 			if (-not $DryRun) { New-Item -ItemType Directory -Path $dest -Force | Out-Null }
 			continue
 		}
-		if ($DryRun) { Write-Ok "would write $relative"; continue }
+		if ($DryRun) {
+			# Render in memory and validate BEFORE anything would be written:
+			# no stray placeholders, no reserved Windows names, JSON/XML files
+			# parse. A dry run that prints "would write" for a broken scaffold
+			# is a lie.
+			$content = Get-Content -LiteralPath $item.FullName -Raw
+			foreach ($key in $Tokens.Keys) {
+				$content = $content.Replace($key, $Tokens[$key])
+			}
+			$stray = [regex]::Match($content, '\{[a-zA-Z_][a-zA-Z0-9_-]*\}')
+			if ($stray.Success) {
+				throw "Dry-run validation failed: stray placeholder '$($stray.Value)' in $relative"
+			}
+			$leaf = Split-Path $dest -Leaf
+			if ($leaf -match '^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)') {
+				throw "Dry-run validation failed: '$leaf' is a reserved Windows file name"
+			}
+			if ($relative.EndsWith(".json")) {
+				try {
+					[void](ConvertFrom-Json -InputObject $content -ErrorAction Stop)
+				} catch {
+					throw "Dry-run validation failed: $relative is not valid JSON"
+				}
+			} elseif ($relative.EndsWith(".xml")) {
+				try {
+					[void]([xml]$content)
+				} catch {
+					throw "Dry-run validation failed: $relative is not valid XML"
+				}
+			}
+			Write-Ok "would write $relative"
+			continue
+		}
 		New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
 		$content = Get-Content -LiteralPath $item.FullName -Raw
 		foreach ($key in $Tokens.Keys) {

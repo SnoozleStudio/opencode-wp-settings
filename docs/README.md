@@ -9,6 +9,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 >
 > - I'm new to AI-assisted WordPress work → [Level 1 Guide](guide-beginners.md)
 > - I'm a developer and want to extend the config itself → [Level 2 Guide](guide-pro.md)
+> - I'm tuning agent budgets, skill routing, or plugin caches → [Level 3 Guide](guide-advanced.md)
 > - I need a specific reference → use the indexes below
 
 ---
@@ -44,7 +45,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── skills/                  26 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper
-├── docs/                    this hub + reference docs + the 2 guides
+├── docs/                    this hub + reference docs + the 3 guides
 ├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
 ├── templates/               scaffolding sources (theme/, plugin/)
 ├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
@@ -83,6 +84,7 @@ lives here.
 | [skill-authoring.md](skill-authoring.md) | how to write skills for this repo | anyone authoring skills | adding or editing a skill |
 | [guide-beginners.md](guide-beginners.md) | Level 1: AI-driven workflows with example prompts | humans | starting out |
 | [guide-pro.md](guide-pro.md) | Level 2: internals, authoring, orchestration | humans | extending the config |
+| [guide-advanced.md](guide-advanced.md) | Level 3: tuning agent depth, skill routing, plugin caches | humans | tuning the config |
 | README.md (this file) | the map + the contract | everyone | orienting |
 
 ---
@@ -230,7 +232,8 @@ truth — adapt, don't reinvent.**
 | [package.json](../package.json) / [bun.lock](../bun.lock) | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq) |
 | [.gitignore](../.gitignore) | repo hygiene (never commit `node_modules/`, `.env*`, local dumps) |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1) | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally |
-| [ci.yml](../.github/workflows/ci.yml) | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, scaffold dry-run smoke tests |
+| [verify-chain-consistency.ps1](../scripts/verify-chain-consistency.ps1) | parses the chain from `docs/verification-chain.md` (the single source of truth) and compares it against the steps hardcoded in `plugins/proof-of-work.ts` — exit 1 on drift, so the doc and the gate can't silently diverge |
+| [ci.yml](../.github/workflows/ci.yml) | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests |
 
 ---
 

@@ -198,6 +198,11 @@ single-file phpcs pass:
 The point: **lint feedback arrives with the edit**, not at commit time. The agent
 sees "phpcs ⚠ 3 error(s)" in the tool title and fixes before moving on.
 
+**Cooldown:** a *clean* lint of a file is cached 2s per file — rapid repeated edits of
+the same file don't re-lint until the window passes. A *failed* lint always re-lints,
+so "fixed" feedback is immediate. The cooldown only suppresses the inline hint; the
+commit gate (`proof-of-work`) always runs the full chain.
+
 ### session-context.ts — the statusline
 
 Injects a git state line into the system prompt so every session knows where it
@@ -230,6 +235,26 @@ export const MyPlugin = async ({ directory }: Parameters<Plugin>[0]) => {
 
 Every plugin ships: a docblock explaining intent, host-shell abstraction (the `run`
 helper pattern — cmd.exe on win32, /bin/sh elsewhere), and explicit no-op conditions.
+
+### Execution order & lifecycle
+
+Plugins load in **filename order** (currently `proof-of-work.ts` → `phpcs-watch.ts` →
+`session-context.ts`), but this is an implementation detail, **not an SDK guarantee** —
+an `@opencode-ai/plugin` upgrade could change it. The three plugins are deliberately
+independent (no cross-plugin dependencies, no shared mutable state), so order never
+matters today.
+
+There are no plugin startup/shutdown or project-detection lifecycle hooks. Every
+plugin re-detects project state on **each** invocation:
+
+- `proof-of-work.ts` calls `isGatedProject(target)` per `git commit`/`git push` —
+  a newly scaffolded theme is gated correctly on first commit
+- `phpcs-watch.ts` re-checks for `phpcs.xml` + the phpcs binary per edit — gating
+  engages the moment the project has both
+- `session-context.ts` refreshes git state on a 30s cache — always current
+
+If a future plugin needs ordering or per-project initialization, request an
+execution-order/lifecycle-hook feature from OpenCode — don't rely on filename order.
 
 ---
 
@@ -338,6 +363,22 @@ Full format in [docs/skill-authoring.md](skill-authoring.md). The essentials:
 - User-invoked skills (grill-me, to-spec) hang off commands; model-invoked
   disciplines (fix, verify, wp-security-audit) hang off description matching.
 
+### Skill priority when multiple match
+
+`review`, `verify`, and `wp-security-audit` overlap on "check this code". The model
+routes on description density, so each description carries explicit "not for…" cues.
+When in doubt, this is the intended split:
+
+| User says | Best skill | Why | Not this |
+|---|---|---|---|
+| "review my changes / is this ready to commit" | `review` | two-axis: Standards + Spec of a diff | `verify` (no adversarial proof), `wp-security-audit` (no attack-surface proof) |
+| "double check this logic / prove it / is the bug really fixed" | `verify` | finder/adversary/referee correctness proof | `review` (no adversary), `wp-security-audit` (not a logic proof) |
+| "is this secure / audit for XSS/SQLi/CSRF" | `wp-security-audit` | full attack surface, proven findings | `review` (standards ≠ security), `verify` (logic ≠ vulnerabilities) |
+| "fix this bug" then "did it land?" | `fix` → `verify` | fix disciplines the change; verify proves it | `review` alone (no fix procedure) |
+
+The `description` frontmatters of these three are the routing contract — if you change
+one, change all three so the "not for…" cues stay mutually exclusive.
+
 ### Vendored upstream skills (gsap-*)
 
 Six `gsap-*` skills are copied **unedited** from
@@ -415,7 +456,7 @@ known trap).
 | `-Install` | `npm install` + `composer install` with the Local-PHP workaround |
 | `-Force` | scaffold over an existing non-empty target (keeps extra files) |
 | `-Slug` / `-Prefix` / `-Name` | overrides; derived from the target leaf name otherwise |
-| `-DryRun` | print what would be written, change nothing |
+| `-DryRun` | render every file in memory, validate (no stray `{tokens}`, no reserved Windows names, JSON/XML parses), print what would be written — change nothing. A dry run that prints "would write" for a broken scaffold is a lie |
 
 ### Root resolution & the Local workaround
 
@@ -469,9 +510,11 @@ This repo runs its own server-side backstop for the same discipline:
 `.github/workflows/ci.yml` validates JSON well-formedness, repo structure and
 frontmatter (`setup.ps1 -Validate`), the docs inventory
 (`scripts/docs-inventory.ps1` — the mechanical subset of `/docs-check`),
-lockfile integrity (`bun install --frozen-lockfile --dry-run`), and
-scaffold dry runs, on every push to `main` and every pull request. The README
-badge is the visible proof; the semantic gate stays local in `proof-of-work.ts`.
+chain consistency (`scripts/verify-chain-consistency.ps1` — the doc's four
+commands vs the gate's hardcoded steps), lockfile integrity
+(`bun install --frozen-lockfile --dry-run`), and scaffold dry runs, on every
+push to `main` and every pull request. The README badge is the visible proof;
+the semantic gate stays local in `proof-of-work.ts`.
 
 `/docs-check` remains the semantic companion to the script: description wording,
 guide references by name, drift reasoning — things a deterministic script cannot
@@ -577,4 +620,4 @@ kill component usage).
 - [Laravel Pint](https://laravel.com/docs/pint)
 - [Vite](https://vitejs.dev) · [Tailwind CSS v4](https://tailwindcss.com/docs) · [GSAP](https://gsap.com/docs) · [Lenis](https://github.com/darkroomengineering/lenis/blob/main/README.md) · [Tempus](https://github.com/darkroomengineering/tempus/blob/main/README.md) · [Three.js](https://threejs.org/docs) · [swup](https://swup.js.org)
 - [WP-CLI](https://wp-cli.org) · [Composer](https://getcomposer.org)
-- [Documentation hub](README.md) · [Level 1 Guide](guide-beginners.md)
+- [Documentation hub](README.md) · [Level 1 Guide](guide-beginners.md) · [Level 3 Guide](guide-advanced.md)
