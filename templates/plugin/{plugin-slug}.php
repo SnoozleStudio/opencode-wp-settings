@@ -26,6 +26,17 @@ define( '{PREFIX}_DIR', plugin_dir_path( __FILE__ ) );
 define( '{PREFIX}_URL', plugin_dir_url( __FILE__ ) );
 
 require_once {PREFIX}_DIR . 'includes/class-{prefix}-plugin.php';
+require_once {PREFIX}_DIR . 'admin/class-{prefix}-admin.php';
+require_once {PREFIX}_DIR . 'public/class-{prefix}-public.php';
+
+/**
+ * Flush rewrite rules on activation so CPT permalinks resolve immediately.
+ */
+function {prefix}_activate(): void {
+	{prefix}_plugin()->register_post_types();
+	flush_rewrite_rules();
+}
+register_activation_hook( {PREFIX}_FILE, '{prefix}_activate' );
 
 /**
  * Boot the plugin singleton.
