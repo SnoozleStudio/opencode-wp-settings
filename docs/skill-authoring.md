@@ -39,7 +39,7 @@ the reusable discipline; commands wire them; agents execute them.
 ## Consistency rules
 
 - Every skill that touches PHP runs the verification chain (build → format:all:check →
-  phpcs) — state it
+  phpcs → phpstan) — state it
 - Every skill that touches security references the escaping matrix, not prose
 - Every skill that reviews uses file:line findings with severity
 - Update `README.md` skill index when adding/removing skills

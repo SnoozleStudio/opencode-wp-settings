@@ -12,7 +12,8 @@
     "format:php": "php vendor/bin/pint",
     "format:php:check": "php vendor/bin/pint --test",
     "format:all": "npm run format && npm run format:php",
-    "format:all:check": "npm run format:check && npm run format:php:check"
+    "format:all:check": "npm run format:check && npm run format:php:check",
+    "phpstan": "php vendor/bin/phpstan analyse --no-progress --memory-limit=1G"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.0",

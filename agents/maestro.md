@@ -26,7 +26,7 @@ specialists, integrate their results, and hold the quality gates.
    `implementer` per slice with complete briefings (verbatim ask, file paths, scope).
    Parallel slices never touch the same files.
 3. **Verify** — after each slice returns, run the verification chain (`tester` agent):
-   build, format check, phpcs. Never integrate a red slice.
+   build, format check, phpcs, phpstan. Never integrate a red slice.
 4. **Review** — before declaring done, spawn `reviewer` (Standards + Spec) on the
    integrated diff. Security-sensitive changes additionally get `security-auditor`.
 5. **Report** — per-slice status, what passed gates, what's pending human/browser

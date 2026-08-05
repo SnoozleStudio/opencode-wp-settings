@@ -100,9 +100,10 @@ stack untested fixes — cascading errors eat context and compound regressions.
 npm run build                       # Vite production build (assets compile)
 npm run format:all:check            # Prettier (JS/CSS/JSON) + Pint (PHP) dry-run
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
-Run all three and fix what they surface before committing — not after. The
+Run all four and fix what they surface before committing — not after. The
 `proof-of-work` plugin gates `git commit`/`git push` on these checks; never bypass it.
 
 ### Failing Tests: Regression vs. Contract Change
@@ -220,7 +221,9 @@ Default stack for Snoozle Studio WordPress work. Framework depth lives in the
 - **WPCS 3.0** — `phpcs.xml` with `WordPress-Extra` + `WordPress-Docs` +
   `PHPCompatibility` + `Universal` (testVersion `8.2-`)
 - **Laravel Pint** — PHP formatter
-- **Husky** — pre-commit gate (format + phpcs)
+- **PHPStan** — `phpstan.neon` at level 8 with `szepeviktor/phpstan-wordpress`
+  (WP globals/functions stubs); theme neon scans `php-stubs/acf-pro-stubs`
+- **Husky** — pre-commit gate (format + phpcs + phpstan)
 - **PHPUnit/wp-env** — not standard; lint + build is the proof-of-work
 
 Always check latest version before installing: `npm info <package>` / `composer show`.

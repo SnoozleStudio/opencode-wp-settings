@@ -1,7 +1,8 @@
 #!/bin/sh
 
-# Pre-commit gate: format + lint must be green.
+# Pre-commit gate: format + lint + static analysis must be green.
 # Never bypass without a documented reason - this is the proof-of-work.
 
 npm run format:all:check || { echo "pre-commit: format check failed"; exit 1; }
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M || { echo "pre-commit: phpcs failed"; exit 1; }
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G || { echo "pre-commit: phpstan failed"; exit 1; }

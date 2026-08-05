@@ -1,5 +1,5 @@
 ---
-description: Tester/verification agent. Runs the project's proof-of-work: build, format checks, and phpcs — and confirms results are genuinely green. Use for verifying changes, reproducing failures, and running the verification chain.
+description: Tester/verification agent. Runs the project's proof-of-work: build, format checks, phpcs, and phpstan — and confirms results are genuinely green. Use for verifying changes, reproducing failures, and running the verification chain.
 mode: subagent
 steps: 60
 color: secondary
@@ -18,10 +18,12 @@ Run in order; stop at the first red:
 npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 - If `phpcs.xml` doesn't exist or is weak (e.g. only the I18n sniff), note it as a
   finding — do not relax the standard
+- If `phpstan.neon` doesn't exist, note it as a finding — do not relax the analysis
 - If a `package.json` script is missing (`format:all:check`), run the closest equivalent
   (`npm run format:check`, `npx prettier --check .`, `vendor/bin/pint --test`) and report
   what you actually ran

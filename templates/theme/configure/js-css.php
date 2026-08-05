@@ -13,10 +13,10 @@ if ( ! function_exists( '{prefix}_enqueue_assets' ) ) {
 	/**
 	 * Enqueue the Vite-built entry script and its CSS.
 	 */
-	function {prefix}_enqueue_assets() {
+	function {prefix}_enqueue_assets(): void {
 		$manifest = {prefix}_get_vite_manifest();
 
-		if ( ! is_array( $manifest ) ) {
+		if ( null === $manifest ) {
 			return;
 		}
 

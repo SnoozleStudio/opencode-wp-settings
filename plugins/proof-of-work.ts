@@ -54,8 +54,8 @@ const isGatedProject = (dir: string): boolean =>
 
 /**
  * Proof-of-work gate: blocks `git push` / `git commit` until the project's
- * verification chain is green (build, format check, phpcs). Mirrors the
- * cc-settings "gate" tier — a non-zero exit cannot be ignored.
+ * verification chain is green (build, format check, phpcs, phpstan). Mirrors
+ * the cc-settings "gate" tier — a non-zero exit cannot be ignored.
  *
  * Skipped when:
  * - the project is not a WordPress theme/plugin (no build script + no phpcs.xml)
@@ -74,6 +74,7 @@ export const ProofOfWork = async ({ directory }: Parameters<Plugin>[0]) => {
 				"phpcs",
 				"vendor\\bin\\phpcs --standard=phpcs.xml -d memory_limit=1024M",
 			],
+			["phpstan", "vendor\\bin\\phpstan analyse --no-progress --memory-limit=1G"],
 		];
 		for (const [name, cmd] of steps) {
 			const out = await run(cmd, directory);

@@ -97,6 +97,7 @@ escaping variants with domain as last arg; translators comments on placeholders.
 npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 ## References

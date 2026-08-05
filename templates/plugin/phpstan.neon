@@ -1,0 +1,16 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - .
+    excludePaths:
+        - vendor/*
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: constant.notFound
+          path: public/class-{prefix}-public.php
+          # {PREFIX}_URL is defined in the plugin main file via define() with a
+          # function-call value (plugin_dir_url()); PHPStan only auto-discovers
+          # statically-evaluable define() values. WP resolves it at runtime.

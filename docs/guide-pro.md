@@ -89,7 +89,7 @@ What's allowed/asked/denied and why:
 | `git checkout -- *`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny** | irreversible history/work-tree damage |
 | `composer install/dump-autoload/validate/show` | allow | toolchain |
 | `composer require/update` | ask | dependency changes need your eyes |
-| `vendor/bin/phpcs/phpcbf/pint`, `php -l` | allow | lint gates |
+| `vendor/bin/phpcs/phpcbf/pint/phpstan`, `php -l` | allow | lint gates |
 | `wp *` | ask | WP-CLI mutates the database/site |
 | `gh pr/issue/run view*`, `gh repo view*` | allow; `gh pr create*`, `gh issue create*` ask | reads free, writes need consent |
 | `node -e/-p/--eval/--print` | deny | arbitrary code exec disguised as a flag |
@@ -138,7 +138,7 @@ const gate = async (command: string): Promise<void> => {
     if (!/\bgit\s+(push|commit)\b/i.test(command)) return;   // only gate push/commit
     if (/(--no-verify|HUSKY=0|SKIP_GATE=1)/i.test(command)) return;  // documented escapes
     if (!isGatedProject(directory)) return;   // needs build script + phpcs.xml/composer.json
-    const result = await runChain();          // build → format:all:check → phpcs
+    const result = await runChain();          // build → format:all:check → phpcs → phpstan
     if (!result.ok) throw new Error(/* "proof-of-work: verification chain failed at …" */);
 };
 ```
@@ -154,6 +154,9 @@ Behavioral details that matter:
   escape hatch, not the norm (README guardrails).
 - **Windows:** commands run through `cmd.exe /c`, which resolves `.cmd` shims
   (`vendor\bin\phpcs.bat`); output is buffered, never echoed.
+- **PHPStan step:** whole-project analysis, run after phpcs with
+  `--no-progress --memory-limit=1G`; per-edit "phpstan-watch" is deliberately not
+  wired up — partial-file analysis on a half-saved tree produces false positives.
 
 ### phpcs-watch.ts — lint at edit time
 
@@ -274,11 +277,12 @@ prompt. `$ARGUMENTS` is replaced by what you type after the slash.
 
 ```markdown
 ---
-description: Run the full lint + format + build verification chain and report status.
+description: Run the full lint + format + build + static-analysis verification chain and report status.
 ---
 
 Run the verification chain: npm run build, npm run format:all:check,
-vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M — in order, stopping at
+vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M,
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G — in order, stopping at
 the first red. Report each step's actual result (exit code + first error line)…
 ```
 
@@ -423,6 +427,7 @@ The chain (in order, stop at first red):
 npm run build
 npm run format:all:check
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
+vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 - **build** — Vite production build (the `dist/` output your PHP enqueues via the
@@ -430,6 +435,8 @@ vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
 - **format:all:check** — Prettier (JS/CSS/JSON) + Pint (PHP) dry-run
 - **phpcs** — WPCS 3.0 (WordPress-Extra + WordPress-Docs + PHPCompatibility,
   `testVersion 8.2-`)
+- **phpstan** — level 8 with `szepeviktor/phpstan-wordpress` (WP globals/functions
+  stubs); the theme neon additionally scans `php-stubs/acf-pro-stubs`
 
 The gate plugin enforces it (see [§4 Plugins](#4-plugins)): `git push`/`git commit`
 in a gated project run the chain first, cached 120s per tree state. Known PHPCS

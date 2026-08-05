@@ -85,6 +85,38 @@ exclusive `Universal.PHP.RequireExitDieParentheses` / `DisallowExitDieParenthese
 pair. Add individual Universal sniffs only when needed. `phpcbf` auto-fixes most
 formatting; `WordPress.Utils.I18nTextDomainFixer` is opt-in.
 
+## PHPStan configuration (enterprise)
+
+`phpstan.neon` — level 8 with the WordPress extension; the theme also scans the ACF
+Pro stubs so `get_field()` returns are typed:
+
+```neon
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - .
+    excludePaths:
+        - node_modules/*
+        - vendor/*
+        - dist/*
+    scanFiles:
+        - vendor/php-stubs/acf-pro-stubs/acf-pro-stubs.php
+```
+
+- `szepeviktor/phpstan-wordpress` ships WP constants, functions and globals
+  (`$wpdb`, `$post`, `$wp_query`, ...) plus the `add_action`/`add_filter` callable
+  checks; it requires `php-stubs/wordpress-stubs` automatically
+- Templates (theme/plugin) ship this config and `phpstan/phpstan` +
+  `szepeviktor/phpstan-wordpress` in `require-dev` — level 8 is the floor, not the
+  ceiling; raise it per project with extra rulesets if desired
+- Run it with `--no-progress --memory-limit=1G`; part of the verification chain and
+  the proof-of-work gate
+- WP idioms that legitimately need `ignoreErrors` (e.g. template-file globals) get a
+  comment explaining why — never a blanket `ignoreErrors` without a reason
+
 ## References
 
 - [WordPress Coding Standards — PHP](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/php/) — the normative source
@@ -92,5 +124,6 @@ formatting; `WordPress.Utils.I18nTextDomainFixer` is opt-in.
 - [PHP_CodeSniffer](https://github.com/PHPCSStandards/PHP_CodeSniffer) — the lint engine
 - [PHPCompatibility](https://github.com/PHPCompatibility/PHPCompatibility) — cross-version sniffing (`testVersion`)
 - [Laravel Pint](https://laravel.com/docs/pint) — formatter; phpcs remains the style authority (see AGENTS.md learnings)
+- [PHPStan](https://phpstan.org) — static analysis engine; [szepeviktor/phpstan-wordpress](https://github.com/szepeviktor/phpstan-wordpress) — WordPress extension
 - [PHP manual](https://www.php.net/manual/en/) — language reference
 - Internal: [plugin architecture](wordpress-plugin-architecture.md) · [security](wordpress-security.md) · [theme architecture](wordpress-theme-architecture.md)

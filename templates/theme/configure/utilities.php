@@ -11,10 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 if ( ! function_exists( '{prefix}_get_vite_manifest' ) ) {
 	/**
-	 * Read the Vite build manifest, static-cached per request.
+	 * Read the Vite build manifest entry, static-cached per request.
 	 *
 	 * @param string $entry Entry name from vite.config (e.g. 'src/scripts/main.js').
-	 * @return array<string, array<string, mixed>>|null
+	 * @return array{file: string, css: string[]}|null
 	 */
 	function {prefix}_get_vite_manifest( $entry = 'src/scripts/main.js' ) {
 		static $manifests = array();
@@ -36,13 +36,27 @@ if ( ! function_exists( '{prefix}_get_vite_manifest' ) ) {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents
 		$manifest = json_decode( (string) file_get_contents( $manifest_path ), true );
 
-		if ( ! is_array( $manifest ) || ! isset( $manifest[ $entry ] ) ) {
+		if ( ! is_array( $manifest ) || ! isset( $manifest[ $entry ] ) || ! is_array( $manifest[ $entry ] ) ) {
 			$manifests[ $entry ] = null;
 
 			return null;
 		}
 
-		$manifests[ $entry ] = $manifest[ $entry ];
+		// The manifest is runtime data from disk - validate before trusting.
+		$entry_manifest = $manifest[ $entry ];
+		$file           = $entry_manifest['file'] ?? null;
+		$css            = $entry_manifest['css'] ?? array();
+
+		if ( ! is_string( $file ) || ! is_array( $css ) ) {
+			$manifests[ $entry ] = null;
+
+			return null;
+		}
+
+		$manifests[ $entry ] = array(
+			'file' => $file,
+			'css'  => array_values( array_filter( $css, 'is_string' ) ),
+		);
 
 		return $manifests[ $entry ];
 	}

@@ -317,10 +317,10 @@ if (-not $DryRun) {
 		Write-Host "  2. npm install"
 		Write-Host "  3. composer install"
 		Write-Host "  4. Edit style.css/readme.txt metadata and ACF field groups"
-		Write-Host "  5. Activate in wp-admin, then run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M"
+		Write-Host "  5. Activate in wp-admin, then run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M / vendor/bin/phpstan analyse --no-progress --memory-limit=1G"
 	} else {
 		Write-Host "  2. Activate in wp-admin (themes: Appearance > Themes; plugins: Plugins)"
 		Write-Host "     ACF field groups load from acf-json/ on the ACF Sync page"
-		Write-Host "  3. Run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M"
+		Write-Host "  3. Run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M / vendor/bin/phpstan analyse --no-progress --memory-limit=1G"
 	}
 }

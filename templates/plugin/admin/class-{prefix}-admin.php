@@ -4,6 +4,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
@@ -12,7 +13,7 @@ if ( ! function_exists( '{prefix}_admin_settings_page' ) ) {
 	/**
 	 * Register the settings page.
 	 */
-	function {prefix}_admin_settings_page() {
+	function {prefix}_admin_settings_page(): void {
 		add_options_page(
 			__( '{plugin_name} Settings', '{text_domain}' ),
 			__( '{plugin_name}', '{text_domain}' ),
@@ -28,7 +29,7 @@ if ( ! function_exists( '{prefix}_admin_render_settings' ) ) {
 	/**
 	 * Render the settings page.
 	 */
-	function {prefix}_admin_render_settings() {
+	function {prefix}_admin_render_settings(): void {
 		if ( ! current_user_can( 'manage_options' ) ) {
 			wp_die( esc_html__( 'You do not have permission to access this page.', '{text_domain}' ) );
 		}

@@ -59,7 +59,7 @@ lives here.
 
 | Doc | Governs | Loaded by | Read it when |
 |---|---|---|---|
-| [wordpress-php-standards.md](wordpress-php-standards.md) | PHP syntax, naming, OOP, phpcs config | `wp-plugin`, `wp-theme` | writing or reviewing any PHP |
+| [wordpress-php-standards.md](wordpress-php-standards.md) | PHP syntax, naming, OOP, phpcs config, PHPStan config | `wp-plugin`, `wp-theme` | writing or reviewing any PHP |
 | [wordpress-security.md](wordpress-security.md) | escaping matrix, sanitization, nonces, auth, SQLi, REST | `wp-security-audit`, `security-auditor` | anything touching input, output, or auth |
 | [wordpress-plugin-architecture.md](wordpress-plugin-architecture.md) | plugin structure, lifecycle, REST, data | `wp-plugin` | building plugins |
 | [wordpress-theme-architecture.md](wordpress-theme-architecture.md) | theme structure, template hierarchy, boot chain, enqueue | `wp-theme` | building themes |
@@ -186,7 +186,7 @@ are TS files built against `@opencode-ai/plugin` (see
 
 | Plugin | File | Hooks | Behavior |
 |---|---|---|---|
-| Proof of work | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts) | `tool.execute.before` (bash) | blocks `git push`/`git commit` until build + format + phpcs are green (gated WP projects only) |
+| Proof of work | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts) | `tool.execute.before` (bash) | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only) |
 | phpcs-watch | [plugins/phpcs-watch.ts](../plugins/phpcs-watch.ts) | `tool.execute.after` (edit/write/apply_patch) | single-file phpcs pass after every `.php` edit; surfaces findings inline |
 | Session context | [plugins/session-context.ts](../plugins/session-context.ts) | `experimental.chat.system.transform` | appends "Git state: branch, N uncommitted file(s)" to the system prompt |
 
@@ -199,8 +199,8 @@ truth — adapt, don't reinvent.**
 
 | Template | Directory | Produces |
 |---|---|---|
-| Theme | [templates/theme](../templates/theme) | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css), acf-json, .husky |
-| Plugin | [templates/plugin](../templates/plugin) | classic plugin: main-file header, uninstall.php, admin/includes/public split, phpcs.xml, composer.json |
+| Theme | [templates/theme](../templates/theme) | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css), acf-json, .husky, phpstan.neon (ACF stubs) |
+| Plugin | [templates/plugin](../templates/plugin) | classic plugin: main-file header, uninstall.php, admin/includes/public split, phpcs.xml, composer.json, phpstan.neon |
 
 ### Scripts & config
 
@@ -236,7 +236,7 @@ Command → skill/agent wiring:
 /section ─► wp-theme                           /plugin ─► scaffolder + templates/plugin
 /review ─► review ─► reviewer                  /verify ─► verify (finder→adversary→referee)
 /audit ─► explore + security-auditor + docs-drift
-/ship ─► build → format → phpcs → review → commit
+/ship ─► build → format → phpcs → phpstan → review → commit
 ```
 
 Skill → reference doc wiring (loaded on demand, keeps SKILL.md lean):

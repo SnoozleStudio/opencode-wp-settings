@@ -1,9 +1,15 @@
 # OpenCode WordPress Settings — Snoozle Studio
 
-Enterprise-grade OpenCode configuration for WordPress plugin and classic theme
-development. A port of [darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings)
-with engineering discipline from [mattpocock/skills](https://github.com/mattpocock/skills) —
-no vibe coding, real production code.
+![WordPress CS](https://img.shields.io/badge/WPCS-Compliant-blue.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
+
+> **Enterprise-grade OpenCode configuration for WordPress plugin and classic theme development.**
+> Eliminates AI "vibe coding" by enforcing WPCS, strict PHPStan typing, and automated
+> verification chains.
+>
+> A port of [darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings)
+> with engineering discipline from [mattpocock/skills](https://github.com/mattpocock/skills).
 
 **This repo IS your global OpenCode config.** It lives at `~/.config/opencode/` and is
 loaded automatically in every project. Updates = `git pull`.
@@ -44,7 +50,7 @@ This repo closes that gap with engineering discipline, not hope:
 - **Skills that teach** — `wp-plugin`, `wp-theme`, `wp-security-audit`… load the
   discipline at the moment it's needed
 - **Verification you can't skip** — the `proof-of-work` plugin physically blocks
-  commits/pushes until build + format + phpcs are green
+  commits/pushes until build + format + phpcs + phpstan are green
 - **Scaffolding that starts right** — templates ship WPCS-compliant from the first
   file, so the AI never writes from a blank slate
 
@@ -104,7 +110,8 @@ discipline. The full wiring lives in the [Documentation Hub](docs/README.md#depe
 ## Guardrails at a glance
 
 - **Verification chain** — `npm run build` → `npm run format:all:check` →
-  `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` before every commit.
+  `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` →
+  `vendor/bin/phpstan analyse --no-progress --memory-limit=1G` before every commit.
   The `proof-of-work` plugin blocks `git push`/`git commit` on a red chain (skip with
   `--no-verify` or `SKIP_GATE=1` — but that's the escape hatch, not the norm)
 - **WordPress contract** — escaping at output, `wp_unslash` before sanitize, nonces +

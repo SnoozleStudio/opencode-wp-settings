@@ -50,9 +50,9 @@ say *"spawn the explore subagent"*, you say *"figure out why my menu is broken"*
 Two rules that protect you, always:
 
 - **The verification chain** — before any commit, the AI must run `npm run build` →
-  `npm run format:all:check` → `vendor/bin/phpcs`. The `proof-of-work` plugin blocks
-  commits when it's red. You never ship broken code because the gate physically won't
-  let it through.
+  `npm run format:all:check` → `vendor/bin/phpcs` → `vendor/bin/phpstan`. The
+  `proof-of-work` plugin blocks commits when it's red. You never ship broken code
+  because the gate physically won't let it through.
 - **Stealth mode** — no "generated with AI" fingerprints ever appear in commits.
 
 ---
@@ -68,7 +68,7 @@ You type:  "/fix the mobile menu doesn't open on iPhone"
               ▼
   explore agent maps the menu code (read-only)
   implementer agent fixes it (reads before editing)
-  verification chain runs (build + format + phpcs)
+  verification chain runs (build + format + phpcs + phpstan)
               │
               ▼
 You get: root cause, files changed, verification results
@@ -437,8 +437,9 @@ stuck — it's applying the stop-and-replan rule.** Answer it.
 | **Skill** | a how-to discipline the AI loads on demand; matched by its description |
 | **Command** | a `/shortcut` — a well-written prompt for a known workflow |
 | **Plugin** | code that hooks into OpenCode itself (commit gate, lint watcher, status line) |
-| **Verification chain** | `npm run build` → `npm run format:all:check` → `vendor/bin/phpcs` — the proof-of-work before any commit |
+| **Verification chain** | `npm run build` → `npm run format:all:check` → `vendor/bin/phpcs` → `vendor/bin/phpstan` — the proof-of-work before any commit |
 | **phpcs** | PHP_CodeSniffer — the PHP lint gate against the WordPress Coding Standards |
+| **PHPStan** | static analysis of PHP types (level 8) — catches type bugs phpcs can't see |
 | **ACF** | Advanced Custom Fields Pro — where content fields live (`get_field()`) |
 | **ACF-json** | the sync files for field groups (edit once, ship everywhere) |
 | **Grilling** | the alignment interview before ambiguous work |

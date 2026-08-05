@@ -13,7 +13,7 @@ if ( ! function_exists( '{prefix}_theme_setup' ) ) {
 	/**
 	 * Register theme supports and menus.
 	 */
-	function {prefix}_theme_setup() {
+	function {prefix}_theme_setup(): void {
 		load_theme_textdomain( '{text_domain}', get_template_directory() . '/languages' );
 
 		add_theme_support( 'title-tag' );
@@ -45,7 +45,7 @@ if ( ! function_exists( '{prefix}_cleanup' ) ) {
 	/**
 	 * Remove front-end bloat: emoji, embed, global styles, unused image sizes.
 	 */
-	function {prefix}_cleanup() {
+	function {prefix}_cleanup(): void {
 		remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
 		remove_action( 'wp_print_styles', 'print_emoji_styles' );
 		remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
@@ -60,7 +60,7 @@ if ( ! function_exists( '{prefix}_content_width' ) ) {
 	/**
 	 * Set the content width (classic themes only).
 	 */
-	function {prefix}_content_width() {
+	function {prefix}_content_width(): void {
 		$GLOBALS['content_width'] = apply_filters( '{prefix}_content_width', 1200 );
 	}
 }

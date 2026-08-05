@@ -6,6 +6,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit();
 }
@@ -19,7 +20,5 @@ foreach ( $options as $option ) {
 	delete_option( $option );
 }
 
-// Multisite: delete site options.
-// foreach ( $options as $option ) {
-// 	delete_site_option( $option );
-// }
+// Multisite: delete site options here when the plugin is uninstalled
+// network-wide.

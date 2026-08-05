@@ -1,0 +1,20 @@
+includes:
+    - vendor/szepeviktor/phpstan-wordpress/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - .
+    excludePaths:
+        - node_modules/*
+        - vendor/*
+        - dist/*
+    scanFiles:
+        - vendor/php-stubs/acf-pro-stubs/acf-pro-stubs.php
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: argument.type
+          path: header.php
+          # WP core accepts `container: false` (render without a wrapper element);
+          # the wordpress-stubs array shape types it as string only.
+          message: '~^Parameter #1 \$args of function wp_nav_menu expects~'

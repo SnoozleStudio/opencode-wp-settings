@@ -47,6 +47,7 @@
 			"vendor/bin/phpcs*": "allow",
 			"vendor/bin/phpcbf*": "allow",
 			"vendor/bin/pint*": "allow",
+			"vendor/bin/phpstan*": "allow",
 			"php -l *": "allow",
 			"wp *": "ask",
 			"gh repo view*": "allow",

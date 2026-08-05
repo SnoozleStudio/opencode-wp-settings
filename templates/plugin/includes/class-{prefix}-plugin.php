@@ -4,6 +4,7 @@
  *
  * @package {text_domain}
  */
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
@@ -44,14 +45,14 @@ class {Prefix}_Plugin {
 	/**
 	 * Load plugin textdomain.
 	 */
-	public function load_textdomain() {
+	public function load_textdomain(): void {
 		load_plugin_textdomain( '{text_domain}', false, dirname( plugin_basename( {PREFIX}_FILE ) ) . '/languages' );
 	}
 
 	/**
 	 * Register post types.
 	 */
-	public function register_post_types() {
+	public function register_post_types(): void {
 		register_post_type(
 			'{prefix}_item',
 			array(
@@ -70,7 +71,7 @@ class {Prefix}_Plugin {
 	/**
 	 * Register REST routes.
 	 */
-	public function register_rest_routes() {
+	public function register_rest_routes(): void {
 		register_rest_route(
 			'{prefix}/v1',
 			'/items/(?P<id>[\d]+)',
@@ -102,7 +103,7 @@ class {Prefix}_Plugin {
 	/**
 	 * REST item handler.
 	 *
-	 * @param  WP_REST_Request  $request  The request.
+	 * @param WP_REST_Request $request The request.
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function rest_get_item( $request ) {
