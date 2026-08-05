@@ -15,6 +15,8 @@ permission:
     "git diff*": allow
     "git show*": allow
     "git branch*": allow
+    "git branch -D *": deny
+    "git branch -d *": deny
     "git rev-parse*": allow
     "git ls-files*": allow
   webfetch: allow
