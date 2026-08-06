@@ -1,18 +1,15 @@
 import './../styles/main.css';
+import { initHero } from './components/hero';
 
 // Entry point - import components and init on DOMContentLoaded.
-// Heavy components (Three.js, QR) must stay behind dynamic import() +
-// IntersectionObserver. Every init returns a cleanup function.
+// Every init returns a cleanup function; components gate themselves
+// on element existence and prefers-reduced-motion.
 
 const cleanups = [];
 
 function init() {
-  const prefersReduced = window.matchMedia(
-    '(prefers-reduced-motion: reduce)'
-  ).matches;
-
-  // const cleanupHero = initHero();
-  // if ( cleanupHero ) cleanups.push( cleanupHero );
+  const cleanupHero = initHero();
+  if (cleanupHero) cleanups.push(cleanupHero);
 }
 
 // Teardown hook for swup content:replace or page transitions.

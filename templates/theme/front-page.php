@@ -11,10 +11,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 get_header();
 
-$hero = get_field( 'hero' );
+// ACF is optional: fall back to defaults when it is not active.
+$hero = function_exists( 'get_field' ) ? get_field( 'hero' ) : array();
 ?>
 
-<section class="hero" id="hero">
+<section class="hero" id="hero" data-hero>
 	<?php if ( is_array( $hero ) && ! empty( $hero['title'] ) ) { ?>
 		<h1 class="hero__title"><?php echo esc_html( $hero['title'] ); ?></h1>
 	<?php } else { ?>

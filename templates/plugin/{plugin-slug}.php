@@ -39,6 +39,14 @@ function {prefix}_activate(): void {
 register_activation_hook( {PREFIX}_FILE, '{prefix}_activate' );
 
 /**
+ * Flush rewrite rules on deactivation so CPT permalinks clean up.
+ */
+function {prefix}_deactivate(): void {
+	flush_rewrite_rules();
+}
+register_deactivation_hook( {PREFIX}_FILE, '{prefix}_deactivate' );
+
+/**
  * Boot the plugin singleton.
  *
  * @return {Prefix}_Plugin

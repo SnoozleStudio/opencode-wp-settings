@@ -31,7 +31,9 @@ Source: `templates/theme/`. Same substitution flow:
 2. `functions.php` boot chain: utilities → nav-walker → configure → js-css (load-order
    sensitive — do not reorder)
 3. `vite.config.mjs` with `base` set to `/wp-content/themes/{slug}/dist/`
-4. ACF: create `acf-json/` with save/load paths wired in `configure/acf.php`
+4. ACF is optional: create `acf-json/` with save/load paths wired in
+   `configure/acf.php` only if the project uses ACF — `front-page.php` guards
+   `get_field()` and runs without it
 5. Run `npm install`, `composer install`, then the verification chain
 
 ## New section in an existing theme
@@ -41,9 +43,10 @@ Match the existing component pattern (do not invent a new one):
 1. Read one existing section's PHP + JS + CSS to learn the house pattern
 2. PHP: `front-page.php`-style section markup or `get_template_part()`, ACF fields via
    `get_field()` with `have_rows()` loops, escaping at output, i18n
-3. JS: new file in `src/scripts/components/{name}.js` following the component template —
-   init guarded by element existence, Tempus, reduced-motion gate, cleanup returned
-4. Wire into `src/scripts/main.js` import + `App` init
+3. JS: new file in `src/scripts/components/{name}.js` following the shipped
+   example (`hero.js` — the house pattern) — init guarded by element existence,
+   Tempus, reduced-motion gate, cleanup returned
+4. Wire into `src/scripts/main.js` import + `init`
 5. Tailwind: tokens in `@theme` in `src/styles/main.css`, no new config files
 6. Run the verification chain
 

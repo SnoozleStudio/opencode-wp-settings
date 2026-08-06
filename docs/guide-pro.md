@@ -444,6 +444,15 @@ known trap).
   (element guard → reduced-motion gate → Tempus → cleanup returned), wire into
   `main.js`, Tailwind tokens in `@theme`. That is exactly what the
   [scaffolder agent](../agents/scaffolder.md) encodes.
+- The theme template ships one runnable house-pattern example —
+  `src/scripts/components/hero.js` (element guard → reduced-motion gate →
+  `gsap.context()` intro → `Tempus.add({ order: -1 })` parallax → cleanup
+  returned), wired into `main.js` and driven by `data-hero` on `front-page.php`.
+  Copy it when adding new components.
+- ACF Pro is optional, not required: `front-page.php` guards `get_field()` with
+  `function_exists()` and falls back to `bloginfo( 'name' )` when ACF is
+  inactive; the save/load filters in `configure/acf.php` are inert without the
+  plugin.
 
 ---
 

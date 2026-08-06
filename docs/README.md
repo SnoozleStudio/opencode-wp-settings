@@ -218,8 +218,8 @@ truth — adapt, don't reinvent.**
 
 | Template | Directory | Produces |
 |---|---|---|
-| Theme | [templates/theme](../templates/theme) | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css), acf-json, .husky, phpstan.neon (ACF stubs) |
-| Plugin | [templates/plugin](../templates/plugin) | classic plugin: main-file header, uninstall.php, admin/includes/public split, phpcs.xml, composer.json, phpstan.neon |
+| Theme | [templates/theme](../templates/theme) | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css → acf), acf-json, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs) |
+| Plugin | [templates/plugin](../templates/plugin) | classic plugin: main-file header, activation/deactivation rewrite hooks, uninstall.php, admin/includes/public split, phpcs.xml, composer.json, phpstan.neon |
 
 ### Scripts & config
 
