@@ -62,42 +62,54 @@ permission level, not by prompt discipline.
 {
   "permission": {
     "bash": {
-      "*": "ask",            // default: ask before any command
-      "npm run *": "allow",  // build/format/dev: friction-free
+      "*": "ask", // default: ask before any command
+      "npm run *": "allow", // build/format/dev: friction-free
       "git status*": "allow",
-      "git checkout -- *": "deny",   // destructive: denied, period
-      "node -e *": "deny",           // eval-style execution: denied
-      "curl * | bash": "deny",       // remote code execution: denied
-      "cat ~/.ssh/*": "deny"         // secrets: denied
+      "git checkout -- *": "deny", // destructive: denied, period
+      "node -e *": "deny", // eval-style execution: denied
+      "curl * | bash": "deny", // remote code execution: denied
+      "cat ~/.ssh/*": "deny", // secrets: denied
     },
-    "read":  { "*": "allow", "~/.ssh/**": "deny", "~/.aws/**": "deny", "~/.npmrc": "deny", "…": "deny" },
-    "edit":  { "*": "allow", "~/.ssh/**": "deny", "~/.aws/**": "deny", "~/.npmrc": "deny", "…": "deny" },
+    "read": {
+      "*": "allow",
+      "~/.ssh/**": "deny",
+      "~/.aws/**": "deny",
+      "~/.npmrc": "deny",
+      "…": "deny",
+    },
+    "edit": {
+      "*": "allow",
+      "~/.ssh/**": "deny",
+      "~/.aws/**": "deny",
+      "~/.npmrc": "deny",
+      "…": "deny",
+    },
     "webfetch": "allow",
     "skill": { "*": "allow" },
-    "task":  { "*": "allow" }
-  }
+    "task": { "*": "allow" },
+  },
 }
 ```
 
 What's allowed/asked/denied and why:
 
-| Pattern | Verdict | Rationale |
-|---|---|---|
-| `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*` | allow | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
-| `bun run *` | allow | same, for the Bun runtime (`bunx *` removed — unscoped remote code execution) |
-| `git status/diff/log/show/branch/blame/rev-parse/remote/stash/add/commit/push/pull/checkout <branch>` | allow | read + normal workflow |
-| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny** | irreversible history/work-tree damage |
-| `composer install/dump-autoload/validate/show` | allow | toolchain |
-| `composer require/update` | ask | dependency changes need your eyes |
-| `vendor/bin/phpcs/phpcbf/pint/phpstan`, `php -l` | allow | lint gates |
-| `wp *` | ask | WP-CLI mutates the database/site |
-| `gh pr/issue/run view*`, `gh repo view*` | allow; `gh pr create*`, `gh issue create*` ask | reads free, writes need consent |
-| `node -e/-p/--eval/--print` | deny | arbitrary code exec disguised as a flag |
-| `curl` with pipes/`-o`/POST/PUT/DELETE | deny | remote execution / silent writes |
-| `iwr/irm * \| iex`, `rm -rf /*`, `rm -rf ~*`, recursive Remove-Item, `rd /s` | deny | ransomware-shaped commands |
-| `sudo *` | deny | privilege boundary |
-| `cat/type/Get-Content ~/.ssh/* ~/.aws/* ~/.gnupg/* ~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config` | deny | secret material |
-| `read`/`edit` of `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**`, `~/.npmrc`, `~/.netrc`, `~/.docker/config.json`, `~/.kube/config` | deny | secrets denied even on read |
+| Pattern                                                                                                                                                       | Verdict                                        | Rationale                                                                                         |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*`                                                                                  | allow                                          | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
+| `bun run *`                                                                                                                                                   | allow                                          | same, for the Bun runtime (`bunx *` removed — unscoped remote code execution)                     |
+| `git status/diff/log/show/branch/blame/rev-parse/remote/stash/add/commit/push/pull/checkout <branch>`                                                         | allow                                          | read + normal workflow                                                                            |
+| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny**                                       | irreversible history/work-tree damage                                                             |
+| `composer install/dump-autoload/validate/show`                                                                                                                | allow                                          | toolchain                                                                                         |
+| `composer require/update`                                                                                                                                     | ask                                            | dependency changes need your eyes                                                                 |
+| `vendor/bin/phpcs/phpcbf/pint/phpstan`, `php -l`                                                                                                              | allow                                          | lint gates                                                                                        |
+| `wp *`                                                                                                                                                        | ask                                            | WP-CLI mutates the database/site                                                                  |
+| `gh pr/issue/run view*`, `gh repo view*`                                                                                                                      | allow; `gh pr create*`, `gh issue create*` ask | reads free, writes need consent                                                                   |
+| `node -e/-p/--eval/--print`                                                                                                                                   | deny                                           | arbitrary code exec disguised as a flag                                                           |
+| `curl` with pipes/`-o`/POST/PUT/DELETE                                                                                                                        | deny                                           | remote execution / silent writes                                                                  |
+| `iwr/irm * \| iex`, `rm -rf /*`, `rm -rf ~*`, recursive Remove-Item, `rd /s`                                                                                  | deny                                           | ransomware-shaped commands                                                                        |
+| `sudo *`                                                                                                                                                      | deny                                           | privilege boundary                                                                                |
+| `cat/type/Get-Content ~/.ssh/* ~/.aws/* ~/.gnupg/* ~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config`                                                    | deny                                           | secret material                                                                                   |
+| `read`/`edit` of `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**`, `~/.npmrc`, `~/.netrc`, `~/.docker/config.json`, `~/.kube/config`                                   | deny                                           | secrets denied even on read                                                                       |
 
 > Extending: add patterns by specificity. Broad `*` denies must come after the
 > specific allows — the most specific pattern wins per command.
@@ -115,12 +127,13 @@ compound commands (`npm run build && npm run format:all:check`).
 
 ## 3. MCP servers
 
-Two servers configured; one active:
+Two servers configured; both active (version-pinned so a breaking release can't
+silently break the stack):
 
-| Server | Command | State | Use |
-|---|---|---|---|
-| Context7 | `npx -y @upstash/context7-mcp` | enabled | current library/framework docs on demand — **mandatory before assuming API knowledge** (AGENTS.md External Libraries rule) |
-| chrome-devtools | `npx -y chrome-devtools-mcp@latest` | `enabled: false` | browser automation, a11y snapshots, profiling — flip on for visual/console work |
+| Server          | Command                              | State   | Use                                                                                                                        |
+| --------------- | ------------------------------------ | ------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Context7        | `npx -y @upstash/context7-mcp@4.0.0` | enabled | current library/framework docs on demand — **mandatory before assuming API knowledge** (AGENTS.md External Libraries rule) |
+| chrome-devtools | `npx -y chrome-devtools-mcp@1.6.0`   | enabled | browser automation, a11y snapshots, profiling — auto-launches Chrome on the first page tool                                |
 
 Pattern: Context7 for "does Vite 8 still call it `rolldownOptions`?" (it does — the
 docs move, your training data doesn't); chrome-devtools for "inspect the computed
@@ -147,12 +160,13 @@ The heart of the "never ship red" rule:
 ```ts
 // plugins/proof-of-work.ts (essence)
 const gate = async (command: string): Promise<void> => {
-    if (!/\bgit(\.exe)?\s+(push|commit)\b/i.test(command)) return; // only gate push/commit
-    if (/(^|\s)(--no-verify|HUSKY=0|SKIP_GATE=1)(\s|$)/i.test(command)) return; // documented escapes
-    const target = resolveTarget(command); // git -C <repo> honored; bare cd chains exempt
-    if (!isGatedProject(target)) return;    // needs build script + phpcs.xml/composer.json
-    const result = await runChain(target);  // build → format:all:check → phpcs → phpstan
-    if (!result.ok) throw new Error(/* "proof-of-work: verification chain failed at …" */);
+  if (!/\bgit(\.exe)?\s+(push|commit)\b/i.test(command)) return; // only gate push/commit
+  if (/(^|\s)(--no-verify|HUSKY=0|SKIP_GATE=1)(\s|$)/i.test(command)) return; // documented escapes
+  const target = resolveTarget(command); // git -C <repo> honored; bare cd chains exempt
+  if (!isGatedProject(target)) return; // needs build script + phpcs.xml/composer.json
+  const result = await runChain(target); // build → format:all:check → phpcs → phpstan
+  if (!result.ok)
+    throw new Error(/* "proof-of-work: verification chain failed at …" */);
 };
 ```
 
@@ -202,8 +216,8 @@ single-file phpcs pass:
 The point: **lint feedback arrives with the edit**, not at commit time. The agent
 sees "phpcs ⚠ 3 error(s)" in the tool title and fixes before moving on.
 
-**Cooldown:** a *clean* lint of a file is cached 2s per file — rapid repeated edits of
-the same file don't re-lint until the window passes. A *failed* lint always re-lints,
+**Cooldown:** a _clean_ lint of a file is cached 2s per file — rapid repeated edits of
+the same file don't re-lint until the window passes. A _failed_ lint always re-lints,
 so "fixed" feedback is immediate. The cooldown only suppresses the inline hint; the
 commit gate (`proof-of-work`) always runs the full chain.
 
@@ -229,11 +243,14 @@ Minimal shape (`plugins/my-plugin.ts`, then restart OpenCode):
 import type { Plugin } from "@opencode-ai/plugin";
 
 export const MyPlugin = async ({ directory }: Parameters<Plugin>[0]) => {
-    return {
-        "tool.execute.before": async (input: { tool: string }, output: { args: Record<string, unknown> }) => {
-            // veto by throwing, or return undefined to pass
-        },
-    };
+  return {
+    "tool.execute.before": async (
+      input: { tool: string },
+      output: { args: Record<string, unknown> },
+    ) => {
+      // veto by throwing, or return undefined to pass
+    },
+  };
 };
 ```
 
@@ -268,25 +285,25 @@ Eight subagents, three flavors:
 
 **Readers (denied edit/write by permission, not by instruction):**
 
-| Agent | depth | Use for |
-|---|---|---|
-| explore | 80 steps | mapping, tracing, "how does X work" — neutral prompts only |
-| planner | 60 steps | DAGs, blast radius, WP-contract check, verification plans |
-| reviewer | 60 steps | Standards + Spec axes, phpcs verbatim |
+| Agent            | depth    | Use for                                                    |
+| ---------------- | -------- | ---------------------------------------------------------- |
+| explore          | 80 steps | mapping, tracing, "how does X work" — neutral prompts only |
+| planner          | 60 steps | DAGs, blast radius, WP-contract check, verification plans  |
+| reviewer         | 60 steps | Standards + Spec axes, phpcs verbatim                      |
 | security-auditor | 80 steps | full attack surface, proven findings (CONFIRMED/PLAUSIBLE) |
 
 **Writers (edit within briefing only):**
 
-| Agent | depth | Use for |
-|---|---|---|
-| implementer | 120 steps | production edits — bound by the **Briefing Gate** (below) |
-| scaffolder | 80 steps | greenfield from `templates/`, new sections in themes |
-| tester | 60 steps | running/proving the verification chain — never fabricates green |
+| Agent       | depth     | Use for                                                         |
+| ----------- | --------- | --------------------------------------------------------------- |
+| implementer | 120 steps | production edits — bound by the **Briefing Gate** (below)       |
+| scaffolder  | 80 steps  | greenfield from `templates/`, new sections in themes            |
+| tester      | 60 steps  | running/proving the verification chain — never fabricates green |
 
 **Orchestrator:**
 
-| Agent | depth | Use for |
-|---|---|---|
+| Agent   | depth     | Use for                                                  |
+| ------- | --------- | -------------------------------------------------------- |
 | maestro | 200 steps | 3+ parallel workstreams, phased execution, quality gates |
 
 ### The Briefing Gate (implementer)
@@ -304,18 +321,18 @@ satisfy.
 
 ### The delegation decision table
 
-| Situation | Delegate to |
-|---|---|
-| "What does this code do?" | explore (or just ask — read-only conversation) |
-| "How should we do X?" / multi-file change | planner |
-| "Fix this bug" | explore → implementer (via fix skill) |
-| "Build this feature" | grill → implementer → tester → reviewer |
-| "Is this right?" (high-stakes) | verify skill (finder/adversary/referee) |
-| "Is this secure?" | security-auditor |
-| "Is this green?" | tester |
-| "Review my diff" | reviewer |
-| "New theme/plugin/section" | scaffolder |
-| "3+ independent pieces" | maestro |
+| Situation                                 | Delegate to                                    |
+| ----------------------------------------- | ---------------------------------------------- |
+| "What does this code do?"                 | explore (or just ask — read-only conversation) |
+| "How should we do X?" / multi-file change | planner                                        |
+| "Fix this bug"                            | explore → implementer (via fix skill)          |
+| "Build this feature"                      | grill → implementer → tester → reviewer        |
+| "Is this right?" (high-stakes)            | verify skill (finder/adversary/referee)        |
+| "Is this secure?"                         | security-auditor                               |
+| "Is this green?"                          | tester                                         |
+| "Review my diff"                          | reviewer                                       |
+| "New theme/plugin/section"                | scaffolder                                     |
+| "3+ independent pieces"                   | maestro                                        |
 
 ---
 
@@ -373,12 +390,12 @@ Full format in [docs/skill-authoring.md](skill-authoring.md). The essentials:
 routes on description density, so each description carries explicit "not for…" cues.
 When in doubt, this is the intended split:
 
-| User says | Best skill | Why | Not this |
-|---|---|---|---|
-| "review my changes / is this ready to commit" | `review` | two-axis: Standards + Spec of a diff | `verify` (no adversarial proof), `wp-security-audit` (no attack-surface proof) |
-| "double check this logic / prove it / is the bug really fixed" | `verify` | finder/adversary/referee correctness proof | `review` (no adversary), `wp-security-audit` (not a logic proof) |
-| "is this secure / audit for XSS/SQLi/CSRF" | `wp-security-audit` | full attack surface, proven findings | `review` (standards ≠ security), `verify` (logic ≠ vulnerabilities) |
-| "fix this bug" then "did it land?" | `fix` → `verify` | fix disciplines the change; verify proves it | `review` alone (no fix procedure) |
+| User says                                                      | Best skill          | Why                                          | Not this                                                                       |
+| -------------------------------------------------------------- | ------------------- | -------------------------------------------- | ------------------------------------------------------------------------------ |
+| "review my changes / is this ready to commit"                  | `review`            | two-axis: Standards + Spec of a diff         | `verify` (no adversarial proof), `wp-security-audit` (no attack-surface proof) |
+| "double check this logic / prove it / is the bug really fixed" | `verify`            | finder/adversary/referee correctness proof   | `review` (no adversary), `wp-security-audit` (not a logic proof)               |
+| "is this secure / audit for XSS/SQLi/CSRF"                     | `wp-security-audit` | full attack surface, proven findings         | `review` (standards ≠ security), `verify` (logic ≠ vulnerabilities)            |
+| "fix this bug" then "did it land?"                             | `fix` → `verify`    | fix disciplines the change; verify proves it | `review` alone (no fix procedure)                                              |
 
 The `description` frontmatters of these three are the routing contract — if you change
 one, change all three so the "not for…" cues stay mutually exclusive.
@@ -397,12 +414,13 @@ ScrollSmoother; Tempus ticker; reduced-motion gate; manifest enqueue) live in
 
 ```markdown
 # WordPress Classic Theme — Enterprise Architecture
+
 Classic themes (not block themes) that survive Theme Review. Load
 `docs/wordpress-theme-architecture.md` and `docs/frontend-stack.md` for full references.
 ```
 
 Then: canonical structure → non-negotiables → stack defaults ("do not invent
-alternatives") → verification chain → scaffolding. Note the *contract trick*: it
+alternatives") → verification chain → scaffolding. Note the _contract trick_: it
 loads the two reference docs by path, so the skill body stays ~100 lines while the
 depth lives in `docs/`.
 
@@ -416,17 +434,17 @@ does semantic substitution (namespaces, class names, text domains).
 
 ### Token table (setup.ps1 `Resolve-Args`)
 
-| Token | Becomes | Example (`-Slug my-plugin -Prefix myp_ -Name "My Plugin"`) |
-|---|---|---|
-| `{plugin_slug}` / `{plugin-slug}` | slug | `my-plugin` |
-| `{plugin_name}` | display name | `My Plugin` |
-| `{theme_slug}` / `{theme-slug}` | slug (theme scaffolds) | `my-theme` |
-| `{theme_name}` | display name (theme scaffolds) | `My Theme` |
-| `{text_domain}` | slug (text domain must match slug) | `my-plugin` |
-| `{prefix}` | prefix, trailing `_` stripped | `myp` |
-| `{PREFIX}` | prefix upper | `MYP` |
-| `{Prefix}` | prefix title-cased | `Myp` |
-| `{description}` | placeholder description | `Initial description.` |
+| Token                             | Becomes                            | Example (`-Slug my-plugin -Prefix myp_ -Name "My Plugin"`) |
+| --------------------------------- | ---------------------------------- | ---------------------------------------------------------- |
+| `{plugin_slug}` / `{plugin-slug}` | slug                               | `my-plugin`                                                |
+| `{plugin_name}`                   | display name                       | `My Plugin`                                                |
+| `{theme_slug}` / `{theme-slug}`   | slug (theme scaffolds)             | `my-theme`                                                 |
+| `{theme_name}`                    | display name (theme scaffolds)     | `My Theme`                                                 |
+| `{text_domain}`                   | slug (text domain must match slug) | `my-plugin`                                                |
+| `{prefix}`                        | prefix, trailing `_` stripped      | `myp`                                                      |
+| `{PREFIX}`                        | prefix upper                       | `MYP`                                                      |
+| `{Prefix}`                        | prefix title-cased                 | `Myp`                                                      |
+| `{description}`                   | placeholder description            | `Initial description.`                                     |
 
 Prefix derivation rule: first 4 letters of the slug minus dashes + `_`
 (`my-plugin` → `myp_`); explicit `-Prefix` overrides. Tokens are a
@@ -460,16 +478,16 @@ known trap).
 
 ### Parameters
 
-| Parameter | Behavior |
-|---|---|
-| `-Validate` | structure check: AGENTS.md/opencode.json present; every agent/skill/command has frontmatter + description; skill `name` matches directory; no plain-scalar description contains `: ` (colon+space — would break YAML parsing and kill the component's routing). Exit 1 on failure |
-| `-NewTheme <dir>` / `-NewPlugin <dir>` | scaffold into an explicit local directory (no WP root needed) |
-| `-Theme <slug>` / `-Plugin <slug>` | scaffold into a WordPress root: walked-up root (site shell) or `-Site <name>` |
-| `-Site <name>` / `-SitesDir <dir>` | resolve `{Local Sites}\<name>\app\public`; `-SitesDir` overrides the sites root |
-| `-Install` | `npm install` + `composer install` with the Local-PHP workaround |
-| `-Force` | scaffold over an existing non-empty target (keeps extra files) |
-| `-Slug` / `-Prefix` / `-Name` | overrides; derived from the target leaf name otherwise |
-| `-DryRun` | render every file in memory, validate (no stray `{tokens}`, no reserved Windows names, JSON/XML parses), print what would be written — change nothing. A dry run that prints "would write" for a broken scaffold is a lie |
+| Parameter                              | Behavior                                                                                                                                                                                                                                                                          |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `-Validate`                            | structure check: AGENTS.md/opencode.json present; every agent/skill/command has frontmatter + description; skill `name` matches directory; no plain-scalar description contains `: ` (colon+space — would break YAML parsing and kill the component's routing). Exit 1 on failure |
+| `-NewTheme <dir>` / `-NewPlugin <dir>` | scaffold into an explicit local directory (no WP root needed)                                                                                                                                                                                                                     |
+| `-Theme <slug>` / `-Plugin <slug>`     | scaffold into a WordPress root: walked-up root (site shell) or `-Site <name>`                                                                                                                                                                                                     |
+| `-Site <name>` / `-SitesDir <dir>`     | resolve `{Local Sites}\<name>\app\public`; `-SitesDir` overrides the sites root                                                                                                                                                                                                   |
+| `-Install`                             | `npm install` + `composer install` with the Local-PHP workaround                                                                                                                                                                                                                  |
+| `-Force`                               | scaffold over an existing non-empty target (keeps extra files)                                                                                                                                                                                                                    |
+| `-Slug` / `-Prefix` / `-Name`          | overrides; derived from the target leaf name otherwise                                                                                                                                                                                                                            |
+| `-DryRun`                              | render every file in memory, validate (no stray `{tokens}`, no reserved Windows names, JSON/XML parses), print what would be written — change nothing. A dry run that prints "would write" for a broken scaffold is a lie                                                         |
 
 ### Root resolution & the Local workaround
 
@@ -549,7 +567,7 @@ documentation in the same change.** A checklist that makes it mechanical:
 [ ] /docs-check green                                  (drift = finding, not nit)
 ```
 
-Why it's enforced at the *documentation layer* and not in a commit plugin: the
+Why it's enforced at the _documentation layer_ and not in a commit plugin: the
 routing table (descriptions) and the map (inventory) are cheap to verify on demand,
 and the human-in-the-loop review catches what automation can't. The hard gate stays
 reserved for code correctness (proof-of-work), which is the thing that breaks
@@ -591,7 +609,9 @@ permission:
 steps: 40
 color: info
 ---
+
 # Glossary Writer
+
 Read CONTEXT.md if present; skim the named files; output one-line definitions…
 ```
 
