@@ -545,3 +545,8 @@ Keep entries terse and factual — one line each.
   restart to take effect. Both servers are now version-pinned
   (`chrome-devtools-mcp@1.6.0`, `@upstash/context7-mcp@4.0.0`) so a breaking
   release can't silently break the stack, and the pinned npx caches are warm.
+- [2026-08-07] tooling: PowerShell 5.1 renders native-command stderr as red
+  ErrorRecord noise under `2>&1` — git push progress goes to stderr BY DESIGN
+  (exit code is the truth; the push succeeded). Run git/native commands WITHOUT
+  `2>&1` (stderr passes through plain); when merged capture is needed, use
+  `2>&1 | ForEach-Object { "$_" }` — `$LASTEXITCODE` is unaffected.
