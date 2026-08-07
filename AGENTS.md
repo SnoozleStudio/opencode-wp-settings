@@ -550,3 +550,12 @@ Keep entries terse and factual — one line each.
   (exit code is the truth; the push succeeded). Run git/native commands WITHOUT
   `2>&1` (stderr passes through plain); when merged capture is needed, use
   `2>&1 | ForEach-Object { "$_" }` — `$LASTEXITCODE` is unaffected.
+- [2026-08-07] tooling: this repo is LF-canonical via `.gitattributes`
+  (`* text=auto` + per-type `eol=lf`); without it, global `core.autocrlf=true`
+  materializes CRLF working copies (6 vendored `skills/gsap-*/SKILL.md` files
+  were CRLF) and warns on every agent-written LF file. After an attribute
+  change: `git add --renormalize .` (blobs already LF — no-op), then flush
+  mixed endings per file — `git checkout-index -f -a` is a stat-cache NO-OP
+  here; delete the file and `git checkout -- <file>` (or bump mtime first).
+  Keep vendored skills text — `npx skills update` refreshes normalize on
+  `git add`.
