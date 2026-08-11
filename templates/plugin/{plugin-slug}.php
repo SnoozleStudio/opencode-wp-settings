@@ -29,6 +29,10 @@ require_once {PREFIX}_DIR . 'includes/class-{prefix}-plugin.php';
 require_once {PREFIX}_DIR . 'admin/class-{prefix}-admin.php';
 require_once {PREFIX}_DIR . 'public/class-{prefix}-public.php';
 
+// Boot the admin and public classes — their constructors wire the hooks.
+new {Prefix}_Admin();
+new {Prefix}_Public();
+
 /**
  * Flush rewrite rules on activation so CPT permalinks resolve immediately.
  */

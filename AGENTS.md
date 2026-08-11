@@ -559,3 +559,10 @@ Keep entries terse and factual — one line each.
   here; delete the file and `git checkout -- <file>` (or bump mtime first).
   Keep vendored skills text — `npx skills update` refreshes normalize on
   `git add`.
+- [2026-08-10] tooling: a shipped `.husky/pre-commit` without a
+  `"prepare": "husky"` package.json script is dormant — hooks never install on
+  `npm install`; and `isGatedProject` in plugins/proof-of-work.ts requires a
+  `build` script, so build-less plugin scaffolds were never gate-protected.
+  Both templates now carry `prepare: husky`; the plugin template ships
+  `"build": "exit 0"` as a documented no-op (plugins have no compiled assets)
+  so the gate's four-step chain runs for plugin projects too.

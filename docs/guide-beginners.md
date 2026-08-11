@@ -430,6 +430,7 @@ The same request, two ways:
 | "clean up a module" | `/refactor` — behavior-preserving steps, chain after every step |
 | "make it faster" | `/audit` — then point at the page: "front page, biggest CLS offender" |
 | "I need a form" | "I want a booking form on the home page" (the AI will grill you) |
+| "what does this codebase do?" | `/context` — builds the project glossary and ADR log |
 
 Rules of thumb:
 
@@ -438,9 +439,9 @@ Rules of thumb:
    a sentence.
 3. **Paste errors verbatim** — screenshots of text help nothing; the error string
    helps everything.
-4. **Use slash commands for known workflows** — `/fix`, `/build`, `/review`, `/ship`
-   are written by engineers who encoded the process. Plain conversation for questions
-   ("what does this function do?").
+4. **Use slash commands for known workflows** — `/fix`, `/build`, `/review`, `/ship`,
+   `/context` are written by engineers who encoded the process. Plain conversation
+   for questions ("what does this function do?").
 5. **Say "you decide" when you trust it** — grilling respects that and stops asking.
 
 ---

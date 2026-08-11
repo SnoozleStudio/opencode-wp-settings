@@ -10,7 +10,8 @@ parameters:
     reportUnmatchedIgnoredErrors: false
     ignoreErrors:
         - identifier: constant.notFound
-          path: public/class-{prefix}-public.php
-          # {PREFIX}_URL is defined in the plugin main file via define() with a
-          # function-call value (plugin_dir_url()); PHPStan only auto-discovers
-          # statically-evaluable define() values. WP resolves it at runtime.
+          # {PREFIX}_* constants are defined in the plugin main file via
+          # define() with function-call values (plugin_dir_url(),
+          # plugin_dir_path()); PHPStan only auto-discovers statically-
+          # evaluable define() values. WP resolves them at runtime, so every
+          # constant-using file needs this ignore.

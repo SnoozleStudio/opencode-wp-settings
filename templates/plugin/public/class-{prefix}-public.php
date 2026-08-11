@@ -1,6 +1,6 @@
 <?php
 /**
- * Front-end functionality - enqueues, shortcodes, public hooks.
+ * Front-end functionality — enqueues, shortcodes, public hooks.
  *
  * @package {text_domain}
  */
@@ -9,11 +9,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit();
 }
 
-if ( ! function_exists( '{prefix}_enqueue_assets' ) ) {
+/**
+ * Front-end assets class.
+ */
+class {Prefix}_Public {
+	/**
+	 * Constructor — wire the public hooks.
+	 */
+	public function __construct() {
+		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+	}
+
 	/**
 	 * Enqueue front-end assets.
 	 */
-	function {prefix}_enqueue_assets(): void {
+	public function enqueue_assets(): void {
 		wp_enqueue_style(
 			'{prefix}-public',
 			{PREFIX}_URL . 'public/css/public.css',
@@ -33,4 +43,3 @@ if ( ! function_exists( '{prefix}_enqueue_assets' ) ) {
 		);
 	}
 }
-add_action( 'wp_enqueue_scripts', '{prefix}_enqueue_assets' );

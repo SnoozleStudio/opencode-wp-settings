@@ -333,6 +333,7 @@ satisfy.
 | "Review my diff"                          | reviewer                                       |
 | "New theme/plugin/section"                | scaffolder                                     |
 | "3+ independent pieces"                   | maestro                                        |
+| "Team vocabulary is drifting / project feels unfamiliar" | `/context` (glossary + ADR log)     |
 
 ---
 
@@ -471,6 +472,15 @@ known trap).
   `function_exists()` and falls back to `bloginfo( 'name' )` when ACF is
   inactive; the save/load filters in `configure/acf.php` are inert without the
   plugin.
+- The plugin template ships no compiled front-end assets: `public/css/public.css`
+  and `public/js/public.js` are plain files enqueued as-is, and `npm run build`
+  is a documented no-op (`exit 0`) so the proof-of-work gate's four-step chain
+  runs for plugin projects too (the gate requires a `build` script).
+- Both templates ship a `.husky/pre-commit` gate (format:all:check + phpcs +
+  phpstan); the `prepare: husky` script installs the hooks on `npm install`.
+- The plugin template's settings page is functional out of the box:
+  `register_setting` + one `add_settings_section`/`add_settings_field` demo in
+  `admin/class-{prefix}-admin.php` — extend it, don't remove the registration.
 
 ---
 

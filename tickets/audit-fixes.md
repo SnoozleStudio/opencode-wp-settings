@@ -356,3 +356,64 @@ docs sync in the same change as the code.
   end-to-end via bun against two fake gated repos: `git -C` reaches the gate,
   same-repo repeat is a cache hit (no re-run), repo B with identical porcelain
   still runs, new HEAD invalidates.
+
+---
+
+## Re-audit batch 3 (2026-08-10) — findings from the fresh post-fix audit
+
+## [x] T31. Plugin template: real Admin/Public classes, working settings page, shipped assets
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `templates/plugin/admin/class-{prefix}-admin.php`,
+  `templates/plugin/public/class-{prefix}-public.php`,
+  `templates/plugin/{plugin-slug}.php`, NEW
+  `templates/plugin/public/css/public.css` + `public/js/public.js`
+- **Cause**: the fresh 2026-08-10 audit found the plugin template's `class-` files
+  contained no classes (WPCS FileName risk), the settings form posted to an
+  unregistered option group (no `register_setting`), and the enqueues referenced
+  assets that didn't exist in the template (fresh-scaffold 404s).
+- **Acceptance**: `{Prefix}_Admin` (settings page on `admin_menu`,
+  `register_setting` + section + one example field on `admin_init`,
+  capability-checked render, sanitize callback) and `{Prefix}_Public` (enqueues)
+  classes exist; main file instantiates both after the requires; the two asset
+  files ship in the template.
+
+## [x] T32. Plugin template gate parity + both templates' husky prepare
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: NEW `templates/plugin/package.json` (no-op `build`, husky + prettier
+  devDeps, `prepare: husky`), NEW `templates/plugin/.husky/pre-commit`,
+  NEW `templates/plugin/.prettierrc`, `templates/theme/package.json` (prepare script)
+- **Cause**: `isGatedProject` in `plugins/proof-of-work.ts` requires a `build`
+  script, so plugin scaffolds were never gate-protected; the theme's husky hooks
+  were never installed (no `prepare` script) — both templates' local gates were
+  dormant.
+- **Acceptance**: plugin scaffolds are gated projects (build script present — a
+  documented no-op; plugins ship no compiled assets); both templates install hooks
+  via `prepare: husky` on `npm install`; plugin pre-commit mirrors the theme's
+  (format:all:check + phpcs + phpstan).
+
+## [x] T33. Plugin phpstan ignore covers all constant-using files
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `templates/plugin/phpstan.neon`
+- **Acceptance**: the `constant.notFound` ignore is no longer path-scoped to
+  public/; main, includes, admin, and public files are all covered;
+  `reportUnmatchedIgnoredErrors: false` already prevents unmatched-ignore noise.
+
+## [x] T34. /context documented in both guides; template docs synced
+
+- **Blocked by**: none
+- **Blocks**: none
+- **Files**: `docs/guide-beginners.md` (slash-command list + weak/strong table row),
+  `docs/guide-pro.md` (delegation table row + §8 template notes), `docs/README.md`
+  hub Plugin row
+- **Cause**: `/context` was the only command absent from both guides (hub-only);
+  the hub Plugin row and §8 didn't reflect the batch-3 template changes.
+- **Acceptance**: `/context` appears in guide-beginners and guide-pro; hub Plugin
+  row describes the working settings page, shipped assets, and pre-commit gate;
+  §8 documents the no-op build rationale and the `prepare: husky` wiring;
+  `/docs-check` green.
