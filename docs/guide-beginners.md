@@ -36,16 +36,16 @@ know how to ask. This guide teaches you that, with copy-paste-ready prompts.
 
 Four layers, bottom to top:
 
-| Layer | What it is | In this repo |
-|---|---|---|
-| **Config** | global settings every session loads | `opencode.json`, `AGENTS.md`, plugins |
-| **Agents** | specialist workers the AI can delegate to (a mapper, a coder, a reviewer…) | 8 in `agents/` |
-| **Skills** | how-to disciplines the AI loads when a task matches | 26 in `skills/` |
-| **Commands** | `/shortcuts` that start a known workflow with a written prompt | 18 in `commands/` |
+| Layer        | What it is                                                                 | In this repo                          |
+| ------------ | -------------------------------------------------------------------------- | ------------------------------------- |
+| **Config**   | global settings every session loads                                        | `opencode.json`, `AGENTS.md`, plugins |
+| **Agents**   | specialist workers the AI can delegate to (a mapper, a coder, a reviewer…) | 8 in `agents/`                        |
+| **Skills**   | how-to disciplines the AI loads when a task matches                        | 26 in `skills/`                       |
+| **Commands** | `/shortcuts` that start a known workflow with a written prompt             | 18 in `commands/`                     |
 
 You almost never touch layers 1–3. You use **commands** and **plain conversation**.
 The AI decides which agent/skill to deploy — that's the "AI-driven" part: you don't
-say *"spawn the explore subagent"*, you say *"figure out why my menu is broken"*.
+say _"spawn the explore subagent"_, you say _"figure out why my menu is broken"_.
 
 Two rules that protect you, always:
 
@@ -96,7 +96,7 @@ Every example below is copy-paste ready. Format: **You say** (the exact prompt) 
 ```
 
 **What happens:** `/fix` runs the full bug workflow — explore maps the animation code,
-the failure is reproduced, the root cause is named in one sentence *before* any edit,
+the failure is reproduced, the root cause is named in one sentence _before_ any edit,
 the implementer fixes only the files involved, the verification chain runs.
 
 **What you get:** root cause, the fix, files modified, verification results.
@@ -160,7 +160,7 @@ and what needs a browser check.
 /section testimonials slider
 ```
 
-**What happens:** the theme skill's section flow — it first *reads an existing section*
+**What happens:** the theme skill's section flow — it first _reads an existing section_
 to learn the house pattern, then builds: PHP markup with ACF fields, a JS component
 (`src/scripts/components/testimonials.js` — element guard, reduced-motion gate,
 cleanup returned), Tailwind tokens. Verification chain runs.
@@ -175,7 +175,7 @@ cleanup returned), Tailwind tokens. Verification chain runs.
 I want a booking form on the home page
 ```
 
-**What happens:** ambiguous feature → the AI *grills you first* (a handful of focused
+**What happens:** ambiguous feature → the AI _grills you first_ (a handful of focused
 questions: what data, which fields, what happens on submit?) before writing anything.
 This is deliberate — it prevents building the wrong thing.
 
@@ -187,7 +187,7 @@ This is deliberate — it prevents building the wrong thing.
 
 ---
 
-**You say:** (from Local's site shell, i.e. right-click your Local site → *Site Shell*)
+**You say:** (from Local's site shell, i.e. right-click your Local site → _Site Shell_)
 
 ```
 "%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
@@ -200,7 +200,7 @@ root (walks up until `wp-load.php`), scaffolds `templates/theme/` into
 having openssl disabled), and prints next steps.
 
 **What you get:** a complete enterprise theme skeleton — style.css header, functions.php
-boot chain, Vite + Tailwind v4, acf-json, phpcs gate. Then: activate it, sync ACF field
+boot chain, Vite + Tailwind v4, acf-json save/load wiring, phpcs gate. Then: activate it, sync ACF field
 groups, run the verification chain.
 
 > From any directory (no site shell): `& "$HOME\.config\opencode\setup.ps1" -Site mysite -Theme mytheme -Install`
@@ -249,8 +249,8 @@ numbered findings at `file:line`, severity, and a concrete fix for each.
 /verify the registration endpoint logic
 ```
 
-**What happens:** adversarial proof: a *finder* agent analyzes for bugs, an
-*adversary* agent tries to disprove each finding, and the referee judges the
+**What happens:** adversarial proof: a _finder_ agent analyzes for bugs, an
+_adversary_ agent tries to disprove each finding, and the referee judges the
 survivors. False positives get killed by the adversary — you only see findings that
 survive attack.
 
@@ -407,14 +407,14 @@ continuation commands. A fresh session can resume without making you re-explain.
 
 No slash needed — these skills auto-match from plain-language requests:
 
-| You say | Skill that fires |
-|---|---|
-| "research the current best practice for X against official docs" | `research` — cited answers, no guessing |
-| "record this gotcha in the learnings log" | `share-learning` — one dated line in AGENTS.md |
-| "write this test-first, red-green-refactor" | `tdd` |
-| "audit this form for accessibility (WCAG 2.2 AA)" | `wp-accessibility` |
-| "make these strings translation-ready" | `wp-i18n` — text domain, escaping matrix |
-| "profile the front page — web vitals, bundle size" | `wp-performance` |
+| You say                                                          | Skill that fires                               |
+| ---------------------------------------------------------------- | ---------------------------------------------- |
+| "research the current best practice for X against official docs" | `research` — cited answers, no guessing        |
+| "record this gotcha in the learnings log"                        | `share-learning` — one dated line in AGENTS.md |
+| "write this test-first, red-green-refactor"                      | `tdd`                                          |
+| "audit this form for accessibility (WCAG 2.2 AA)"                | `wp-accessibility`                             |
+| "make these strings translation-ready"                           | `wp-i18n` — text domain, escaping matrix       |
+| "profile the front page — web vitals, bundle size"               | `wp-performance`                               |
 
 ---
 
@@ -422,15 +422,15 @@ No slash needed — these skills auto-match from plain-language requests:
 
 The same request, two ways:
 
-| Weak prompt | Strong prompt |
-|---|---|
-| "fix the menu" | `/fix the mobile menu doesn't open on iPhone 14, only Safari — sticky header, Lenis enabled` |
-| "add a section" | `/section pricing, 3 tiers, ACF repeater with title+price+features, matching the services section style` |
-| "check my code" | `/review` (after staging changes) |
-| "clean up a module" | `/refactor` — behavior-preserving steps, chain after every step |
-| "make it faster" | `/audit` — then point at the page: "front page, biggest CLS offender" |
-| "I need a form" | "I want a booking form on the home page" (the AI will grill you) |
-| "what does this codebase do?" | `/context` — builds the project glossary and ADR log |
+| Weak prompt                   | Strong prompt                                                                                            |
+| ----------------------------- | -------------------------------------------------------------------------------------------------------- |
+| "fix the menu"                | `/fix the mobile menu doesn't open on iPhone 14, only Safari — sticky header, Lenis enabled`             |
+| "add a section"               | `/section pricing, 3 tiers, ACF repeater with title+price+features, matching the services section style` |
+| "check my code"               | `/review` (after staging changes)                                                                        |
+| "clean up a module"           | `/refactor` — behavior-preserving steps, chain after every step                                          |
+| "make it faster"              | `/audit` — then point at the page: "front page, biggest CLS offender"                                    |
+| "I need a form"               | "I want a booking form on the home page" (the AI will grill you)                                         |
+| "what does this codebase do?" | `/context` — builds the project glossary and ADR log                                                     |
 
 Rules of thumb:
 
@@ -450,13 +450,13 @@ Rules of thumb:
 
 The system is built to fail honestly, and to stop early:
 
-| Situation | What happens | What you do |
-|---|---|---|
-| Fix attempt fails twice | the **2-iteration limit** stops the work | you get 2-3 alternative approaches with trade-offs — pick one |
-| A check is red | the gate refuses to commit | read the first error, ask `/check` again after fixes — never bypass with `--no-verify` unless you know exactly why |
-| Visual/animation work | the AI says "compiles green, needs browser validation" | check it in the browser — that's expected, not a failure |
-| Context feels lost / long session | `/handoff` (checkpoint) | quicksave, continue later |
-| A tool can't run (no network, missing binary) | the AI says so explicitly | never pretend a check passed — the honesty rule |
+| Situation                                     | What happens                                           | What you do                                                                                                        |
+| --------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| Fix attempt fails twice                       | the **2-iteration limit** stops the work               | you get 2-3 alternative approaches with trade-offs — pick one                                                      |
+| A check is red                                | the gate refuses to commit                             | read the first error, ask `/check` again after fixes — never bypass with `--no-verify` unless you know exactly why |
+| Visual/animation work                         | the AI says "compiles green, needs browser validation" | check it in the browser — that's expected, not a failure                                                           |
+| Context feels lost / long session             | `/handoff` (checkpoint)                                | quicksave, continue later                                                                                          |
+| A tool can't run (no network, missing binary) | the AI says so explicitly                              | never pretend a check passed — the honesty rule                                                                    |
 
 The most important behavior: **if the AI stops and asks you a question, it's not
 stuck — it's applying the stop-and-replan rule.** Answer it.
@@ -465,21 +465,21 @@ stuck — it's applying the stop-and-replan rule.** Answer it.
 
 ## 6. Glossary
 
-| Term | Meaning |
-|---|---|
-| **Agent** | a specialist worker the AI can delegate to (explore = maps code, implementer = writes code, reviewer = reviews diffs, …) |
-| **Skill** | a how-to discipline the AI loads on demand; matched by its description |
-| **Command** | a `/shortcut` — a well-written prompt for a known workflow |
-| **Plugin** | code that hooks into OpenCode itself (commit gate, lint watcher, status line) |
+| Term                   | Meaning                                                                                                                            |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| **Agent**              | a specialist worker the AI can delegate to (explore = maps code, implementer = writes code, reviewer = reviews diffs, …)           |
+| **Skill**              | a how-to discipline the AI loads on demand; matched by its description                                                             |
+| **Command**            | a `/shortcut` — a well-written prompt for a known workflow                                                                         |
+| **Plugin**             | code that hooks into OpenCode itself (commit gate, lint watcher, status line)                                                      |
 | **Verification chain** | the canonical proof-of-work chain — build → format:all:check → phpcs → phpstan, see [verification-chain.md](verification-chain.md) |
-| **phpcs** | PHP_CodeSniffer — the PHP lint gate against the WordPress Coding Standards |
-| **PHPStan** | static analysis of PHP types (level 8) — catches type bugs phpcs can't see |
-| **ACF** | Advanced Custom Fields Pro — where content fields live (`get_field()`) |
-| **ACF-json** | the sync files for field groups (edit once, ship everywhere) |
-| **Grilling** | the alignment interview before ambiguous work |
-| **Handoff** | one-page session transfer so a fresh session can continue |
-| **Stealth mode** | no AI fingerprints in git history, ever |
-| **WPCS** | WordPress Coding Standards (the rules phpcs enforces) |
+| **phpcs**              | PHP_CodeSniffer — the PHP lint gate against the WordPress Coding Standards                                                         |
+| **PHPStan**            | static analysis of PHP types (level 8) — catches type bugs phpcs can't see                                                         |
+| **ACF**                | Advanced Custom Fields Pro — where content fields live (`get_field()`)                                                             |
+| **ACF-json**           | the sync files for field groups (edit once, ship everywhere)                                                                       |
+| **Grilling**           | the alignment interview before ambiguous work                                                                                      |
+| **Handoff**            | one-page session transfer so a fresh session can continue                                                                          |
+| **Stealth mode**       | no AI fingerprints in git history, ever                                                                                            |
+| **WPCS**               | WordPress Coding Standards (the rules phpcs enforces)                                                                              |
 
 ---
 

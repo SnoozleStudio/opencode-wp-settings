@@ -50,7 +50,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── templates/               scaffolding sources (theme/, plugin/)
 ├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
 ├── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
-├── scripts/                 docs-inventory.ps1 — deterministic docs-sync check (CI + local)
+├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
 └── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, smoke tests
 ```
 
@@ -212,14 +212,14 @@ All three import the shared shell runner [plugins/lib/run.ts](../plugins/lib/run
 ### Templates (2)
 
 Scaffolding sources consumed by the `scaffolder` agent and `setup.ps1`/`scaffold.cmd`.
-Placeholders (`{slug}`, `{prefix}`, `{PREFIX}`, `{Prefix}`, `{text_domain}`, `{name}`,
+Placeholders (`{<kind>_slug}`/`{<kind>-slug}`/`{<kind>_name}`, `{prefix}`, `{PREFIX}`, `{Prefix}`, `{text_domain}`,
 `{description}`) are substituted at scaffold time. **The templates are the source of
 truth — adapt, don't reinvent.**
 
-| Template | Directory                               | Produces                                                                                                                                                                                                                                                                                                                  |
-| -------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Theme    | [templates/theme](../templates/theme)   | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css → acf), acf-json, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs) |
-| Plugin   | [templates/plugin](../templates/plugin) | classic plugin: main-file header, activation/deactivation rewrite hooks, uninstall.php, admin/includes/public split with a working settings page (register_setting + example field), shipped public.css/public.js assets, .husky pre-commit gate, phpcs.xml, composer.json, phpstan.neon |
+| Template | Directory                               | Produces                                                                                                                                                                                                                                                                                                                                   |
+| -------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Theme    | [templates/theme](../templates/theme)   | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css → acf), acf-json save/load wiring, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs) |
+| Plugin   | [templates/plugin](../templates/plugin) | classic plugin: main-file header, activation/deactivation rewrite hooks, uninstall.php, admin/includes/public split with a working settings page (register_setting + example field), shipped public.css/public.js assets, .husky pre-commit gate, phpcs.xml, composer.json, phpstan.neon                                                   |
 
 ### Scripts & config
 
@@ -230,7 +230,7 @@ truth — adapt, don't reinvent.**
 | [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets deny, `node -e` deny), MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                                                                                                                                                                     |
 | [tui.json](../tui.json)                                                 | TUI plugin `opencode-subagent-statusline`                                                                                                                                                                                                                                                                                             |
 | [package.json](../package.json) / [bun.lock](../bun.lock)               | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq)                                                                                                                                                                             |
-| [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`, local dumps)                                                                                                                                                                                                                                                                     |
+| [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`)                                                                                                                                                                                                                                                                                  |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1)                     | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally                                                                                               |
 | [verify-chain-consistency.ps1](../scripts/verify-chain-consistency.ps1) | parses the chain from `docs/verification-chain.md` (the single source of truth) and compares it against the steps hardcoded in `plugins/proof-of-work.ts` — exit 1 on drift, so the doc and the gate can't silently diverge                                                                                                           |
 | [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests                                                                                                                                                  |

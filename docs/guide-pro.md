@@ -95,7 +95,7 @@ What's allowed/asked/denied and why:
 
 | Pattern                                                                                                                                                       | Verdict                                        | Rationale                                                                                         |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*`                                                                                  | allow                                          | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
+| `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*`, `npx -y @upstash/context7-mcp*`, `npx skills add*`, `npx skills update*`        | allow                                          | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
 | `bun run *`                                                                                                                                                   | allow                                          | same, for the Bun runtime (`bunx *` removed — unscoped remote code execution)                     |
 | `git status/diff/log/show/branch/blame/rev-parse/remote/stash/add/commit/push/pull/checkout <branch>`                                                         | allow                                          | read + normal workflow                                                                            |
 | `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny**                                       | irreversible history/work-tree damage                                                             |
@@ -109,6 +109,7 @@ What's allowed/asked/denied and why:
 | `iwr/irm * \| iex`, `rm -rf /*`, `rm -rf ~*`, recursive Remove-Item, `rd /s`                                                                                  | deny                                           | ransomware-shaped commands                                                                        |
 | `sudo *`                                                                                                                                                      | deny                                           | privilege boundary                                                                                |
 | `cat/type/Get-Content ~/.ssh/* ~/.aws/* ~/.gnupg/* ~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config`                                                    | deny                                           | secret material                                                                                   |
+| `cat/type/Get-Content $HOME/* $env:USERPROFILE/* C:/Users/*/.ssh/*`                                                                                           | deny                                           | win32 case variants of the secret paths                                                           |
 | `read`/`edit` of `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**`, `~/.npmrc`, `~/.netrc`, `~/.docker/config.json`, `~/.kube/config`                                   | deny                                           | secrets denied even on read                                                                       |
 
 > Extending: add patterns by specificity. Broad `*` denies must come after the
@@ -259,7 +260,7 @@ helper pattern — cmd.exe on win32, /bin/sh elsewhere), and explicit no-op cond
 
 ### Execution order & lifecycle
 
-Plugins load in **filename order** (currently `proof-of-work.ts` → `phpcs-watch.ts` →
+Plugins load in **filename order** (currently `phpcs-watch.ts` → `proof-of-work.ts` →
 `session-context.ts`), but this is an implementation detail, **not an SDK guarantee** —
 an `@opencode-ai/plugin` upgrade could change it. The three plugins are deliberately
 independent (no cross-plugin dependencies, no shared mutable state), so order never
@@ -321,19 +322,19 @@ satisfy.
 
 ### The delegation decision table
 
-| Situation                                 | Delegate to                                    |
-| ----------------------------------------- | ---------------------------------------------- |
-| "What does this code do?"                 | explore (or just ask — read-only conversation) |
-| "How should we do X?" / multi-file change | planner                                        |
-| "Fix this bug"                            | explore → implementer (via fix skill)          |
-| "Build this feature"                      | grill → implementer → tester → reviewer        |
-| "Is this right?" (high-stakes)            | verify skill (finder/adversary/referee)        |
-| "Is this secure?"                         | security-auditor                               |
-| "Is this green?"                          | tester                                         |
-| "Review my diff"                          | reviewer                                       |
-| "New theme/plugin/section"                | scaffolder                                     |
-| "3+ independent pieces"                   | maestro                                        |
-| "Team vocabulary is drifting / project feels unfamiliar" | `/context` (glossary + ADR log)     |
+| Situation                                                | Delegate to                                    |
+| -------------------------------------------------------- | ---------------------------------------------- |
+| "What does this code do?"                                | explore (or just ask — read-only conversation) |
+| "How should we do X?" / multi-file change                | planner                                        |
+| "Fix this bug"                                           | explore → implementer (via fix skill)          |
+| "Build this feature"                                     | grill → implementer → tester → reviewer        |
+| "Is this right?" (high-stakes)                           | verify skill (finder/adversary/referee)        |
+| "Is this secure?"                                        | security-auditor                               |
+| "Is this green?"                                         | tester                                         |
+| "Review my diff"                                         | reviewer                                       |
+| "New theme/plugin/section"                               | scaffolder                                     |
+| "3+ independent pieces"                                  | maestro                                        |
+| "Team vocabulary is drifting / project feels unfamiliar" | `/context` (glossary + ADR log)                |
 
 ---
 
