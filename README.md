@@ -153,16 +153,17 @@ This repo closes that gap with engineering discipline, not hope:
 AGENTS.md             Portable coding standards (guardrails, WP + front-end stack, git)
 LICENSE               MIT license (incl. upstream attribution: cc-settings, mattpocock/skills)
 opencode.json         Global config: permission allow/ask/deny lists, MCP servers
-tui.json              TUI plugins (subagent statusline)
+tui.json / tui.jsonc   TUI plugins (subagent statusline; herdr session reporting)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
-skills/               26 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
-                      review, refactor, tdd, gsap-core/gsap-scrolltrigger/... vendored
-                      from greensock/gsap-skills, ...)
+skills/               27 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
+                      review, refactor, tdd, landing-page-conversion-audit,
+                      gsap-core/gsap-scrolltrigger/... vendored from greensock/gsap-skills, ...)
 commands/             18 slash commands (/fix /build /review /verify /ship /audit
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
                       + plugins/lib/run.ts (shared shell runner)
+                      + herdr-agent-state.js (herdr-installed, managed)
 docs/                 Documentation hub + reference docs + 3 guides
 tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
@@ -235,6 +236,11 @@ All 18 commands, with the skill/agent each invokes, are indexed in the
 
 Skills auto-match from their descriptions; load [docs/skill-authoring.md](docs/skill-authoring.md)
 before adding new ones.
+
+The WPCS enforcement system also ships as a distributable kit for any agent
+tool: [SnoozleStudio/wp-standards-agent](https://github.com/SnoozleStudio/wp-standards-agent) —
+SKILL.md + portable `AGENTS.md.snippet` + drop-in phpcs/pint/phpstan/husky gate.
+Install into your own agent setup with `npx skills add SnoozleStudio/wp-standards-agent`.
 
 ## Scaffolding new projects
 

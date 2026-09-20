@@ -19,7 +19,7 @@ jobs:
         # every bun version - never strict JSON. The lockfile step below is its
         # real validation.
         run: |
-          for f in opencode.json tui.json package.json; do
+          for f in opencode.json tui.json tui.jsonc package.json; do
             jq empty "$f"
           done
       - uses: oven-sh/setup-bun@v2

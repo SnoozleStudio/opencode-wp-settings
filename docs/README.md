@@ -20,7 +20,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 2. [Reference docs index](#reference-docs-index)
 3. [Component inventory](#component-inventory)
    - [Agents (8)](#agents-8)
-   - [Skills (26)](#skills-26)
+   - [Skills (27)](#skills-27)
    - [Commands (18)](#commands-18)
    - [Plugins (3)](#plugins-3)
    - [Templates (2)](#templates-2)
@@ -42,7 +42,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── tui.json                 TUI plugins (subagent statusline)
 ├── package.json / bun.lock  plugin runtime dependency (@opencode-ai/plugin)
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
-├── skills/                  26 skills (reusable disciplines; auto-matched by description)
+├── skills/                  27 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper
 ├── docs/                    this hub + reference docs + the 3 guides
@@ -111,7 +111,7 @@ permission; writers edit strictly within their briefing.
 | Scaffolder       | [agents/scaffolder.md](../agents/scaffolder.md)             | generates projects from `templates/`, new sections   | no        |
 | Maestro          | [agents/maestro.md](../agents/maestro.md)                   | orchestrates parallel subagent workstreams           | no        |
 
-### Skills (26)
+### Skills (27)
 
 Skills in `skills/` are the reusable disciplines. OpenCode auto-matches them from the
 frontmatter `description` — the description **is** the routing table. Category splits:
@@ -151,6 +151,12 @@ frontmatter `description` — the description **is** the routing table. Category
 | handoff         | [skills/handoff/SKILL.md](../skills/handoff/SKILL.md)                 | —          | "done for today", session transfer         |
 | share-learning  | [skills/share-learning/SKILL.md](../skills/share-learning/SKILL.md)   | —          | gotcha worth a learnings-log entry         |
 
+**CRO & marketing**
+
+| Skill                        | File                                                                                  | Loads docs | Trigger phrases                                                                      |
+| ---------------------------- | ------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------ |
+| landing-page-conversion-audit | [skills/landing-page-conversion-audit/SKILL.md](../skills/landing-page-conversion-audit/SKILL.md) | —          | "why isn't this page converting", CRO / landing page review, low conversion rate |
+
 **Vendored (upstream, unedited)**
 
 Copied from [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) —
@@ -166,6 +172,12 @@ integration rules in `frontend-stack.md` override. Refresh with
 | gsap-plugins       | [skills/gsap-plugins/SKILL.md](../skills/gsap-plugins/SKILL.md)             | SplitText, Observer, Draggable, plugins  |
 | gsap-utils         | [skills/gsap-utils/SKILL.md](../skills/gsap-utils/SKILL.md)                 | gsap.utils, clamp, snap, toArray         |
 | gsap-performance   | [skills/gsap-performance/SKILL.md](../skills/gsap-performance/SKILL.md)     | animation performance, jank, 60fps       |
+
+**External (not in this repo — distributable)**
+
+| Project | Where | What it is |
+| ------- | ----- | ---------- |
+| wp-standards-agent | [github.com/SnoozleStudio/wp-standards-agent](https://github.com/SnoozleStudio/wp-standards-agent) | the public, portable version of this repo's guardrails + verification chain: a SKILL.md, an AGENTS.md.snippet for any agent tool, and the drop-in phpcs/pint/phpstan/husky gate. Install via `npx skills add SnoozleStudio/wp-standards-agent`. Source for the WordCamp Pisa 2026 talk |
 
 ### Commands (18)
 
@@ -205,9 +217,11 @@ are TS files built against `@opencode-ai/plugin` (see
 | Proof of work   | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts)     | `tool.execute.before` (bash)                  | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only; session-directory scoped — `git -C <repo>` honored, bare `cd` chains exempt) |
 | phpcs-watch     | [plugins/phpcs-watch.ts](../plugins/phpcs-watch.ts)         | `tool.execute.after` (edit/write/apply_patch) | single-file phpcs pass after every `.php` edit; surfaces findings inline                                                                                                              |
 | Session context | [plugins/session-context.ts](../plugins/session-context.ts) | `experimental.chat.system.transform`          | appends "Git state: branch, N uncommitted file(s)" to the system prompt                                                                                                               |
+| herdr agent state | [plugins/herdr-agent-state.js](../plugins/herdr-agent-state.js) | `chat.message`, `event`                        | herdr-installed pane integration (managed — do not edit); reports agent/session state to herdr over a named pipe when `HERDR_ENV=1`                                                                                                                   |
 
-All three import the shared shell runner [plugins/lib/run.ts](../plugins/lib/run.ts)
-(`run()` + `isWin32()`) — change exec behavior there, not per plugin.
+All three hook plugins import the shared shell runner [plugins/lib/run.ts](../plugins/lib/run.ts)
+(`run()` + `isWin32()`) — change exec behavior there, not per plugin. `herdr-agent-state.js`
+is a plain JS plugin installed and managed by herdr; reinstate/update overwrites it.
 
 ### Templates (2)
 
@@ -229,6 +243,7 @@ truth — adapt, don't reinvent.**
 | [scaffold.cmd](../scaffold.cmd)                                         | shell-agnostic wrapper (cmd/Git Bash/PowerShell) forwarding to setup.ps1 — the entry point from Local's site shell                                                                                                                                                                                                                    |
 | [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets deny, `node -e` deny), MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                                                                                                                                                                     |
 | [tui.json](../tui.json)                                                 | TUI plugin `opencode-subagent-statusline`                                                                                                                                                                                                                                                                                             |
+| [tui.jsonc](../tui.jsonc)                                               | herdr TUI integration (`./herdr-tui-session.js` — session selection reporting; installed/managed by herdr)                                                                                                                                                                                                                             |
 | [package.json](../package.json) / [bun.lock](../bun.lock)               | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq)                                                                                                                                                                             |
 | [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`)                                                                                                                                                                                                                                                                                  |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1)                     | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally                                                                                               |

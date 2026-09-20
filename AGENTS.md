@@ -488,7 +488,13 @@ Keep entries terse and factual — one line each.
   wrap in phpcs:disable/enable with a comment instead of passing a fake version.
 - [2026-08-04] tooling: Local by Flywheel's bundled PHP has openssl disabled in php.ini —
   composer install fails TLS; enable per-invocation with a temp php.ini
-  (extension=openssl + mbstring) instead of editing Local's php.ini.
+  (extension=openssl + mbstring) instead of editing Local's php.ini. SUPERSEDED 2026-09-06:
+  appended `extension=openssl` + `extension=curl` (DLLs already ship in ext/) to
+  `C:\Program Files (x86)\Local\resources\extraResources\lightning-services\php-8.2.29+0\bin\win64\php.ini`
+  (backup `php.ini.bak`) — composer on the PATH php now works with no override; re-apply
+  the two lines if a Local update resets that ini or switches the PATH PHP version.
+  Note the APPDATA site-runtime root has no ini (per-site rendered config) — site PHP
+  still lacks openssl/curl, which only matters if a site needs HTTPS calls from PHP.
 - [2026-08-04] tooling: PowerShell 5.1 Set-Content -Encoding UTF8 writes a BOM which
   breaks JSON.parse — use [IO.File]::WriteAllText with UTF8Encoding($false); Get-Content
   defaults to ANSI and mangles UTF-8 — keep .ps1 and template files ASCII-only.

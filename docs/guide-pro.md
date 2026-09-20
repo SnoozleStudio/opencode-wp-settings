@@ -46,7 +46,11 @@ project/.opencode/             ← project-scoped agents/skills/commands — ext
 - `plugins/*.ts` are compiled and loaded at startup, keyed by
   `package.json` → `@opencode-ai/plugin` (the plugin SDK version this repo pins).
 - `tui.json` loads the TUI plugin `opencode-subagent-statusline` (subagent status in
-  the terminal UI).
+  the terminal UI). `tui.jsonc` + `herdr-tui-session.js` (root) are the herdr TUI
+  integration — installed and managed by herdr, not edited here.
+- `plugins/*.ts` are the three hook plugins; `plugins/herdr-agent-state.js` is a
+  herdr-installed JS plugin reporting agent state to the herdr pane (also managed,
+  do not edit).
 
 **Security model in one line:** the AI may run many things without asking, may ask on
 sensitive ones, and **cannot** touch secrets or destructive git operations — at the
