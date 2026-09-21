@@ -406,15 +406,17 @@ When in doubt, this is the intended split:
 The `description` frontmatters of these three are the routing contract — if you change
 one, change all three so the "not for…" cues stay mutually exclusive.
 
-### Vendored upstream skills (gsap-*)
+### Vendored upstream skills (gsap-*, frontend-design)
 
 Six `gsap-*` skills are copied **unedited** from
 [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) — official API
-depth for core/timeline/ScrollTrigger/plugins/utils/performance. Refresh with
-`npx skills update -a opencode -g`; never edit them in place (updates would be
-overwritten). Their guidance is generic — house integration rules (Lenis, not
-ScrollSmoother; Tempus ticker; reduced-motion gate; manifest enqueue) live in
-`docs/frontend-stack.md` and win over vendor guidance.
+depth for core/timeline/ScrollTrigger/plugins/utils/performance. `frontend-design`
+comes **unedited** from [anthropics/skills](https://github.com/anthropics/skills) —
+distinctive visual direction, typography, and anti-templated-design guidance for new
+UI or redesigns. Refresh with `npx skills update -a opencode -g`; never edit them in
+place (updates would be overwritten). Their guidance is generic — house integration
+rules (Lenis, not ScrollSmoother; Tempus ticker; reduced-motion gate; manifest
+enqueue) live in `docs/frontend-stack.md` and win over vendor guidance.
 
 ### Anatomy of a good skill (wp-theme as the reference)
 

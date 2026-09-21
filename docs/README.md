@@ -20,7 +20,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 2. [Reference docs index](#reference-docs-index)
 3. [Component inventory](#component-inventory)
    - [Agents (8)](#agents-8)
-   - [Skills (27)](#skills-27)
+   - [Skills (28)](#skills-28)
    - [Commands (18)](#commands-18)
    - [Plugins (3)](#plugins-3)
    - [Templates (2)](#templates-2)
@@ -42,7 +42,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── tui.json                 TUI plugins (subagent statusline)
 ├── package.json / bun.lock  plugin runtime dependency (@opencode-ai/plugin)
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
-├── skills/                  27 skills (reusable disciplines; auto-matched by description)
+├── skills/                  28 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper
 ├── docs/                    this hub + reference docs + the 3 guides
@@ -111,7 +111,7 @@ permission; writers edit strictly within their briefing.
 | Scaffolder       | [agents/scaffolder.md](../agents/scaffolder.md)             | generates projects from `templates/`, new sections   | no        |
 | Maestro          | [agents/maestro.md](../agents/maestro.md)                   | orchestrates parallel subagent workstreams           | no        |
 
-### Skills (27)
+### Skills (28)
 
 Skills in `skills/` are the reusable disciplines. OpenCode auto-matches them from the
 frontmatter `description` — the description **is** the routing table. Category splits:
@@ -160,7 +160,8 @@ frontmatter `description` — the description **is** the routing table. Category
 **Vendored (upstream, unedited)**
 
 Copied from [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) —
-official GSAP API depth. Generic guidance (no WordPress/Vite/Lenis/Tempus): house
+official GSAP API depth — and [anthropics/skills](https://github.com/anthropics/skills)
+(frontend-design). Generic guidance (no WordPress/Vite/Lenis/Tempus): house
 integration rules in `frontend-stack.md` override. Refresh with
 `npx skills update -a opencode -g`; never edit in place.
 
@@ -172,6 +173,7 @@ integration rules in `frontend-stack.md` override. Refresh with
 | gsap-plugins       | [skills/gsap-plugins/SKILL.md](../skills/gsap-plugins/SKILL.md)             | SplitText, Observer, Draggable, plugins  |
 | gsap-utils         | [skills/gsap-utils/SKILL.md](../skills/gsap-utils/SKILL.md)                 | gsap.utils, clamp, snap, toArray         |
 | gsap-performance   | [skills/gsap-performance/SKILL.md](../skills/gsap-performance/SKILL.md)     | animation performance, jank, 60fps       |
+| frontend-design   | [skills/frontend-design/SKILL.md](../skills/frontend-design/SKILL.md)       | distinctive visual design, typography, avoid AI-templated look |
 
 **External (not in this repo — distributable)**
 
