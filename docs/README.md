@@ -25,6 +25,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
    - [Plugins (3)](#plugins-3)
    - [Templates (2)](#templates-2)
    - [Scripts & config](#scripts--config)
+   - [External libraries & references](#external-libraries--references)
 4. [Dependency map](#dependency-map)
 5. [Documentation Contract](#documentation-contract)
 6. [Verifying docs stay in sync](#verifying-docs-stay-in-sync)
@@ -191,6 +192,66 @@ Refresh with `npx skills update -a opencode -g`; never edit in place.
 | Project | Where | What it is |
 | ------- | ----- | ---------- |
 | wp-standards-agent | [github.com/SnoozleStudio/wp-standards-agent](https://github.com/SnoozleStudio/wp-standards-agent) | the public, portable version of this repo's guardrails + verification chain: a SKILL.md, an AGENTS.md.snippet for any agent tool, and the drop-in phpcs/pint/phpstan/husky gate. Install via `npx skills add SnoozleStudio/wp-standards-agent`. Source for the WordCamp Pisa 2026 talk |
+
+### External libraries & references
+
+Every external library, service, or action this config consumes — source, license, and
+pin. Versions are shown as pinned in the config files; "latest known" notes where the
+upstream has moved on. Vendored-skill sources are cited in the Skills inventory above;
+the distributable `wp-standards-agent` project above; upstream attribution also lives in
+`LICENSE` (cc-settings, mattpocock/skills). `nixie-fx` was evaluated for creative-UI
+particles and not adopted (see AGENTS.md learnings log).
+
+**Runtime services (MCP — `opencode.json`)**
+
+| Service | Package (pinned) | Source | License | Notes |
+| ------- | ---------------- | ------ | ------- | ----- |
+| context7 | `@upstash/context7-mcp@4.0.0` (latest known 4.1.1) | [upstash/context7](https://github.com/upstash/context7) | MIT | library docs; pinned so a breaking release can't silently break the stack — bump deliberately, restart to take effect |
+| chrome-devtools | `chrome-devtools-mcp@1.6.0` (latest known 1.9.0) | [ChromeDevTools/chrome-devtools-mcp](https://github.com/ChromeDevTools/chrome-devtools-mcp) | Apache-2.0 | browser automation (snapshot/click/perf/Lighthouse) |
+
+**TUI plugins & runtime (`tui.json`, herdr)**
+
+| Name | Source | License | Notes |
+| ---- | ------ | ------- | ----- |
+| opencode-subagent-statusline (resolved 1.3.0) | [Joaquinvesapa/sub-agent-statusline](https://github.com/Joaquinvesapa/sub-agent-statusline) | MIT | unpinned in `tui.json` — resolves at install |
+| herdr (opencode integration v10) | [herdr.dev](https://herdr.dev) · [herdrdev/herdr](https://github.com/herdrdev/herdr) | Apache-2.0 | the runtime that owns this terminal; installs two **managed** files — `herdr-tui-session.js` and `plugins/herdr-agent-state.js` — reinstalled/overwritten by herdr, never edit |
+
+**Tooling CLIs**
+
+| Tool | Source | License | Notes |
+| ---- | ------ | ------- | ----- |
+| skills CLI (`npx skills`, 1.7.0) | [vercel-labs/skills](https://github.com/vercel-labs/skills) | MIT | vendored-skill install/refresh (`npx skills add/update -a opencode -g`) + wp-standards-agent install |
+| bun | [bun.sh](https://bun.sh) | MIT | CI lockfile integrity (`bun install --frozen-lockfile --dry-run`) |
+
+**CI actions (`.github/workflows/ci.yml`)**
+
+| Action | Source | License |
+| ------ | ------ | ------- |
+| `actions/checkout@v4` | [actions/checkout](https://github.com/actions/checkout) | MIT |
+| `oven-sh/setup-bun@v2` | [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun) | MIT |
+
+**Scaffolded stacks (templates/)**
+
+npm (semver ranges in `templates/theme/package.json`): `vite@^8` ([vitejs.dev](https://vitejs.dev)) ·
+`tailwindcss@^4` + `@tailwindcss/vite` ([tailwindcss.com](https://tailwindcss.com/docs)) ·
+`gsap@^3.15` ([gsap.com](https://gsap.com/docs)) · `lenis@^1.3`
+([darkroomengineering/lenis](https://github.com/darkroomengineering/lenis)) ·
+`tempus@^1.0.0-dev` ([darkroomengineering/tempus](https://github.com/darkroomengineering/tempus)) ·
+`husky@^9` ([typicode/husky](https://github.com/typicode/husky)) · `prettier@^3` +
+`prettier-plugin-tailwindcss@^0.8` ([prettier.io](https://prettier.io)) ·
+`swup` ([swup.js.org](https://swup.js.org)) — optional page transitions.
+
+Composer dev tools (semver ranges in `templates/*/composer.json`):
+
+| Package | Source | License |
+| ------- | ------ | ------- |
+| wp-coding-standards/wpcs | [WordPress/WordPress-Coding-Standards](https://github.com/WordPress/WordPress-Coding-Standards) | — |
+| phpcompatibility/php-compatibility | [PHPCompatibility/PHPCompatibility](https://github.com/PHPCompatibility/PHPCompatibility) | — |
+| laravel/pint | [laravel/pint](https://github.com/laravel/pint) | MIT |
+| phpstan/phpstan | [phpstan.org](https://phpstan.org) | — |
+| szepeviktor/phpstan-wordpress | [szepeviktor/phpstan-wordpress](https://github.com/szepeviktor/phpstan-wordpress) | — |
+| php-stubs/acf-pro-stubs | [php-stubs/acf-pro-stubs](https://github.com/php-stubs/acf-pro-stubs) | GPL-2.0-or-later |
+| dealerdirect/phpcodesniffer-composer-installer | [PHPCSStandards/phpcodesniffer-composer-installer](https://github.com/PHPCSStandards/phpcodesniffer-composer-installer) | MIT |
 
 ### Commands (18)
 

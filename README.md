@@ -243,6 +243,11 @@ All 18 commands, with the skill/agent each invokes, are indexed in the
 Skills auto-match from their descriptions; load [docs/skill-authoring.md](docs/skill-authoring.md)
 before adding new ones.
 
+Every external library, service, and action this config consumes — MCP servers, TUI
+plugins, herdr, the skills CLI, CI actions, and the scaffolded npm/composer stacks — is
+cited with source and license in the
+[Documentation Hub § External libraries & references](docs/README.md#external-libraries--references).
+
 The WPCS enforcement system also ships as a distributable kit for any agent
 tool: [SnoozleStudio/wp-standards-agent](https://github.com/SnoozleStudio/wp-standards-agent) —
 SKILL.md + portable `AGENTS.md.snippet` + drop-in phpcs/pint/phpstan/husky gate.
