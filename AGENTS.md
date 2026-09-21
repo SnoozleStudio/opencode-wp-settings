@@ -572,3 +572,5 @@ Keep entries terse and factual — one line each.
   Both templates now carry `prepare: husky`; the plugin template ships
   `"build": "exit 0"` as a documented no-op (plugins have no compiled assets)
   so the gate's four-step chain runs for plugin projects too.
+
+- [2026-09-21] tooling: nixie-fx (azakhary/nixie-fx) evaluated for creative-UI particles - deferred. Two opencode-compatible skills (nixie-fx-runtime, nixie-fx-authoring) install via `npx skills add https://github.com/azakhary/nixie-fx`; if adopted: vendor gsap-style into skills/ + house rules in frontend-stack.md (Tempus-driven update once per frame, reduced-motion gate, dynamic import chunk, dispose on scope end, editor-to-out/vfx export pipeline).

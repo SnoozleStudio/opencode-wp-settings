@@ -88,10 +88,13 @@ lenis.on("scroll", ScrollTrigger.update);
 - Text plugins: SplitText (`new SplitText(el, { type: 'chars,words,lines' })`, revert
   after), ScrambleTextPlugin (`gsap.to(el, { scrambleText: '...' })`)
 - **Vendored skills**: the `gsap-*` skills (greensock/gsap-skills) carry official
-  API depth. Their guidance is generic — no WordPress/Vite/Lenis/Tempus. House
+  API depth; the `threejs-*` skills (CloudAI-X/threejs-skills) carry Three.js r160+
+  API depth (scene setup, geometry, materials, shaders, postprocessing, loaders).
+  Their guidance is generic — no WordPress/Vite/Lenis/Tempus. House
   rules in this doc and `wp-theme` override: Lenis (never ScrollSmoother — two
   smooth-scroll libs conflict), Tempus ticker routing, reduced-motion gate,
-  manifest enqueue. Refresh them via `npx skills update -a opencode -g`, never edit.
+  manifest enqueue, Three.js via dynamic `import()` with full dispose.
+  Refresh them via `npx skills update -a opencode -g`, never edit.
 - All plugins (SplitText, MorphSVG, Observer, etc.) are free since the Webflow
   acquisition — install everything from the public `gsap` npm package; no Club
   GSAP membership, no private registry.

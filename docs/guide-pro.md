@@ -406,17 +406,22 @@ When in doubt, this is the intended split:
 The `description` frontmatters of these three are the routing contract — if you change
 one, change all three so the "not for…" cues stay mutually exclusive.
 
-### Vendored upstream skills (gsap-*, frontend-design)
+### Vendored upstream skills (gsap-*, threejs-*, frontend-design)
 
 Six `gsap-*` skills are copied **unedited** from
 [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) — official API
-depth for core/timeline/ScrollTrigger/plugins/utils/performance. `frontend-design`
+depth for core/timeline/ScrollTrigger/plugins/utils/performance. Ten `threejs-*` skills
+(fundamentals, geometry, materials, lighting, textures, animation, loaders, shaders,
+postprocessing, interaction) come **unedited** from
+[CloudAI-X/threejs-skills](https://github.com/CloudAI-X/threejs-skills) (MIT per README) —
+Three.js r160+ API depth audited against the official docs. `frontend-design`
 comes **unedited** from [anthropics/skills](https://github.com/anthropics/skills) —
 distinctive visual direction, typography, and anti-templated-design guidance for new
 UI or redesigns. Refresh with `npx skills update -a opencode -g`; never edit them in
 place (updates would be overwritten). Their guidance is generic — house integration
 rules (Lenis, not ScrollSmoother; Tempus ticker; reduced-motion gate; manifest
-enqueue) live in `docs/frontend-stack.md` and win over vendor guidance.
+enqueue; dynamic `import()` + dispose for Three.js) live in `docs/frontend-stack.md`
+and win over vendor guidance.
 
 ### Anatomy of a good skill (wp-theme as the reference)
 

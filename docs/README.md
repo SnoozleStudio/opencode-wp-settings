@@ -20,7 +20,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 2. [Reference docs index](#reference-docs-index)
 3. [Component inventory](#component-inventory)
    - [Agents (8)](#agents-8)
-   - [Skills (28)](#skills-28)
+   - [Skills (38)](#skills-38)
    - [Commands (18)](#commands-18)
    - [Plugins (3)](#plugins-3)
    - [Templates (2)](#templates-2)
@@ -42,7 +42,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── tui.json                 TUI plugins (subagent statusline)
 ├── package.json / bun.lock  plugin runtime dependency (@opencode-ai/plugin)
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
-├── skills/                  28 skills (reusable disciplines; auto-matched by description)
+├── skills/                  38 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper
 ├── docs/                    this hub + reference docs + the 3 guides
@@ -111,7 +111,7 @@ permission; writers edit strictly within their briefing.
 | Scaffolder       | [agents/scaffolder.md](../agents/scaffolder.md)             | generates projects from `templates/`, new sections   | no        |
 | Maestro          | [agents/maestro.md](../agents/maestro.md)                   | orchestrates parallel subagent workstreams           | no        |
 
-### Skills (28)
+### Skills (38)
 
 Skills in `skills/` are the reusable disciplines. OpenCode auto-matches them from the
 frontmatter `description` — the description **is** the routing table. Category splits:
@@ -160,10 +160,11 @@ frontmatter `description` — the description **is** the routing table. Category
 **Vendored (upstream, unedited)**
 
 Copied from [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) —
-official GSAP API depth — and [anthropics/skills](https://github.com/anthropics/skills)
-(frontend-design). Generic guidance (no WordPress/Vite/Lenis/Tempus): house
-integration rules in `frontend-stack.md` override. Refresh with
-`npx skills update -a opencode -g`; never edit in place.
+official GSAP API depth — [anthropics/skills](https://github.com/anthropics/skills)
+(frontend-design), and [CloudAI-X/threejs-skills](https://github.com/CloudAI-X/threejs-skills)
+(threejs-*, MIT per README — no LICENSE file in the repo). Generic guidance (no
+WordPress/Vite/Lenis/Tempus): house integration rules in `frontend-stack.md` override.
+Refresh with `npx skills update -a opencode -g`; never edit in place.
 
 | Skill              | File                                                                        | Trigger phrases                          |
 | ------------------ | --------------------------------------------------------------------------- | ---------------------------------------- |
@@ -174,6 +175,16 @@ integration rules in `frontend-stack.md` override. Refresh with
 | gsap-utils         | [skills/gsap-utils/SKILL.md](../skills/gsap-utils/SKILL.md)                 | gsap.utils, clamp, snap, toArray         |
 | gsap-performance   | [skills/gsap-performance/SKILL.md](../skills/gsap-performance/SKILL.md)     | animation performance, jank, 60fps       |
 | frontend-design   | [skills/frontend-design/SKILL.md](../skills/frontend-design/SKILL.md)       | distinctive visual design, typography, avoid AI-templated look |
+| threejs-fundamentals | [skills/threejs-fundamentals/SKILL.md](../skills/threejs-fundamentals/SKILL.md) | scene setup, cameras, renderer, Object3D hierarchy, transforms |
+| threejs-geometry   | [skills/threejs-geometry/SKILL.md](../skills/threejs-geometry/SKILL.md)     | BufferGeometry, instancing, custom geometry                    |
+| threejs-materials  | [skills/threejs-materials/SKILL.md](../skills/threejs-materials/SKILL.md)   | PBR/basic/phong/standard materials, ShaderMaterial             |
+| threejs-lighting   | [skills/threejs-lighting/SKILL.md](../skills/threejs-lighting/SKILL.md)     | light types, shadows, environment lighting                     |
+| threejs-textures   | [skills/threejs-textures/SKILL.md](../skills/threejs-textures/SKILL.md)     | texture types, UV mapping, env maps, render targets            |
+| threejs-animation  | [skills/threejs-animation/SKILL.md](../skills/threejs-animation/SKILL.md)   | keyframe/skeletal animation, morph targets, animation mixing   |
+| threejs-loaders    | [skills/threejs-loaders/SKILL.md](../skills/threejs-loaders/SKILL.md)       | GLTF/GLB loading, texture loading, async patterns, caching     |
+| threejs-shaders    | [skills/threejs-shaders/SKILL.md](../skills/threejs-shaders/SKILL.md)       | GLSL, ShaderMaterial, uniforms, custom effects                 |
+| threejs-postprocessing | [skills/threejs-postprocessing/SKILL.md](../skills/threejs-postprocessing/SKILL.md) | EffectComposer, bloom, DOF, screen-space effects, WebGPU |
+| threejs-interaction | [skills/threejs-interaction/SKILL.md](../skills/threejs-interaction/SKILL.md) | raycasting, camera controls, mouse/touch input, object picking |
 
 **External (not in this repo — distributable)**
 

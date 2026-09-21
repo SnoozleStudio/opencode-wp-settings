@@ -156,10 +156,11 @@ opencode.json         Global config: permission allow/ask/deny lists, MCP server
 tui.json / tui.jsonc   TUI plugins (subagent statusline; herdr session reporting)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
-skills/               28 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
+skills/               38 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
                       review, refactor, tdd, landing-page-conversion-audit,
                       gsap-core/gsap-scrolltrigger/... vendored from greensock/gsap-skills,
-                      frontend-design vendored from anthropics/skills, ...)
+                      frontend-design vendored from anthropics/skills,
+                      threejs-* vendored from CloudAI-X/threejs-skills, ...)
 commands/             18 slash commands (/fix /build /review /verify /ship /audit
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
@@ -234,6 +235,9 @@ All 18 commands, with the skill/agent each invokes, are indexed in the
   `gsap-plugins`, `gsap-utils`, `gsap-performance` — official GSAP skills copied
   unedited from [greensock/gsap-skills](https://github.com/greensock/gsap-skills);
   `frontend-design` copied unedited from [anthropics/skills](https://github.com/anthropics/skills);
+  `threejs-fundamentals/geometry/materials/lighting/textures/animation/loaders/shaders/
+  postprocessing/interaction` copied unedited from
+  [CloudAI-X/threejs-skills](https://github.com/CloudAI-X/threejs-skills);
   refresh via `npx skills update -a opencode -g`, never edit
 
 Skills auto-match from their descriptions; load [docs/skill-authoring.md](docs/skill-authoring.md)
