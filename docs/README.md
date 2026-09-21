@@ -152,40 +152,37 @@ frontmatter `description` — the description **is** the routing table. Category
 | handoff         | [skills/handoff/SKILL.md](../skills/handoff/SKILL.md)                 | —          | "done for today", session transfer         |
 | share-learning  | [skills/share-learning/SKILL.md](../skills/share-learning/SKILL.md)   | —          | gotcha worth a learnings-log entry         |
 
-**CRO & marketing**
-
-| Skill                        | File                                                                                  | Loads docs | Trigger phrases                                                                      |
-| ---------------------------- | ------------------------------------------------------------------------------------- | ---------- | ------------------------------------------------------------------------------------ |
-| landing-page-conversion-audit | [skills/landing-page-conversion-audit/SKILL.md](../skills/landing-page-conversion-audit/SKILL.md) | —          | "why isn't this page converting", CRO / landing page review, low conversion rate |
-
 **Vendored (upstream, unedited)**
 
 Copied from [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) —
 official GSAP API depth — [anthropics/skills](https://github.com/anthropics/skills)
-(frontend-design), and [CloudAI-X/threejs-skills](https://github.com/CloudAI-X/threejs-skills)
-(threejs-*, MIT per README — no LICENSE file in the repo). Generic guidance (no
-WordPress/Vite/Lenis/Tempus): house integration rules in `frontend-stack.md` override.
-Refresh with `npx skills update -a opencode -g`; never edit in place.
+(frontend-design), [CloudAI-X/threejs-skills](https://github.com/CloudAI-X/threejs-skills)
+(threejs-*, MIT per README — no LICENSE file in the repo), and
+[autonnel/autonnel-skills](https://github.com/autonnel/autonnel-skills) (Apache-2.0)
+(landing-page-conversion-audit). Generic guidance (no WordPress/Vite/Lenis/Tempus):
+house integration rules in `frontend-stack.md` override. Refresh with
+`npx skills update -a opencode -g`; never edit in place.
 
-| Skill              | File                                                                        | Trigger phrases                          |
-| ------------------ | --------------------------------------------------------------------------- | ---------------------------------------- |
-| gsap-core          | [skills/gsap-core/SKILL.md](../skills/gsap-core/SKILL.md)                   | GSAP tweens, easing, stagger, matchMedia |
-| gsap-timeline      | [skills/gsap-timeline/SKILL.md](../skills/gsap-timeline/SKILL.md)           | timelines, sequencing, animation order   |
-| gsap-scrolltrigger | [skills/gsap-scrolltrigger/SKILL.md](../skills/gsap-scrolltrigger/SKILL.md) | scroll animation, parallax, pinning      |
-| gsap-plugins       | [skills/gsap-plugins/SKILL.md](../skills/gsap-plugins/SKILL.md)             | SplitText, Observer, Draggable, plugins  |
-| gsap-utils         | [skills/gsap-utils/SKILL.md](../skills/gsap-utils/SKILL.md)                 | gsap.utils, clamp, snap, toArray         |
-| gsap-performance   | [skills/gsap-performance/SKILL.md](../skills/gsap-performance/SKILL.md)     | animation performance, jank, 60fps       |
-| frontend-design   | [skills/frontend-design/SKILL.md](../skills/frontend-design/SKILL.md)       | distinctive visual design, typography, avoid AI-templated look |
-| threejs-fundamentals | [skills/threejs-fundamentals/SKILL.md](../skills/threejs-fundamentals/SKILL.md) | scene setup, cameras, renderer, Object3D hierarchy, transforms |
-| threejs-geometry   | [skills/threejs-geometry/SKILL.md](../skills/threejs-geometry/SKILL.md)     | BufferGeometry, instancing, custom geometry                    |
-| threejs-materials  | [skills/threejs-materials/SKILL.md](../skills/threejs-materials/SKILL.md)   | PBR/basic/phong/standard materials, ShaderMaterial             |
-| threejs-lighting   | [skills/threejs-lighting/SKILL.md](../skills/threejs-lighting/SKILL.md)     | light types, shadows, environment lighting                     |
-| threejs-textures   | [skills/threejs-textures/SKILL.md](../skills/threejs-textures/SKILL.md)     | texture types, UV mapping, env maps, render targets            |
-| threejs-animation  | [skills/threejs-animation/SKILL.md](../skills/threejs-animation/SKILL.md)   | keyframe/skeletal animation, morph targets, animation mixing   |
-| threejs-loaders    | [skills/threejs-loaders/SKILL.md](../skills/threejs-loaders/SKILL.md)       | GLTF/GLB loading, texture loading, async patterns, caching     |
-| threejs-shaders    | [skills/threejs-shaders/SKILL.md](../skills/threejs-shaders/SKILL.md)       | GLSL, ShaderMaterial, uniforms, custom effects                 |
-| threejs-postprocessing | [skills/threejs-postprocessing/SKILL.md](../skills/threejs-postprocessing/SKILL.md) | EffectComposer, bloom, DOF, screen-space effects, WebGPU |
-| threejs-interaction | [skills/threejs-interaction/SKILL.md](../skills/threejs-interaction/SKILL.md) | raycasting, camera controls, mouse/touch input, object picking |
+| Skill                        | File                                                                                  | Trigger phrases                                                                 |
+| ---------------------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| gsap-core                    | [skills/gsap-core/SKILL.md](../skills/gsap-core/SKILL.md)                             | GSAP tweens, easing, stagger, matchMedia                                        |
+| gsap-timeline                | [skills/gsap-timeline/SKILL.md](../skills/gsap-timeline/SKILL.md)                     | timelines, sequencing, animation order                                          |
+| gsap-scrolltrigger           | [skills/gsap-scrolltrigger/SKILL.md](../skills/gsap-scrolltrigger/SKILL.md)           | scroll animation, parallax, pinning                                             |
+| gsap-plugins                 | [skills/gsap-plugins/SKILL.md](../skills/gsap-plugins/SKILL.md)                       | SplitText, Observer, Draggable, plugins                                         |
+| gsap-utils                   | [skills/gsap-utils/SKILL.md](../skills/gsap-utils/SKILL.md)                           | gsap.utils, clamp, snap, toArray                                                |
+| gsap-performance             | [skills/gsap-performance/SKILL.md](../skills/gsap-performance/SKILL.md)               | animation performance, jank, 60fps                                              |
+| frontend-design              | [skills/frontend-design/SKILL.md](../skills/frontend-design/SKILL.md)                 | distinctive visual design, typography, avoid AI-templated look                  |
+| landing-page-conversion-audit | [skills/landing-page-conversion-audit/SKILL.md](../skills/landing-page-conversion-audit/SKILL.md) | CRO / landing page review, low conversion rate, "why isn't this page converting" |
+| threejs-fundamentals         | [skills/threejs-fundamentals/SKILL.md](../skills/threejs-fundamentals/SKILL.md)       | scene setup, cameras, renderer, Object3D hierarchy, transforms                  |
+| threejs-geometry             | [skills/threejs-geometry/SKILL.md](../skills/threejs-geometry/SKILL.md)               | BufferGeometry, instancing, custom geometry                                    |
+| threejs-materials            | [skills/threejs-materials/SKILL.md](../skills/threejs-materials/SKILL.md)             | PBR/basic/phong/standard materials, ShaderMaterial                             |
+| threejs-lighting             | [skills/threejs-lighting/SKILL.md](../skills/threejs-lighting/SKILL.md)               | light types, shadows, environment lighting                                     |
+| threejs-textures             | [skills/threejs-textures/SKILL.md](../skills/threejs-textures/SKILL.md)               | texture types, UV mapping, env maps, render targets                            |
+| threejs-animation            | [skills/threejs-animation/SKILL.md](../skills/threejs-animation/SKILL.md)             | keyframe/skeletal animation, morph targets, animation mixing                   |
+| threejs-loaders              | [skills/threejs-loaders/SKILL.md](../skills/threejs-loaders/SKILL.md)                 | GLTF/GLB loading, texture loading, async patterns, caching                     |
+| threejs-shaders              | [skills/threejs-shaders/SKILL.md](../skills/threejs-shaders/SKILL.md)                 | GLSL, ShaderMaterial, uniforms, custom effects                                 |
+| threejs-postprocessing       | [skills/threejs-postprocessing/SKILL.md](../skills/threejs-postprocessing/SKILL.md)   | EffectComposer, bloom, DOF, screen-space effects, WebGPU                       |
+| threejs-interaction          | [skills/threejs-interaction/SKILL.md](../skills/threejs-interaction/SKILL.md)         | raycasting, camera controls, mouse/touch input, object picking                 |
 
 **External (not in this repo — distributable)**
 
@@ -252,6 +249,27 @@ Composer dev tools (semver ranges in `templates/*/composer.json`):
 | szepeviktor/phpstan-wordpress | [szepeviktor/phpstan-wordpress](https://github.com/szepeviktor/phpstan-wordpress) | — |
 | php-stubs/acf-pro-stubs | [php-stubs/acf-pro-stubs](https://github.com/php-stubs/acf-pro-stubs) | GPL-2.0-or-later |
 | dealerdirect/phpcodesniffer-composer-installer | [PHPCSStandards/phpcodesniffer-composer-installer](https://github.com/PHPCSStandards/phpcodesniffer-composer-installer) | MIT |
+
+**External skills (auto-loaded from `~/.agents/skills` — not git-tracked in this repo)**
+
+OpenCode auto-discovers these from the agent-compatible global path; they are not in
+`skills/` and not covered by this repo's docs-inventory. Refresh with their own
+installers (`npx skills add …` / `npx ctx7 setup`).
+
+| Skill | Source | License | Notes |
+| ----- | ------ | ------- | ----- |
+| agent-browser | [vercel-labs/agent-browser](https://github.com/vercel-labs/agent-browser) | Apache-2.0 | browser automation CLI skill (`npx skills add vercel-labs/agent-browser`) |
+| simplify | [brianlovin/claude-config](https://github.com/brianlovin/claude-config) | no license file detected — see source | post-write clarity pass over recently modified code |
+| context7-mcp | [upstash/context7](https://github.com/upstash/context7) | MIT | Context7 MCP usage guidance (pairs with the `context7` MCP server) |
+| find-docs | [upstash/context7](https://github.com/upstash/context7) | MIT | Context7 CLI (`ctx7 docs`) documentation lookup — installed by `npx ctx7 setup` |
+
+**Config & skills lineage (adapted in-repo)**
+
+| Lineage | Source | What was ported |
+| ------- | ------ | --------------- |
+| cc-settings | [darkroomengineering/cc-settings](https://github.com/darkroomengineering/cc-settings) | the config structure this repo ports: permission allow/ask/deny matrix, hooks/gate patterns, scaffold-and-validate workflow |
+| mattpocock/skills | [mattpocock/skills](https://github.com/mattpocock/skills) | the skill-writing discipline this repo adapts (see `skill-authoring.md`) + the workflow-skill family (`grill-me`, `to-spec`, `to-tickets`, `handoff`, `share-learning`, …) |
+| OpenCode | [opencode.ai/docs](https://opencode.ai/docs) | the SKILL.md format, agent/command/plugin contracts this repo builds on |
 
 ### Commands (18)
 

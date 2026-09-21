@@ -406,7 +406,7 @@ When in doubt, this is the intended split:
 The `description` frontmatters of these three are the routing contract — if you change
 one, change all three so the "not for…" cues stay mutually exclusive.
 
-### Vendored upstream skills (gsap-*, threejs-*, frontend-design)
+### Vendored upstream skills (gsap-*, threejs-*, frontend-design, landing-page-conversion-audit)
 
 Six `gsap-*` skills are copied **unedited** from
 [greensock/gsap-skills](https://github.com/greensock/gsap-skills) (MIT) — official API
@@ -417,11 +417,19 @@ postprocessing, interaction) come **unedited** from
 Three.js r160+ API depth audited against the official docs. `frontend-design`
 comes **unedited** from [anthropics/skills](https://github.com/anthropics/skills) —
 distinctive visual direction, typography, and anti-templated-design guidance for new
-UI or redesigns. Refresh with `npx skills update -a opencode -g`; never edit them in
+UI or redesigns. `landing-page-conversion-audit` comes **unedited** from
+[autonnel/autonnel-skills](https://github.com/autonnel/autonnel-skills) (Apache-2.0).
+Refresh with `npx skills update -a opencode -g`; never edit them in
 place (updates would be overwritten). Their guidance is generic — house integration
 rules (Lenis, not ScrollSmoother; Tempus ticker; reduced-motion gate; manifest
 enqueue; dynamic `import()` + dispose for Three.js) live in `docs/frontend-stack.md`
 and win over vendor guidance.
+
+Separately, four external skills are auto-loaded from `~/.agents/skills` (not tracked
+in this repo): `agent-browser` (vercel-labs/agent-browser, Apache-2.0), `simplify`
+(brianlovin/claude-config), `context7-mcp` and `find-docs` (upstash/context7, MIT).
+All external sources are cited in the
+[hub § External libraries & references](README.md#external-libraries--references).
 
 ### Anatomy of a good skill (wp-theme as the reference)
 
