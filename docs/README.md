@@ -52,7 +52,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
 ├── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
 ├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
-└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, smoke tests
+└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, smoke tests, workflow lint (actionlint + zizmor)
 ```
 
 ### Tickets
@@ -222,10 +222,17 @@ particles and not adopted (see AGENTS.md learnings log).
 
 **CI actions (`.github/workflows/ci.yml`)**
 
-| Action | Source | License |
-| ------ | ------ | ------- |
-| `actions/checkout@v4` | [actions/checkout](https://github.com/actions/checkout) | MIT |
-| `oven-sh/setup-bun@v2` | [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun) | MIT |
+Per the [GitHub Actions Workflow Standard](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
+— every action SHA-pinned with a version comment, `persist-credentials: false`,
+`permissions: {}` + per-job grants:
+
+| Action | Pin | Source | License |
+| ------ | --- | ------ | ------- |
+| `actions/checkout` | `11d5960...` # v4.4.0 | [actions/checkout](https://github.com/actions/checkout) | MIT |
+| `oven-sh/setup-bun` | `0c5077e...` # v2.2.0 | [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun) | MIT |
+| `shivammathur/setup-php` | `f3e473d...` # v2.37.2 | [shivammathur/setup-php](https://github.com/shivammathur/setup-php) | MIT |
+| actionlint (binary, `workflows` job) | 1.7.12 | [rhysd/actionlint](https://github.com/rhysd/actionlint) | MIT |
+| zizmor (`pip`, `workflows` job) | 1.30.1 | [zizmorcore/zizmor](https://github.com/zizmorcore/zizmor) | MIT |
 
 **Scaffolded stacks (templates/)**
 
@@ -236,6 +243,8 @@ npm (semver ranges in `templates/theme/package.json`): `vite@^8` ([vitejs.dev](h
 `tempus@^1.0.0-dev` ([darkroomengineering/tempus](https://github.com/darkroomengineering/tempus)) ·
 `husky@^9` ([typicode/husky](https://github.com/typicode/husky)) · `prettier@^3` +
 `prettier-plugin-tailwindcss@^0.8` ([prettier.io](https://prettier.io)) ·
+`eslint@^9` + `@wordpress/eslint-plugin@^27` (flat config — the JS standard lint
+gate; rides inside `format:all:check`) ·
 `swup` ([swup.js.org](https://swup.js.org)) — optional page transitions.
 
 Composer dev tools (semver ranges in `templates/*/composer.json`):
@@ -324,8 +333,8 @@ truth — adapt, don't reinvent.**
 
 | Template | Directory                               | Produces                                                                                                                                                                                                                                                                                                                                   |
 | -------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme    | [templates/theme](../templates/theme)   | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css → acf), acf-json save/load wiring, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs) |
-| Plugin   | [templates/plugin](../templates/plugin) | classic plugin: main-file header, activation/deactivation rewrite hooks, uninstall.php, admin/includes/public split with a working settings page (register_setting + example field), shipped public.css/public.js assets, .husky pre-commit gate, phpcs.xml, composer.json, phpstan.neon                                                   |
+| Theme    | [templates/theme](../templates/theme)   | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css → acf), acf-json save/load wiring, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs), eslint.config.mjs (flat, @wordpress/eslint-plugin), `.github/workflows/ci.yml` (verification chain, standard-compliant pins) |
+| Plugin   | [templates/plugin](../templates/plugin) | classic plugin: main-file header, activation/deactivation rewrite hooks, uninstall.php, admin/includes/public split with a working settings page (register_setting + example field), shipped public.css/public.js assets, .husky pre-commit gate, phpcs.xml, composer.json, phpstan.neon, eslint.config.mjs (flat, @wordpress/eslint-plugin), `.github/workflows/ci.yml` (verification chain, standard-compliant pins)                                                                                                                   |
 
 ### Scripts & config
 
@@ -340,7 +349,7 @@ truth — adapt, don't reinvent.**
 | [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`)                                                                                                                                                                                                                                                                                  |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1)                     | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally                                                                                               |
 | [verify-chain-consistency.ps1](../scripts/verify-chain-consistency.ps1) | parses the chain from `docs/verification-chain.md` (the single source of truth) and compares it against the steps hardcoded in `plugins/proof-of-work.ts` — exit 1 on drift, so the doc and the gate can't silently diverge                                                                                                           |
-| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests                                                                                                                                                  |
+| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned per the WordPress GitHub Actions Workflow Standard |
 
 ---
 

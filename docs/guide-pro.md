@@ -498,6 +498,13 @@ known trap).
   runs for plugin projects too (the gate requires a `build` script).
 - Both templates ship a `.husky/pre-commit` gate (format:all:check + phpcs +
   phpstan); the `prepare: husky` script installs the hooks on `npm install`.
+- Both templates ship `eslint.config.mjs` (flat config, `@wordpress/eslint-plugin`
+  v27 — the JS standard lint gate, wired into `format:all:check`) and
+  `.github/workflows/ci.yml` (the four-step verification chain in CI, with
+  SHA-pinned actions per the WordPress GitHub Actions Workflow Standard).
+- Both templates' `phpcs.xml` carries the WPCS 3.x opt-ins: `ValidatedSanitizedInput`
+  and `PrefixAllGlobals` with the `prefixes` property (scaffold `{prefix}` token —
+  ≥4 chars, no trailing underscore).
 - The plugin template's settings page is functional out of the box:
   `register_setting` + one `add_settings_section`/`add_settings_field` demo in
   `admin/class-{prefix}-admin.php` — extend it, don't remove the registration.
@@ -550,16 +557,20 @@ format:all:check → phpcs → phpstan, in order, stop at first red. What each s
 
 - **build** — Vite production build (the `dist/` output your PHP enqueues via the
   manifest)
-- **format:all:check** — Prettier (JS/CSS/JSON) + Pint (PHP) dry-run
+- **format:all:check** — Prettier (JS/CSS/HTML, `useTabs: true` per the WP
+  standards) + ESLint (`@wordpress/eslint-plugin`, flat config) + Pint (PHP)
+  dry-run
 - **phpcs** — WPCS 3.0 (WordPress-Extra + WordPress-Docs + PHPCompatibility,
-  `testVersion 8.2-`)
+  `testVersion 8.2-`) + the two 3.x opt-ins: `ValidatedSanitizedInput` and
+  `PrefixAllGlobals` with the `prefixes` property (≥4 chars)
 - **phpstan** — level 8 with `szepeviktor/phpstan-wordpress` (WP globals/functions
   stubs); the theme neon additionally scans `php-stubs/acf-pro-stubs`
 
 The gate plugin enforces it (see [§4 Plugins](#4-plugins)): `git push`/`git commit`
 in a gated project run the chain first, cached 120s per tree state. Known PHPCS
 landmines documented in the repo: never `ref="Universal"` wholesale (mutually
-exclusive sniffs pair), PHPCompatibilityWP is gone in phpcompatibility 9.x (use
+exclusive sniffs pair), PHPCompatibilityWP is unmaintained against the
+php-compatibility 9.x line (its master requires `^10@dev` — use plain
 `PHPCompatibility`), and the Vite hash-as-version enqueue needs a
 `phpcs:disable`/`enable` comment rather than a fake `$ver`.
 
@@ -573,9 +584,11 @@ frontmatter (`setup.ps1 -Validate`), the docs inventory
 (`scripts/docs-inventory.ps1` — the mechanical subset of `/docs-check`),
 chain consistency (`scripts/verify-chain-consistency.ps1` — the doc's four
 commands vs the gate's hardcoded steps), lockfile integrity
-(`bun install --frozen-lockfile --dry-run`), and scaffold dry runs, on every
-push to `main` and every pull request. The README badge is the visible proof;
-the semantic gate stays local in `proof-of-work.ts`.
+(`bun install --frozen-lockfile --dry-run`), scaffold dry runs, and — per the
+official [GitHub Actions Workflow Standard](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/) —
+workflow lint (actionlint 1.7.12 + zizmor 1.30.1) with every action SHA-pinned,
+on every push to `main` and every pull request. The README badge is the visible
+proof; the semantic gate stays local in `proof-of-work.ts`.
 
 `/docs-check` remains the semantic companion to the script: description wording,
 guide references by name, drift reasoning — things a deterministic script cannot

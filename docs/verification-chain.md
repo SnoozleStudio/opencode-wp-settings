@@ -10,10 +10,14 @@ Run in order for theme/plugin projects; stop at the first red:
 
 ```text
 npm run build                       # Vite production build (assets compile)
-npm run format:all:check            # Prettier (JS/CSS/JSON) + Pint (PHP) dry-run
+npm run format:all:check            # Prettier (JS/CSS/HTML) + ESLint (@wordpress/eslint-plugin) + Pint (PHP) dry-run
 vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M
 vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
+
+Note: ESLint rides inside `format:all:check` (`npm run format:check && npm run lint &&
+npm run format:php:check`) — the chain stays four steps, the gate and the consistency
+script are unchanged.
 
 ## Rules
 

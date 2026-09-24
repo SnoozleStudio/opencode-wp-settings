@@ -244,11 +244,17 @@ Default stack for Snoozle Studio WordPress work. Framework depth lives in the
 ### Quality
 
 - **WPCS 3.0** — `phpcs.xml` with `WordPress-Extra` + `WordPress-Docs` +
-  `PHPCompatibility` + `Universal` (testVersion `8.2-`)
+  `PHPCompatibility` (testVersion `8.2-`) + the two WPCS 3.x opt-ins:
+  `WordPress.Security.ValidatedSanitizedInput` and
+  `WordPress.NamingConventions.PrefixAllGlobals` with the `prefixes` property
+  (≥4 chars — never `ref="Universal"` wholesale)
 - **Laravel Pint** — PHP formatter
 - **PHPStan** — `phpstan.neon` at level 8 with `szepeviktor/phpstan-wordpress`
   (WP globals/functions stubs); theme neon scans `php-stubs/acf-pro-stubs`
-- **Husky** — pre-commit gate (format + phpcs + phpstan)
+- **ESLint** + `@wordpress/eslint-plugin` (flat config) — JS standard lint gate;
+  rides inside `format:all:check`; `.prettierrc` ships `useTabs: true` (WP
+  JS/CSS/HTML standards mandate tabs)
+- **Husky** — pre-commit gate (format + lint + phpcs + phpstan)
 - **PHPUnit/wp-env** — not standard; lint + build is the proof-of-work
 
 Always check latest version before installing: `npm info <package>` / `composer show`.
@@ -482,7 +488,8 @@ Keep entries terse and factual — one line each.
 - [2026-08-04] tooling: `ref="Universal"` in phpcs.xml loads EVERY sniff in the namespace —
   including the mutually exclusive RequireExitDieParentheses/DisallowExitDieParentheses
   pair. WordPress-Extra already includes a curated Universal subset; PHPCompatibilityWP
-  no longer exists in phpcompatibility 9.x (use PHPCompatibility).
+  exists as a separate package but is unmaintained against the php-compatibility 9.x
+  line (its master requires ^10@dev) — use plain PHPCompatibility with testVersion.
 - [2026-08-04] wordpress: enqueueing Vite hashed assets with $ver = null trips
   WordPress.WP.EnqueuedResourceParameters.MissingVersion — the hash IS the cache-buster;
   wrap in phpcs:disable/enable with a comment instead of passing a fake version.
@@ -574,3 +581,38 @@ Keep entries terse and factual — one line each.
   so the gate's four-step chain runs for plugin projects too.
 
 - [2026-09-21] tooling: nixie-fx (azakhary/nixie-fx) evaluated for creative-UI particles - deferred. Two opencode-compatible skills (nixie-fx-runtime, nixie-fx-authoring) install via `npx skills add https://github.com/azakhary/nixie-fx`; if adopted: vendor gsap-style into skills/ + house rules in frontend-stack.md (Tempus-driven update once per frame, reduced-motion gate, dynamic import chunk, dispose on scope end, editor-to-out/vfx export pipeline).
+
+- [2026-09-24] wordpress: WPCS 3.x has two silent opt-ins: `ValidatedSanitizedInput`
+  is not referenced by Core/Extra/Docs anymore (input boundary unenforced by
+  default), and `PrefixAllGlobals` no-ops at runtime without the `prefixes`
+  property (WPCS 3.2+ requires ≥4 chars; `wp`/`_`/`php`/`wordpress` blocklisted).
+  Both must be added explicitly to phpcs.xml — templates now ship them with a
+  `{prefix}` scaffold token.
+- [2026-09-24] tooling: the GitHub Actions Workflow Standard (developer.wordpress.org,
+  Apr 2026) mandates actionlint + zizmor, SHA-pinned actions with version comments,
+  `persist-credentials: false` on checkout, `permissions: {}` + per-job grants, and
+  env-var injection for untrusted expressions. Verified pins in this repo's ci.yml:
+  checkout v4.4.0 `11d5960...`, setup-bun v2.2.0 `0c5077e...`, setup-php v2.37.2
+  `f3e473d...`, actionlint 1.7.12, zizmor 1.30.1.
+- [2026-09-24] wordpress: WP JS/CSS/HTML standards mandate tabs; Prettier must ship
+  `useTabs: true, tabWidth: 4`. ESLint + `@wordpress/eslint-plugin` (v27, flat
+  config `eslint.config.mjs`, `...wordpress.configs.recommended`) is the JS lint
+  gate and rides inside `format:all:check` — the 4-step proof-of-work chain is
+  unchanged.
+- [2026-09-24] tooling: production-theme drift — a scaffolded theme's phpcs.xml had
+  been replaced with an i18n-only ruleset (no Core/Extra/Docs/PHPCompatibility) and
+  `phpcompatibility/php-compatibility` was missing from composer.json, so the gate
+  enforced nothing. `/audit`-style checks must diff live projects against the
+  templates, not assume scaffolds stay pristine. WPCS 3.4.x PrefixAllGlobals
+  requires a ≥4-char prefix — a 2-char prefix (e.g. `ss`) forces a prefix
+  migration or a documented error-code exclusion.
+- [2026-09-24] wordpress: `setup_postdata()` does NOT assign the global `$post` —
+  verified on WP 7.1.2 and documented on developer.wordpress.org (the global is
+  only set by `WP_Query::the_post()`; `WP_Query::setup_postdata()` sets only
+  `$id`/`$authordata`/`$pages`/...). The ACF-tutorial pattern
+  `foreach ( $posts as $p ) { setup_postdata( $p ); get_the_title(); }` therefore
+  renders the MAIN QUERY post (e.g. "Homepage" on a static front page) for every
+  item. Always pass the post explicitly — `get_the_title( $p )`,
+  `get_field( 'name', $id )`, `have_rows( 'name', $id )` — or assign
+  `global $post; $post = $p;` first. Fixing one production theme section this
+  way took 26 items from "Homepage" to their real titles.

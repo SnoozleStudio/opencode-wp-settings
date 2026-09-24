@@ -65,9 +65,16 @@ writing or reviewing any PHP. The AGENTS.md summary is the floor; this is the ce
     <exclude-pattern>dist/*</exclude-pattern>
     <arg name="extensions" value="php"/>
     <config name="testVersion" value="8.2-"/>
+    <config name="minimum_supported_wp_version" value="6.8"/>
     <rule ref="WordPress-Extra"/>
     <rule ref="WordPress-Docs"/>
     <rule ref="PHPCompatibility"/>
+    <rule ref="WordPress.Security.ValidatedSanitizedInput"/>
+    <rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+        <properties>
+            <property name="prefixes" value="your-prefix"/>
+        </properties>
+    </rule>
     <rule ref="WordPress.WP.I18n">
         <properties>
             <property name="text_domain" value="your-slug"/>
@@ -84,6 +91,18 @@ namespace container, so PHPCS loads every sniff in it — including the mutually
 exclusive `Universal.PHP.RequireExitDieParentheses` / `DisallowExitDieParentheses`
 pair. Add individual Universal sniffs only when needed. `phpcbf` auto-fixes most
 formatting; `WordPress.Utils.I18nTextDomainFixer` is opt-in.
+
+Two sniffs are **opt-in in WPCS 3.x** — add them explicitly or they silently do nothing:
+
+- `WordPress.Security.ValidatedSanitizedInput` — in WPCS 2.x it was part of
+  WordPress-Extra; since 3.0 it exists but is referenced by no ruleset. Without it,
+  the gate enforces escaping (`EscapeOutput`) and nonces (`NonceVerification`) but
+  NOT the `wp_unslash()`-then-sanitize input boundary.
+- `WordPress.NamingConventions.PrefixAllGlobals` — without the `prefixes` property
+  (or a CLI `--config-set prefixes ...`) the sniff no-ops at runtime: no error, no
+  warning. Prefixes must be ≥4 chars (WPCS 3.2+); `wp`, `_`, `php`, `wordpress` are
+  blocklisted; namespace prefixes match case-insensitively (`snoozle` matches
+  `Snoozle\...`). Pass the bare prefix without a trailing underscore.
 
 ## PHPStan configuration (enterprise)
 

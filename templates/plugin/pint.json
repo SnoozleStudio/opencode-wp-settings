@@ -19,6 +19,8 @@
     "new_with_parentheses": false,
     "trim_array_spaces": false,
     "blank_line_after_opening_tag": false,
+    "increment_style": false,
+    "no_superfluous_phpdoc_tags": false,
     "concat_space": {
       "spacing": "one"
     }

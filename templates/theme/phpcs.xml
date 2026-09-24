@@ -18,6 +18,27 @@
 	<rule ref="WordPress-Docs"/>
 	<rule ref="PHPCompatibility"/>
 
+	<!-- Opt-in in WPCS 3.x: input sanitization (wp_unslash + sanitize at the
+	     boundary) is not part of WordPress-Extra anymore. -->
+	<rule ref="WordPress.Security.ValidatedSanitizedInput"/>
+
+	<!-- acf_esc_html() is ACF's esc_html() wrapper - not on the WPCS escaping list. -->
+	<rule ref="WordPress.Security.EscapeOutput">
+		<properties>
+			<property name="customEscapingFunctions" type="array">
+				<element value="acf_esc_html"/>
+			</property>
+		</properties>
+	</rule>
+
+	<!-- PrefixAllGlobals silently no-ops without the prefixes property;
+	     the scaffold substitutes {prefix} (no trailing underscore). -->
+	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
+		<properties>
+			<property name="prefixes" value="{prefix}"/>
+		</properties>
+	</rule>
+
 	<rule ref="WordPress.WP.I18n">
 		<properties>
 			<property name="text_domain" value="{text_domain}"/>

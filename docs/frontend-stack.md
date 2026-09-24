@@ -33,6 +33,30 @@ Tailwind v4 (CSS-first), GSAP 3.15, Lenis 1.3, Tempus, Three.js, swup (optional)
 - Prettier: `prettier-plugin-tailwindcss` sorts classes (v4: it auto-detects the CSS
   stylesheet)
 
+## WordPress JS/CSS/HTML standards (enforcement)
+
+The official WordPress JS, CSS, and HTML Coding Standards are enforced by tooling, not
+just review:
+
+- **Indentation: tabs** — the WP standards mandate real tabs for JS, CSS, and HTML.
+  `.prettierrc` ships `useTabs: true`, `tabWidth: 4` (tabs count as 4 spaces toward
+  the 80/100-char soft limit). Do not switch a scaffolded project back to spaces.
+- **Prettier** (`.prettierrc`): `semi: true`, `singleQuote: true` (WP JS standard),
+  `trailingComma: es5`, `printWidth: 80`.
+- **ESLint + `@wordpress/eslint-plugin`** (flat config, `eslint.config.mjs`) — the JS
+  standard's lint gate (JSHint in the handbook, ESLint in modern production):
+  `===` over `==`, `const`/`let` over `var`, camelCase naming (acronyms
+  `currentDOMDocument`, abbreviations `userId`), braces on all blocks, no short
+  ternary in WP-land, single quotes, no unused vars. Runs via `npm run lint`
+  (and `lint:fix`); wired into `format:all:check`.
+- CSS: the WP CSS standard's property ordering / media-query grouping rules target
+  handwritten core stylesheets — with Tailwind v4 CSS-first they are moot (utility
+  classes). The applicable rules remain: lowercase names, hex/rgba colors,
+  `@theme` tokens in lowercase hex, tabs.
+- HTML: lowercase tags/attributes, quoted attribute values, `<br />` (space before
+  self-closing slash), boolean attributes without values — enforced by Prettier's
+  HTML formatter; mixed PHP/HTML indentation by WPCS `Squiz.PHP.EmbeddedPhp`.
+
 ## Lenis (smooth scroll)
 
 ```js
