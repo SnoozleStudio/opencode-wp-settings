@@ -112,7 +112,7 @@ What's allowed/asked/denied and why:
 | `curl` with pipes/`-o`/POST/PUT/DELETE                                                                                                                        | deny                                           | remote execution / silent writes                                                                  |
 | `iwr/irm * \| iex`, `rm -rf /*`, `rm -rf ~*`, recursive Remove-Item, `rd /s`                                                                                  | deny                                           | ransomware-shaped commands                                                                        |
 | `sudo *`                                                                                                                                                      | deny                                           | privilege boundary                                                                                |
-| `cat/type/Get-Content ~/.ssh/* ~/.aws/* ~/.gnupg/* ~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config`                                                    | deny                                           | secret material                                                                                   |
+| `cat/type` on `~/.ssh/* ~/.aws/* ~/.gnupg/* ~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config`; `Get-Content` on `~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config` (+ `$HOME`/`$env:USERPROFILE`/`C:/Users/*` variants) | deny | secret material — `Get-Content ~/.ssh/*` etc. fall through to the generic `ask` (still never auto-allowed) |
 | `cat/type/Get-Content $HOME/* $env:USERPROFILE/* C:/Users/*/.ssh/*`                                                                                           | deny                                           | win32 case variants of the secret paths                                                           |
 | `read`/`edit` of `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**`, `~/.npmrc`, `~/.netrc`, `~/.docker/config.json`, `~/.kube/config`                                   | deny                                           | secrets denied even on read                                                                       |
 
@@ -288,7 +288,9 @@ execution-order/lifecycle-hook feature from OpenCode — don't rely on filename 
 
 Eight subagents, three flavors:
 
-**Readers (denied edit/write by permission, not by instruction):**
+**Readers (write-restraint by permission where the config denies, by instruction
+otherwise — explore and security-auditor deny only `edit`, so their
+`write`/`apply_patch` restraint is prompt-level):**
 
 | Agent            | depth    | Use for                                                    |
 | ---------------- | -------- | ---------------------------------------------------------- |
@@ -659,8 +661,8 @@ Read CONTEXT.md if present; skim the named files; output one-line definitions…
 ```
 
 Then either invoke by description or wire a command: `commands/glossary.md` →
-`Write a glossary for: $ARGUMENTS …`. And per the contract: add the row to
-[Agents table](README.md#agents-8) and mention the command in the guides.
+`Write a glossary for: $ARGUMENTS …`. And per the contract: add the row to the
+hub's [Agents table](README.md#agents-8) and mention the command in the guides.
 
 ### Example C — tune the gate's cache window
 
@@ -668,7 +670,7 @@ The 120s TTL in `plugins/proof-of-work.ts` is a trade-off: fast iterations in a 
 repo vs. stale-green risk. `GATE_CACHE_TTL_MS = 120_000` is the single knob; the
 `lastState` (porcelain output) guard means a changed tree invalidates the cache
 regardless of time. Extending it means editing the constant — and updating the
-[Plugins table](README.md#plugins-3) + this guide's §4 description of the cache.
+hub's [Plugins table](README.md#plugins-3) + this guide's §4 description of the cache.
 
 ### Example D — docs-sync pass on this repo
 

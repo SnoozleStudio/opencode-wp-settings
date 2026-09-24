@@ -41,18 +41,19 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── AGENTS.md                portable coding standards + guardrails (bound every session)
 ├── opencode.json            permission allow/ask/deny matrix + MCP server config
 ├── tui.json                 TUI plugins (subagent statusline)
+├── tui.jsonc                herdr TUI integration (herdr-tui-session.js — managed)
 ├── package.json / bun.lock  plugin runtime dependency (@opencode-ai/plugin)
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
 ├── skills/                  38 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
-├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper
+├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper + herdr-agent-state.js (herdr-managed)
 ├── docs/                    this hub + reference docs + the 3 guides
 ├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
 ├── templates/               scaffolding sources (theme/, plugin/)
 ├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
 ├── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
 ├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
-└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, smoke tests, workflow lint (actionlint + zizmor)
+└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, workflow lint (actionlint + zizmor)
 ```
 
 ### Tickets
@@ -224,15 +225,16 @@ particles and not adopted (see AGENTS.md learnings log).
 
 Per the [GitHub Actions Workflow Standard](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/)
 — every action SHA-pinned with a version comment, `persist-credentials: false`,
-`permissions: {}` + per-job grants:
+`permissions: {}` + per-job grants. Rows marked "(template CI only)" pin the
+scaffolded `templates/*/.github/workflows/ci.yml`, not this repo's own workflow.
 
 | Action | Pin | Source | License |
 | ------ | --- | ------ | ------- |
 | `actions/checkout` | `11d5960...` # v4.4.0 | [actions/checkout](https://github.com/actions/checkout) | MIT |
 | `oven-sh/setup-bun` | `0c5077e...` # v2.2.0 | [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun) | MIT |
-| `shivammathur/setup-php` | `f3e473d...` # 2.37.2 | [shivammathur/setup-php](https://github.com/shivammathur/setup-php) | MIT |
 | actionlint (binary, `workflows` job) | 1.7.12 | [rhysd/actionlint](https://github.com/rhysd/actionlint) | MIT |
 | zizmor (`pip`, `workflows` job) | 1.30.1 | [zizmorcore/zizmor](https://github.com/zizmorcore/zizmor) | MIT |
+| `shivammathur/setup-php` (template CI only) | `f3e473d...` # 2.37.2 | [shivammathur/setup-php](https://github.com/shivammathur/setup-php) | MIT |
 
 **Scaffolded stacks (templates/)**
 
@@ -244,8 +246,11 @@ npm (semver ranges in `templates/theme/package.json`): `vite@^8` ([vitejs.dev](h
 `husky@^9` ([typicode/husky](https://github.com/typicode/husky)) · `prettier@^3` +
 `prettier-plugin-tailwindcss@^0.8` ([prettier.io](https://prettier.io)) ·
 `eslint@^9` + `@wordpress/eslint-plugin@^27` (flat config — the JS standard lint
-gate; rides inside `format:all:check`) ·
-`swup` ([swup.js.org](https://swup.js.org)) — optional page transitions.
+gate; rides inside `format:all:check`).
+
+Not shipped in the template, added per project when needed: `three` (Three.js —
+dynamic `import()` pattern in `frontend-stack.md`) and `swup` ([swup.js.org](https://swup.js.org) —
+optional page transitions).
 
 Composer dev tools (semver ranges in `templates/*/composer.json`):
 
@@ -284,7 +289,7 @@ installers (`npx skills add …` / `npx ctx7 setup`).
 
 Slash commands in `commands/` are user-invoked workflows. Each is a markdown file whose
 body is the prompt sent to the model; `$ARGUMENTS` is what you type after the slash.
-See [guide-pro.md § Commands](guide-pro.md#commands-18) for authoring.
+See [guide-pro.md § Commands](guide-pro.md#6-commands--authoring) for authoring.
 
 | Command       | File                                                | Invokes                                                | Use when                           |
 | ------------- | --------------------------------------------------- | ------------------------------------------------------ | ---------------------------------- |
@@ -311,7 +316,7 @@ See [guide-pro.md § Commands](guide-pro.md#commands-18) for authoring.
 
 Hook plugins in `plugins/` run inside the OpenCode process and observe tool calls. They
 are TS files built against `@opencode-ai/plugin` (see
-[guide-pro.md § Plugins](guide-pro.md#plugins-3)).
+[guide-pro.md § Plugins](guide-pro.md#4-plugins)).
 
 | Plugin          | File                                                        | Hooks                                         | Behavior                                                                                                                                                                              |
 | --------------- | ----------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -408,7 +413,7 @@ every session    ──► session-context: git state line appended to system pr
 | You changed…                      | You must update…                                                                                                          |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | An agent (`agents/`)              | its `description` frontmatter + this hub's [Agents table](#agents-8)                                                      |
-| A skill (`skills/`)               | its `description` frontmatter (the routing table) + [Skills table](#skills-26) + skill-authoring.md if the format changed |
+| A skill (`skills/`)               | its `description` frontmatter (the routing table) + [Skills table](#skills-38) + skill-authoring.md if the format changed |
 | A vendored skill (`gsap-*`)       | never edit in place — bump via `npx skills update -a opencode -g`; inventory unchanged                                    |
 | A command (`commands/`)           | its `description` + [Commands table](#commands-18) + any example walkthrough in the guides that uses it                   |
 | A plugin (`plugins/`)             | its docblock + [Plugins table](#plugins-3) + guide-pro § Plugins                                                          |

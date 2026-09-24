@@ -1,7 +1,8 @@
 # Accessibility — WCAG 2.2 AA (WordPress)
 
 Load this when building or reviewing UI. WordPress conformance: WCAG 2.2 Level AA,
-WAI-ARIA 1.1. "Accessibility-ready" tag = Theme Review minimums, not a WCAG claim.
+WAI-ARIA 1.1 (the WP coding standards' normative ARIA reference). "Accessibility-ready"
+tag = Theme Review minimums, not a WCAG claim.
 
 ## Perceivable
 
@@ -58,7 +59,7 @@ menus; contrast 4.5:1; 200% zoom usability.
 ## References
 
 - [WCAG 2.2 — W3C Recommendation](https://www.w3.org/TR/WCAG22/) — the normative spec; this repo targets Level AA
-- [WAI-ARIA 1.2](https://www.w3.org/TR/wai-aria-1.2/) — the ARIA specification
+- [WAI-ARIA 1.1](https://www.w3.org/TR/wai-aria-1.1/) — the normative ARIA spec per the WordPress coding standards (APG patterns may cite 1.2)
 - [W3C Web Accessibility Tutorials](https://www.w3.org/WAI/tutorials/) — practical how-to guidance
 - [WordPress Theme Handbook — Accessibility](https://developer.wordpress.org/themes/accessibility/) — Theme Review "accessibility-ready" minimums
 - [WordPress Accessibility team](https://make.wordpress.org/accessibility/) — community testing and standards

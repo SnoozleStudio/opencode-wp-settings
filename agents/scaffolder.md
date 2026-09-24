@@ -28,12 +28,13 @@ Source: `templates/theme/`. Same substitution flow:
 
 1. `style.css` header: Theme Name, Author, Description, Version, Requires at least,
    Tested up to, Requires PHP, License, Text Domain (slug with dashes)
-2. `functions.php` boot chain: utilities → nav-walker → configure → js-css (load-order
-   sensitive — do not reorder)
+2. `functions.php` boot chain: utilities → nav-walker → configure → js-css → acf
+   (load-order sensitive — do not reorder; `configure/acf.php` ships always with
+   the save/load filters wired, only `acf-json/` is optional)
 3. `vite.config.mjs` with `base` set to `/wp-content/themes/{slug}/dist/`
-4. ACF is optional: create `acf-json/` with save/load paths wired in
-   `configure/acf.php` only if the project uses ACF — `front-page.php` guards
-   `get_field()` and runs without it
+4. ACF is optional as a runtime plugin: `front-page.php` guards `get_field()` and
+   runs without it — but do NOT remove or skip `configure/acf.php`, the boot chain
+   requires it unconditionally
 5. Run `npm install`, `composer install`, then the verification chain
 
 ## New section in an existing theme

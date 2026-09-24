@@ -1,7 +1,10 @@
 # Front-End Stack — WordPress + Vite Integration
 
 Load this when writing or reviewing JS/CSS in themes/plugins. Stack: Vite 8 (Rolldown),
-Tailwind v4 (CSS-first), GSAP 3.15, Lenis 1.3, Tempus, Three.js, swup (optional).
+Tailwind v4 (CSS-first), GSAP 3.15, Lenis 1.3, Tempus. Three.js and swup are
+**optional per-project additions** — not installed by the scaffolded template;
+add the dependency when the feature lands (Three.js always via dynamic
+`import()`).
 
 ## Vite 8 for WordPress
 
@@ -160,8 +163,10 @@ export function initComponent() {
 }
 ```
 
-Registered in `main.js`: init on DOMContentLoaded, cleanups collected; IntersectionObserver
-for lazy/heavy inits; `navigator.hardwareConcurrency <= 4` frame-skipping for heavy loops.
+Registered in `main.js`: init on DOMContentLoaded, cleanups collected. The shipped
+template example stops there — the house pattern scales with an IntersectionObserver
+for lazy/heavy inits and `navigator.hardwareConcurrency <= 4` frame-skipping for
+heavy loops, applied per project when the section needs it.
 
 ## References
 

@@ -63,7 +63,9 @@ writing or reviewing any PHP. The AGENTS.md summary is the floor; this is the ce
     <exclude-pattern>node_modules/*</exclude-pattern>
     <exclude-pattern>vendor/*</exclude-pattern>
     <exclude-pattern>dist/*</exclude-pattern>
+    <exclude-pattern>*.bak</exclude-pattern>
     <arg name="extensions" value="php"/>
+    <arg value="ps"/>
     <config name="testVersion" value="8.2-"/>
     <config name="minimum_supported_wp_version" value="6.8"/>
     <rule ref="WordPress-Extra"/>
@@ -82,6 +84,23 @@ writing or reviewing any PHP. The AGENTS.md summary is the floor; this is the ce
     </rule>
 </ruleset>
 ```
+
+This mirrors the shipped templates exactly (`templates/{theme,plugin}/phpcs.xml`).
+Theme-only addition: ACF themes also register `acf_esc_html` (ACF's `esc_html()`
+wrapper, not on the WPCS escaping list) as a custom escaping function:
+
+```xml
+<rule ref="WordPress.Security.EscapeOutput">
+    <properties>
+        <property name="customEscapingFunctions" type="array">
+            <element value="acf_esc_html"/>
+        </property>
+    </properties>
+</rule>
+```
+
+`<arg value="ps"/>` prints the progress + sniff summary; `*.bak` keeps editor
+backups out of the scan.
 
 Rule groups: `WordPress` (all), `WordPress-Core` (PHP standards), `WordPress-Docs`
 (phpdoc), `WordPress-Extra` (best practices incl. escaping/sanitization sniffs and a
@@ -123,7 +142,18 @@ parameters:
         - dist/*
     scanFiles:
         - vendor/php-stubs/acf-pro-stubs/acf-pro-stubs.php
+    reportUnmatchedIgnoredErrors: false
+    ignoreErrors:
+        - identifier: constant.notFound
+          # {PREFIX}_* constants defined via define() with function-call values
+          # are not statically evaluable; WP resolves them at runtime.
 ```
+
+The templates ship this plus their project-specific `ignoreErrors` blocks
+(`templates/theme/phpstan.neon` — `wp_nav_menu` `container: false` typing;
+`templates/plugin/phpstan.neon` — plugin-constant discovery). Every
+`ignoreErrors` entry carries a comment explaining why — never a blanket
+suppression without a reason.
 
 - `szepeviktor/phpstan-wordpress` ships WP constants, functions and globals
   (`$wpdb`, `$post`, `$wp_query`, ...) plus the `add_action`/`add_filter` callable
@@ -133,8 +163,6 @@ parameters:
   ceiling; raise it per project with extra rulesets if desired
 - Run it with `--no-progress --memory-limit=1G`; part of the verification chain and
   the proof-of-work gate
-- WP idioms that legitimately need `ignoreErrors` (e.g. template-file globals) get a
-  comment explaining why — never a blanket `ignoreErrors` without a reason
 
 ## References
 

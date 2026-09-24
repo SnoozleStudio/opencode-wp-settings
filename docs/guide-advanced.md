@@ -48,7 +48,7 @@ theme does not need a 120-step implementer:
 - **Planner 40**: changes with a blast radius you already know
 
 The defaults above are the tested values; change them in `agents/*.md`, and update
-the hub [Agents table](README.md#agents-8) in the same change.
+the hub's [Agents table](README.md#agents-8) in the same change.
 
 ## 3. Out-of-steps fallback
 
@@ -83,7 +83,9 @@ description, not any "routing" code (there is none).
   its body either fires wrongly or never fires. `/docs-check` catches inventory
   drift, not wording drift — keep descriptions honest by hand.
 
-Descriptions are 1–1024 chars (enforced by `setup.ps1 -Validate`).
+Descriptions are 1–1024 chars per OpenCode's spec; `setup.ps1 -Validate` checks
+presence, the colon-space plain-scalar guard, and skill name↔directory match — it
+does not enforce the length limit.
 
 ## 5. Tuning plugin cache windows
 

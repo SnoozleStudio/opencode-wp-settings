@@ -8,7 +8,7 @@ Source: WordPress Plugin Handbook. Load this when building plugins.
 plugin-slug/
 ├── plugin-slug.php          # main file — ONLY file with the plugin header
 ├── uninstall.php            # guarded by WP_UNINSTALL_PLUGIN
-├── languages/               # load_plugin_textdomain path
+├── languages/               # load_plugin_textdomain path (declared in the header; create the dir when the first .po/.mo lands — the template does not ship it)
 ├── includes/                # classes (class-{name}.php) + shared functions
 ├── admin/                   # admin-only (still capability-checked)
 └── public/                  # front-end code
