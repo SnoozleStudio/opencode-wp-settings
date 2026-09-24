@@ -170,8 +170,9 @@ plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-c
 docs/                 Documentation hub + reference docs + 3 guides
 tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
-setup.ps1             Validation + project scaffolding (Windows, Local site-shell aware)
-scaffold.cmd          Shell-agnostic wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
+setup.ps1             Validation + project scaffolding (cross-platform: Windows/macOS/Linux, Local-aware)
+scaffold.cmd          Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
+scaffold.sh           POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 scripts/              docs-inventory.ps1 (docs sync) + verify-chain-consistency.ps1 (chain vs gate)
 .github/              CI workflow (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, workflow lint (actionlint + zizmor)
 ```
@@ -286,6 +287,26 @@ and use the direct form instead:
 ```powershell
 & "$HOME\.config\opencode\setup.ps1" -Theme mytheme -Prefix mt_ -Name "My Theme"
 ```
+
+### macOS / Linux
+
+`scaffold.sh` is the POSIX counterpart of `scaffold.cmd` — it forwards every argument
+to `setup.ps1` via `pwsh` (PowerShell 7+, required; its path is resolved from the
+script's own location, so any checkout works):
+
+```sh
+# From ~/.config/opencode
+./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mt_ -Name "My Theme"
+./scaffold.sh -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
+# Or call setup.ps1 directly
+pwsh -NoProfile -File "$HOME/.config/opencode/setup.ps1" -Site mysite -Theme mytheme -Install
+```
+
+On macOS, Local's bundled PHP also lives under a `lightning-services` path, so
+`-Install`'s openssl/mbstring php.ini workaround applies the same way. On Linux,
+Local by Flywheel is not supported — use `-NewTheme`/`-NewPlugin` (explicit
+directories) or point `-SitesDir` at an existing WordPress checkout; `-Install`
+uses the system PHP/composer on PATH.
 
 `setup.ps1` also targets a site from any directory (no site shell needed):
 

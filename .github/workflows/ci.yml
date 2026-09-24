@@ -41,6 +41,10 @@ jobs:
       - name: setup.ps1 -Validate
         shell: pwsh
         run: pwsh -NoProfile -File setup.ps1 -Validate
+      - name: scaffold.sh syntax
+        run: sh -n scaffold.sh
+      - name: scaffold.sh executes
+        run: ./scaffold.sh -Validate
 
   docs:
     name: Docs inventory & links
@@ -83,6 +87,8 @@ jobs:
       - name: Plugin template dry run
         shell: pwsh
         run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix tst_ -Name "Test Plugin" -DryRun
+      - name: scaffold.sh dry run (POSIX wrapper path)
+        run: ./scaffold.sh -NewTheme "$RUNNER_TEMP/theme-sh" -Slug theme-sh -Prefix tst_ -Name "Test Theme" -DryRun
 
   workflows:
     name: Workflow lint (actionlint + zizmor)

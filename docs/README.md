@@ -50,8 +50,9 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── docs/                    this hub + reference docs + the 3 guides
 ├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
 ├── templates/               scaffolding sources (theme/, plugin/)
-├── setup.ps1                validation + project scaffolding (PowerShell, Local-aware)
-├── scaffold.cmd             shell-agnostic wrapper for setup.ps1 (cmd/Git Bash/PS)
+├── setup.ps1                validation + project scaffolding (cross-platform: Windows/macOS/Linux, Local-aware)
+├── scaffold.cmd             Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
+├── scaffold.sh              POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 ├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
 └── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, workflow lint (actionlint + zizmor)
 ```
@@ -332,7 +333,8 @@ is a plain JS plugin installed and managed by herdr; reinstate/update overwrites
 
 ### Templates (2)
 
-Scaffolding sources consumed by the `scaffolder` agent and `setup.ps1`/`scaffold.cmd`.
+Scaffolding sources consumed by the `scaffolder` agent and `setup.ps1`
+(`scaffold.cmd` on Windows, `scaffold.sh` on macOS/Linux).
 Placeholders (`{<kind>_slug}`/`{<kind>-slug}`/`{<kind>_name}`, `{prefix}`, `{PREFIX}`, `{Prefix}`, `{text_domain}`,
 `{description}`) are substituted at scaffold time. **The templates are the source of
 truth — adapt, don't reinvent.**
@@ -346,8 +348,8 @@ truth — adapt, don't reinvent.**
 
 | File                                                                    | Purpose                                                                                                                                                                                                                                                                                                                               |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [setup.ps1](../setup.ps1)                                               | `-Validate` repo structure/frontmatter (incl. the YAML colon-space guard — `: ` in a plain-scalar description breaks parsing); `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into a Local site (walks up for `wp-load.php`, or `-Site <name>`); `-Install` npm+composer (Local PHP openssl workaround); `-Force`, `-DryRun` |
-| [scaffold.cmd](../scaffold.cmd)                                         | shell-agnostic wrapper (cmd/Git Bash/PowerShell) forwarding to setup.ps1 — the entry point from Local's site shell                                                                                                                                                                                                                    |
+| [setup.ps1](../setup.ps1)                                               | `-Validate` repo structure/frontmatter (incl. the YAML colon-space guard — `: ` in a plain-scalar description breaks parsing); `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into a Local site (walks up for `wp-load.php`, or `-Site <name>`); `-Install` npm+composer (Local PHP openssl workaround); `-Force`, `-DryRun`. Cross-platform: Windows PowerShell 5.1+ and pwsh 7+ (macOS/Linux); Local detection matches `lightning-services` paths on Windows and macOS; Linux has no Local — explicit-dir scaffolding + system tooling |
+| [scaffold.cmd](../scaffold.cmd)                                         | Windows wrapper (cmd/Git Bash/PowerShell) forwarding to setup.ps1 — the entry point from Local's site shell |
 | [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets deny, `node -e` deny), MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                                                                                                                                                                     |
 | [tui.json](../tui.json)                                                 | TUI plugin `opencode-subagent-statusline`                                                                                                                                                                                                                                                                                             |
 | [tui.jsonc](../tui.jsonc)                                               | herdr TUI integration (`./herdr-tui-session.js` — session selection reporting; installed/managed by herdr)                                                                                                                                                                                                                             |
@@ -419,7 +421,7 @@ every session    ──► session-context: git state line appended to system pr
 | A command (`commands/`)           | its `description` + [Commands table](#commands-18) + any example walkthrough in the guides that uses it                   |
 | A plugin (`plugins/`)             | its docblock + [Plugins table](#plugins-3) + guide-pro § Plugins                                                          |
 | A template (`templates/`)         | the [Templates table](#templates-2) + guide-pro § Templates + the scaffolder agent if flow changed                        |
-| `setup.ps1` / `scaffold.cmd`      | the [Scripts table](#scripts--config) + README scaffolding section + guide-pro § Scaffolding                              |
+| `setup.ps1` / `scaffold.cmd` / `scaffold.sh` | the [Scripts table](#scripts--config) + README scaffolding section + guide-pro § Scaffolding                              |
 | `scripts/` / `.github/workflows/` | the [Scripts table](#scripts--config) + README "What's inside" (the CI runs them — a listed-but-untracked file fails CI)  |
 | `opencode.json` / `tui.json`      | README "What's inside" + guide-pro § Permissions/MCP                                                                      |
 | `README.md` "What's inside"       | keep counts and file list truthful — they are verified by `/docs-check`                                                   |

@@ -193,7 +193,14 @@ This is deliberate — it prevents building the wrong thing.
 "%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
 ```
 
-**What happens:** `scaffold.cmd` forwards to `setup.ps1`, which detects the WordPress
+On macOS/Linux (from `~/.config/opencode`):
+
+```
+./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mt_ -Name "My Theme" -Install
+```
+
+**What happens:** `scaffold.cmd` (Windows) / `scaffold.sh` (macOS/Linux) forwards to
+`setup.ps1`, which detects the WordPress
 root (walks up until `wp-load.php`), scaffolds `templates/theme/` into
 `wp-content/themes/mytheme/` with slug/prefix/name substituted everywhere, runs
 `npm install` + `composer install` (including the workaround for Local's bundled PHP

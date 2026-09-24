@@ -513,7 +513,7 @@ known trap).
 
 ---
 
-## 9. setup.ps1 & scaffold.cmd internals
+## 9. setup.ps1 & scaffold wrappers internals
 
 ### Parameters
 
@@ -540,11 +540,19 @@ known trap).
   `extension=openssl` + `extension=mbstring`, points `$env:PHPRC` at it, installs,
   and restores the environment (including deleting the temp ini) in `finally`.
   System PHP installs are used untouched.
-- `scaffold.cmd` is the shell-agnostic door: Local's Windows site shell opens
+- `scaffold.cmd` is the Windows door: Local's Windows site shell opens
   **cmd.exe by default**, where `&`-call syntax and `$HOME` don't exist. The wrapper
   is a `@echo off` stub that forwards `%*` to
   `powershell -NoProfile -ExecutionPolicy Bypass -File …\setup.ps1` — works from
   cmd, Git Bash, and PowerShell alike.
+- `scaffold.sh` is the macOS/Linux door: a POSIX `sh` stub forwarding `"$@"` to
+  `pwsh -NoProfile -File "$(dirname "$0")/setup.ps1"` — the path resolves from the
+  script's own location, so any checkout works (no hardcoded `%USERPROFILE%`).
+- Path building is platform-safe throughout (`Join-Path` chains only — no
+  backslash literals), so `-Site`, `-Theme` and `-Plugin` resolve identically on
+  Windows, macOS and Linux. Local's PHP detection (`lightning-services`) matches
+  both Windows and macOS installs; on Linux (Local unsupported) use
+  `-NewTheme`/`-NewPlugin` with explicit directories and system tooling.
 - Encoding discipline: files are written UTF-8 **without BOM**
   (`[System.IO.File]::WriteAllText` + `UTF8Encoding($false)`) — PowerShell 5.1's
   `Set-Content -Encoding UTF8` writes a BOM that breaks things; `Get-Content`

@@ -398,7 +398,8 @@ No AI fingerprints in git history, PRs, or descriptions. Ever.
 ## Documentation Contract (This Repo)
 
 **Every change to THIS repo (agents/, skills/, commands/, plugins/, templates/,
-scripts/, .github/workflows/, opencode.json, tui.json, setup.ps1, scaffold.cmd)
+scripts/, .github/workflows/, opencode.json, tui.json, setup.ps1, scaffold.cmd,
+scaffold.sh)
 must update the documentation in the
 same change.** A change without its doc sync is incomplete — do not report it done.
 
@@ -416,7 +417,7 @@ Mandatory sync targets (summary):
 | command                  | its `description` + hub inventory row + guide examples that use it           |
 | plugin                   | its docblock + hub inventory row + guide-pro § Plugins                       |
 | template                 | hub inventory row + guide-pro § Templates + scaffolder agent if flow changed |
-| setup.ps1 / scaffold.cmd | hub scripts table + README scaffolding section + guide-pro § Scaffolding     |
+| setup.ps1 / scaffold.cmd / scaffold.sh | hub scripts table + README scaffolding section + guide-pro § Scaffolding     |
 | opencode.json / tui.json | README "What's inside" + guide-pro § Permissions/MCP                         |
 | anything user-facing     | Level 1 guide examples (they must not lie)                                   |
 
@@ -471,11 +472,13 @@ Use this table to decide where a piece of knowledge belongs:
 **Rule of thumb:** if another project's agent would benefit from knowing it, record it in
 the learnings log. Otherwise let auto-memory handle it.
 
+
 ## Self-Evolving Learnings (agent convention)
 
 After completing a session, if you hit a non-obvious bug, discovered a useful pattern, or
 found an edge case, append a dated entry to the project's `AGENTS.md` under
-`## Self-Evolving Learnings`:
+`
+## Self-Evolving Learnings`:
 
 ```
 - [YYYY-MM-DD] <category>: <one-line learning>
@@ -622,3 +625,13 @@ Keep entries terse and factual — one line each.
   `get_field( 'name', $id )`, `have_rows( 'name', $id )` — or assign
   `global $post; $post = $p;` first. Fixing one production theme section this
   way took 26 items from "Homepage" to their real titles.
+- [2026-09-24] tooling: cross-platform pass — setup.ps1 now runs on pwsh 7
+  (macOS/Linux) and Windows PowerShell 5.1+. Two latent bugs fixed: `Join-Path`
+  with backslash literals (`app\public`, `wp-content\themes\{x}`) created
+  literal backslash-named dirs on POSIX (use `Join-Path` chains only), and
+  `TrimStart('\')` left a leading `/` on POSIX relative paths (trim both
+  separators). `scaffold.sh` (POSIX sh, `dirname`-based) is the macOS/Linux
+  counterpart of `scaffold.cmd` (which hardcodes `%USERPROFILE%`). Local PHP
+  detection (`lightning-services` path match) already worked on macOS; Linux has
+  no Local — explicit-dir scaffolding. CI smoke job now exercises `scaffold.sh`
+  on Ubuntu as the cross-platform proof.

@@ -5,12 +5,23 @@
 
 .DESCRIPTION
 	This repo IS the global OpenCode config (~/.config/opencode), so there is
-	nothing to install. This script:
+	nothing to install. This script runs under PowerShell 5.1+ (Windows) and
+	pwsh 7+ (macOS/Linux). It:
 
 	  * Default (-Validate):     checks skill/agent/command frontmatter and structure.
 	  * -NewTheme/-NewPlugin:    scaffolds into an explicit target directory.
 	  * -Theme/-Plugin:          scaffolds into wp-content\themes|plugins\{slug} of the
 	                             current WordPress root (Local site shell) or of -Site.
+
+	Platform notes:
+	  * Windows: run from Local's site shell via scaffold.cmd, or
+	    .\setup.ps1 directly from PowerShell.
+	  * macOS: run ./scaffold.sh or pwsh -File setup.ps1. Local's bundled PHP
+	    also lives under a "lightning-services" path, so -Install's
+	    openssl/mbstring php.ini workaround applies there too.
+	  * Linux: Local by Flywheel is not supported - use -NewTheme/-NewPlugin
+	    (explicit directories) or pass -SitesDir to an existing WP checkout;
+	    -Install uses the system PHP/composer on PATH.
 
 .PARAMETER Validate
 	Run structural validation only (default).
@@ -62,11 +73,14 @@
 	.\setup.ps1 -Validate
 	.\setup.ps1 -NewTheme ..\wp-content\themes\ss -Slug ss -Prefix ss_ -Name "Snoozle Studio"
 	.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myp_ -Name "My Plugin"
-	# From Local's site shell (cmd.exe by default on Windows - use scaffold.cmd):
+	# From Local's site shell on Windows (cmd.exe by default - use scaffold.cmd):
 	scaffold.cmd -Theme mytheme -Prefix mt_ -Name "My Theme"
 	scaffold.cmd -Plugin my-plugin -Install
 	# From Local's site shell configured to PowerShell:
 	.\setup.ps1 -Theme mytheme -Prefix mt_ -Name "My Theme"
+	# macOS/Linux (POSIX shell; repo at ~/.config/opencode):
+	./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mt_ -Name "My Theme"
+	./scaffold.sh -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
 	# From anywhere, targeting a site by name:
 	.\setup.ps1 -Site mysite -Theme mytheme -Install
 	.\setup.ps1 -Theme demo -SitesDir D:\Local\Sites -DryRun
@@ -144,7 +158,7 @@ function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Toke
 	Write-Step "Scaffolding from $Source"
 	$items = Get-ChildItem -LiteralPath $Source -Recurse -Force
 	foreach ($item in $items) {
-		$relative = $item.FullName.Substring($Source.Length).TrimStart("\")
+		$relative = $item.FullName.Substring($Source.Length).TrimStart("\", "/")
 		foreach ($key in $Tokens.Keys) {
 			$relative = $relative.Replace($key, $Tokens[$key])
 		}
@@ -266,7 +280,7 @@ function Resolve-LocalSiteRoot([string]$SiteName) {
 		$available = ((Get-ChildItem -LiteralPath $sitesRoot -Directory -ErrorAction SilentlyContinue).Name) -join ", "
 		throw "Local site '$SiteName' not found in $sitesRoot. Available sites: $available"
 	}
-	$public = Join-Path $siteDir "app\public"
+	$public = Join-Path $siteDir (Join-Path "app" "public")
 	if (-not (Test-Path (Join-Path $public "wp-load.php"))) {
 		throw "Site '$SiteName' root not found at $public (expected app\public containing wp-load.php)."
 	}
@@ -355,12 +369,12 @@ if ($NewTheme) { $TargetPath = $NewTheme; $Kind = "theme" }
 elseif ($NewPlugin) { $TargetPath = $NewPlugin; $Kind = "plugin" }
 elseif ($Theme) {
 	if (-not $Slug) { $Slug = $Theme }
-	$TargetPath = Join-Path (Resolve-SiteRoot) "wp-content\themes\$Theme"
+	$TargetPath = Join-Path (Resolve-SiteRoot) (Join-Path "wp-content" (Join-Path "themes" $Theme))
 	$Kind = "theme"
 }
 elseif ($Plugin) {
 	if (-not $Slug) { $Slug = $Plugin }
-	$TargetPath = Join-Path (Resolve-SiteRoot) "wp-content\plugins\$Plugin"
+	$TargetPath = Join-Path (Resolve-SiteRoot) (Join-Path "wp-content" (Join-Path "plugins" $Plugin))
 	$Kind = "plugin"
 }
 
