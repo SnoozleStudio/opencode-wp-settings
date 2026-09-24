@@ -264,6 +264,10 @@ Always check latest version before installing: `npm info <package>` / `composer 
 ## WordPress Coding Standards (Non-Negotiable)
 
 Full reference in `docs/wordpress-php-standards.md`. Load it when writing or reviewing PHP.
+Standards questions route to the six standards skills — `wp-php-standards`,
+`wp-js-standards`, `wp-css-standards`, `wp-html-standards`,
+`wp-accessibility-standards`, `wp-github-actions-standards` (each distilled from the
+official developer.wordpress.org pages; the PHP skill owns the deep doc).
 The summary that must never be violated:
 
 ### Naming & Structure

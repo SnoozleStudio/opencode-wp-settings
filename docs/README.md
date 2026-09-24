@@ -20,7 +20,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 2. [Reference docs index](#reference-docs-index)
 3. [Component inventory](#component-inventory)
    - [Agents (8)](#agents-8)
-   - [Skills (38)](#skills-38)
+   - [Skills (44)](#skills-44)
    - [Commands (18)](#commands-18)
    - [Plugins (3)](#plugins-3)
    - [Templates (2)](#templates-2)
@@ -44,7 +44,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── tui.jsonc                herdr TUI integration (herdr-tui-session.js — managed)
 ├── package.json / bun.lock  plugin runtime dependency (@opencode-ai/plugin)
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
-├── skills/                  38 skills (reusable disciplines; auto-matched by description)
+├── skills/                  44 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper + herdr-agent-state.js (herdr-managed)
 ├── docs/                    this hub + reference docs + the 3 guides
@@ -113,7 +113,7 @@ permission; writers edit strictly within their briefing.
 | Scaffolder       | [agents/scaffolder.md](../agents/scaffolder.md)             | generates projects from `templates/`, new sections   | no        |
 | Maestro          | [agents/maestro.md](../agents/maestro.md)                   | orchestrates parallel subagent workstreams           | no        |
 
-### Skills (38)
+### Skills (44)
 
 Skills in `skills/` are the reusable disciplines. OpenCode auto-matches them from the
 frontmatter `description` — the description **is** the routing table. Category splits:
@@ -128,6 +128,12 @@ frontmatter `description` — the description **is** the routing table. Category
 | wp-accessibility  | [skills/wp-accessibility/SKILL.md](../skills/wp-accessibility/SKILL.md)   | accessibility                      | WCAG, a11y, contrast, keyboard, aria           |
 | wp-performance    | [skills/wp-performance/SKILL.md](../skills/wp-performance/SKILL.md)       | performance                        | "slow site", web vitals, bundle size, rAF      |
 | wp-i18n           | [skills/wp-i18n/SKILL.md](../skills/wp-i18n/SKILL.md)                     | —                                  | translations, text domain, `esc_html_e`        |
+| wp-php-standards  | [skills/wp-php-standards/SKILL.md](../skills/wp-php-standards/SKILL.md)   | php-standards (owns the doc)       | WordPress PHP standard, escaping, phpcs rules  |
+| wp-js-standards   | [skills/wp-js-standards/SKILL.md](../skills/wp-js-standards/SKILL.md)     | frontend-stack (enforcement)       | WordPress JS standard, camelCase, `===`, const |
+| wp-css-standards  | [skills/wp-css-standards/SKILL.md](../skills/wp-css-standards/SKILL.md)   | frontend-stack (enforcement)       | WordPress CSS standard, property ordering      |
+| wp-html-standards | [skills/wp-html-standards/SKILL.md](../skills/wp-html-standards/SKILL.md) | —                                  | WordPress HTML standard, markup, self-closing  |
+| wp-github-actions-standards | [skills/wp-github-actions-standards/SKILL.md](../skills/wp-github-actions-standards/SKILL.md) | verification-chain | GitHub Actions standard, actionlint, zizmor    |
+| wp-accessibility-standards | [skills/wp-accessibility-standards/SKILL.md](../skills/wp-accessibility-standards/SKILL.md) | accessibility (conformance) | accessibility conformance, WCAG levels         |
 
 **Engineering**
 
@@ -413,7 +419,7 @@ every session    ──► session-context: git state line appended to system pr
 | You changed…                      | You must update…                                                                                                          |
 | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | An agent (`agents/`)              | its `description` frontmatter + this hub's [Agents table](#agents-8)                                                      |
-| A skill (`skills/`)               | its `description` frontmatter (the routing table) + [Skills table](#skills-38) + skill-authoring.md if the format changed |
+| A skill (`skills/`)               | its `description` frontmatter (the routing table) + [Skills table](#skills-44) + skill-authoring.md if the format changed |
 | A vendored skill (`gsap-*`)       | never edit in place — bump via `npx skills update -a opencode -g`; inventory unchanged                                    |
 | A command (`commands/`)           | its `description` + [Commands table](#commands-18) + any example walkthrough in the guides that uses it                   |
 | A plugin (`plugins/`)             | its docblock + [Plugins table](#plugins-3) + guide-pro § Plugins                                                          |

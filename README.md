@@ -156,8 +156,9 @@ opencode.json         Global config: permission allow/ask/deny lists, MCP server
 tui.json / tui.jsonc   TUI plugins (subagent statusline; herdr session reporting)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
-skills/               38 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
+skills/               44 skills (wp-plugin, wp-theme, wp-security-audit, fix, verify,
                       review, refactor, tdd, landing-page-conversion-audit,
+                      wp-php/wp-js/wp-css/wp-html/wp-accessibility/wp-github-actions-standards,
                       gsap-core/gsap-scrolltrigger/... vendored from greensock/gsap-skills,
                       frontend-design vendored from anthropics/skills,
                       threejs-* vendored from CloudAI-X/threejs-skills, ...)
