@@ -250,11 +250,6 @@ CLI, CI actions, scaffolded npm/composer stacks, vendored and auto-loaded skills
 the cc-settings / mattpocock lineage — is cited with source and license in the
 [Documentation Hub § External libraries & references](docs/README.md#external-libraries--references).
 
-The WPCS enforcement system also ships as a distributable kit for any agent
-tool: [SnoozleStudio/wp-standards-agent](https://github.com/SnoozleStudio/wp-standards-agent) —
-SKILL.md + portable `AGENTS.md.snippet` + drop-in phpcs/pint/phpstan/husky gate.
-Install into your own agent setup with `npx skills add SnoozleStudio/wp-standards-agent`.
-
 ## Scaffolding new projects
 
 ```powershell

@@ -191,18 +191,13 @@ house integration rules in `frontend-stack.md` override. Refresh with
 | threejs-postprocessing       | [skills/threejs-postprocessing/SKILL.md](../skills/threejs-postprocessing/SKILL.md)   | EffectComposer, bloom, DOF, screen-space effects, WebGPU                       |
 | threejs-interaction          | [skills/threejs-interaction/SKILL.md](../skills/threejs-interaction/SKILL.md)         | raycasting, camera controls, mouse/touch input, object picking                 |
 
-**External (not in this repo — distributable)**
-
-| Project | Where | What it is |
-| ------- | ----- | ---------- |
-| wp-standards-agent | [github.com/SnoozleStudio/wp-standards-agent](https://github.com/SnoozleStudio/wp-standards-agent) | the public, portable version of this repo's guardrails + verification chain: a SKILL.md, an AGENTS.md.snippet for any agent tool, and the drop-in phpcs/pint/phpstan/husky gate. Install via `npx skills add SnoozleStudio/wp-standards-agent`. Source for the WordCamp Pisa 2026 talk |
 
 ### External libraries & references
 
 Every external library, service, or action this config consumes — source, license, and
 pin. Versions are shown as pinned in the config files; "latest known" notes where the
 upstream has moved on. Vendored-skill sources are cited in the Skills inventory above;
-the distributable `wp-standards-agent` project above; upstream attribution also lives in
+upstream attribution also lives in
 `LICENSE` (cc-settings, mattpocock/skills). `nixie-fx` was evaluated for creative-UI
 particles and not adopted (see AGENTS.md learnings log).
 
@@ -224,7 +219,7 @@ particles and not adopted (see AGENTS.md learnings log).
 
 | Tool | Source | License | Notes |
 | ---- | ------ | ------- | ----- |
-| skills CLI (`npx skills`, 1.7.0) | [vercel-labs/skills](https://github.com/vercel-labs/skills) | MIT | vendored-skill install/refresh (`npx skills add/update -a opencode -g`) + wp-standards-agent install |
+| skills CLI (`npx skills`, 1.7.0) | [vercel-labs/skills](https://github.com/vercel-labs/skills) | MIT | vendored-skill install/refresh (`npx skills add/update -a opencode -g`) |
 | bun | [bun.sh](https://bun.sh) | MIT | CI lockfile integrity (`bun install --frozen-lockfile --dry-run`) |
 
 **CI actions (`.github/workflows/ci.yml`)**
