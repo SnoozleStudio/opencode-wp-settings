@@ -19,6 +19,12 @@ knowing exactly what ESLint enforces vs what stays review-only.
 - Writing or reviewing theme/plugin JS (ES modules, components, utilities)
 - Answering "what does the WordPress JS standard say about X"
 
+## Code refactoring
+
+- New or updated code must conform and pass lint; refactoring older files to the
+  standard is not urgent — **whitespace-only patches to working files are strongly
+  discouraged**
+
 ## The standard
 
 ### Spacing
@@ -54,6 +60,8 @@ knowing exactly what ESLint enforces vs what stays review-only.
 - Globals used in a file documented at the top: `/* global passwordStrength:true */`
   (`:true` = defined here, omitted = read-only)
 - jQuery via `( function ( $ ) { ... } )( jQuery );` — never assume a global `$`
+- Files that add to or modify the global `wp` object access it safely:
+  `window.wp = window.wp || {};` at the top — never overwrite existing properties
 
 ### Naming
 
@@ -95,6 +103,10 @@ knowing exactly what ESLint enforces vs what stays review-only.
 - Cache loop maxes: `for ( i = 0, max = getCount(); i < max; i++ )`
 - Iterate jQuery collections only with `$collection.each()`; raw data with native
   iteration — never jQuery for plain objects
+- Underscore collection functions (`_.each`, `_.map`, `_.reduce`) for efficient
+  readable transforms of large data sets; chain with `_.chain( obj ).keys().map( fn ).value()`
+- Type-check with Underscore's `_.isFunction`/`_.isArray`/`_.isUndefined` where
+  Backbone/Underscore are already in use
 
 ## Enforcement mapping
 

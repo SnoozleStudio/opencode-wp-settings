@@ -268,6 +268,8 @@ Standards questions route to the six standards skills — `wp-php-standards`,
 `wp-js-standards`, `wp-css-standards`, `wp-html-standards`,
 `wp-accessibility-standards`, `wp-github-actions-standards` (each distilled from the
 official developer.wordpress.org pages; the PHP skill owns the deep doc).
+The standards are mandatory for Core, recommended for themes/plugins; third-party
+libraries are exempt.
 The summary that must never be violated:
 
 ### Naming & Structure

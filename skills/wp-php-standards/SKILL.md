@@ -9,6 +9,11 @@ The full reference lives in `docs/wordpress-php-standards.md` — load it when w
 or reviewing PHP. This skill is the routing entry point and carries the floor that
 must never be violated (mirrors AGENTS.md).
 
+**Scope** (umbrella page): the standards are mandatory for WordPress Core and
+recommended for themes/plugins; third-party libraries are exempt even when
+integrated. "Coding style" may differ for themes/plugins, but the
+interoperability, translatability, and security best practices are not optional.
+
 ## Goal
 
 Write and review PHP that passes the WordPress Coding Standards gate (phpcs) —
