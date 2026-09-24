@@ -230,7 +230,7 @@ Per the [GitHub Actions Workflow Standard](https://developer.wordpress.org/codin
 | ------ | --- | ------ | ------- |
 | `actions/checkout` | `11d5960...` # v4.4.0 | [actions/checkout](https://github.com/actions/checkout) | MIT |
 | `oven-sh/setup-bun` | `0c5077e...` # v2.2.0 | [oven-sh/setup-bun](https://github.com/oven-sh/setup-bun) | MIT |
-| `shivammathur/setup-php` | `f3e473d...` # v2.37.2 | [shivammathur/setup-php](https://github.com/shivammathur/setup-php) | MIT |
+| `shivammathur/setup-php` | `f3e473d...` # 2.37.2 | [shivammathur/setup-php](https://github.com/shivammathur/setup-php) | MIT |
 | actionlint (binary, `workflows` job) | 1.7.12 | [rhysd/actionlint](https://github.com/rhysd/actionlint) | MIT |
 | zizmor (`pip`, `workflows` job) | 1.30.1 | [zizmorcore/zizmor](https://github.com/zizmorcore/zizmor) | MIT |
 

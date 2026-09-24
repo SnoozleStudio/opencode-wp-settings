@@ -592,7 +592,7 @@ Keep entries terse and factual — one line each.
   Apr 2026) mandates actionlint + zizmor, SHA-pinned actions with version comments,
   `persist-credentials: false` on checkout, `permissions: {}` + per-job grants, and
   env-var injection for untrusted expressions. Verified pins in this repo's ci.yml:
-  checkout v4.4.0 `11d5960...`, setup-bun v2.2.0 `0c5077e...`, setup-php v2.37.2
+  checkout v4.4.0 `11d5960...`, setup-bun v2.2.0 `0c5077e...`, setup-php 2.37.2
   `f3e473d...`, actionlint 1.7.12, zizmor 1.30.1.
 - [2026-09-24] wordpress: WP JS/CSS/HTML standards mandate tabs; Prettier must ship
   `useTabs: true, tabWidth: 4`. ESLint + `@wordpress/eslint-plugin` (v27, flat
