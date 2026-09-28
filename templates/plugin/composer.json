@@ -7,6 +7,7 @@
     "php": ">=8.2"
   },
   "require-dev": {
+    "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
     "laravel/pint": "^1.29",
     "phpcompatibility/php-compatibility": "^9.3",
     "phpstan/phpstan": "^2.0",

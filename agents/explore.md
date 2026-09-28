@@ -9,7 +9,6 @@ permission:
     "grep*": allow
     "Get-ChildItem*": allow
     "Test-Path*": allow
-    "Select-String*": allow
     "git status*": allow
     "git log*": allow
     "git diff*": allow

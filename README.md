@@ -7,7 +7,7 @@ projects with project-specific instructions, coding standards, automated
 verification, and reusable development workflows.
 
 ![CI](https://github.com/SnoozleStudio/opencode-wp-settings/actions/workflows/ci.yml/badge.svg)
-![Checks](https://img.shields.io/badge/checks-6-green.svg)
+![Checks](https://img.shields.io/badge/checks-7-green.svg)
 ![MIT](https://img.shields.io/badge/License-MIT-green.svg)
 ![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-7.0-blue.svg)
@@ -45,11 +45,11 @@ with engineering discipline from [mattpocock/skills](https://github.com/mattpoco
 Every push to `main` validates:
 
 - JSON well-formedness
-- repository structure and frontmatter
+- repository structure and frontmatter (Linux + macOS runners)
 - documentation inventory and internal links
 - verification-chain consistency (docs vs gate plugin)
 - lockfile integrity
-- scaffold dry-run smoke tests
+- scaffold dry-run smoke tests (Linux + macOS runners)
 
 ---
 
@@ -261,18 +261,16 @@ the cc-settings / mattpocock lineage — is cited with source and license in the
 
 Then `npm install && composer install` in the project and run the verification chain.
 
-## Scaffolding from a Local site shell
+## Scaffolding from inside a WordPress checkout
 
-Works with Local 10.x (tested on 10.1.1+6939). Open a site and click **Site Shell**
-(right-click the site → *Site Shell*): the shell starts at the site root,
-`C:\Users\<user>\Local Sites\<site>\app\public` — a WordPress root. On Windows Local's
-site shell opens **Command Prompt by default** (PowerShell/Windows Terminal only when
-set in Local > Preferences), so the entry point is the cmd-native `scaffold.cmd`
-wrapper — it forwards every argument to `setup.ps1` and works from cmd, Git Bash and
-PowerShell alike:
+Works with any stack — XAMPP, MAMP, Local, a Linux checkout, a Docker volume.
+The root is auto-detected by walking up for `wp-load.php`. On Windows the
+shell may be **Command Prompt** (no `&`-calls, no `$HOME`), so the entry point
+is the cmd-native `scaffold.cmd` wrapper — it forwards every argument to
+`setup.ps1` and works from cmd, Git Bash and PowerShell alike:
 
 ```cmd
-:: From the site shell (root auto-detected by walking up for wp-load.php)
+:: From anywhere inside the checkout (root auto-detected)
 "%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mt_ -Name "My Theme"
 "%USERPROFILE%\.config\opencode\scaffold.cmd" -Plugin my-plugin -Install
 ```
@@ -281,12 +279,18 @@ Optionally register the config dir on your user PATH once — then it's a bare
 `scaffold -Theme ...` from any shell. Prefer the env-var editor over `setx PATH
 "%USERPROFILE%\.config\opencode;%PATH%"` — setx truncates PATH beyond 1024 chars.
 
-Prefer PowerShell? Switch Local > Preferences → Shell to PowerShell/Windows Terminal
-and use the direct form instead:
+Prefer PowerShell? Use the direct form instead:
 
 ```powershell
 & "$HOME\.config\opencode\setup.ps1" -Theme mytheme -Prefix mt_ -Name "My Theme"
 ```
+
+### Local site shell
+
+With Local 10.x (tested on 10.1.1+6939), open a site and click **Site Shell**:
+the shell starts at the site root (`C:\Users\<user>\Local Sites\<site>\app\public`
+— a WordPress root). Switch Local > Preferences → Shell to PowerShell/Windows
+Terminal for the direct form above; otherwise `scaffold.cmd` is the entry point.
 
 ### macOS / Linux
 
@@ -302,31 +306,36 @@ script's own location, so any checkout works):
 pwsh -NoProfile -File "$HOME/.config/opencode/setup.ps1" -Site mysite -Theme mytheme -Install
 ```
 
-On macOS, Local's bundled PHP also lives under a `lightning-services` path, so
-`-Install`'s openssl/mbstring php.ini workaround applies the same way. On Linux,
-Local by Flywheel is not supported — use `-NewTheme`/`-NewPlugin` (explicit
-directories) or point `-SitesDir` at an existing WordPress checkout; `-Install`
-uses the system PHP/composer on PATH.
+On macOS/Linux, a bundled PHP with openssl/mbstring disabled (e.g. Local's
+`lightning-services` PHP) gets `-Install`'s php.ini workaround the same way;
+system PHP/composer installs are used untouched.
 
-`setup.ps1` also targets a site from any directory (no site shell needed):
+`setup.ps1` also targets a checkout from any directory (no site shell needed).
+Resolution order: `-WpRoot` (explicit root, any layout — remote mounts,
+non-standard trees) → walk-up from cwd → `-Site` (a directory under
+`-SitesDir`, see below):
 
 ```powershell
 & "$HOME\.config\opencode\setup.ps1" -Site mysite -Theme mytheme -Install
+& "$HOME\.config\opencode\setup.ps1" -WpRoot D:\xampp\htdocs\mysite -Theme mytheme -DryRun
 ```
 
-- `-Theme <slug>` / `-Plugin <slug>` scaffold into `wp-content\themes\<slug>` /
-  `wp-content\plugins\<slug>`; the slug becomes the folder name, text domain and
+- `-Theme <slug>` / `-Plugin <slug>` scaffold into `wp-content/themes/<slug>` /
+  `wp-content/plugins/<slug>`; the slug becomes the folder name, text domain and
   prefix base
-- `-Site <name>` resolves `{Local Sites}\<name>\app\public`; `-SitesDir` overrides the
-  sites folder. From the site shell no `-Site` is needed — the script walks up from
+- `-Site <name>` resolves `{sites-dir}\<name>` when that directory contains
+  `wp-load.php` (XAMPP/MAMP/plain checkouts), else `{sites-dir}\<name>\app\public`
+  (Local layout); `-SitesDir` overrides the sites folder (default `$HOME\Local Sites`,
+  the Local default — point it at `htdocs`, `/var/www`, or any folder).
+  From inside a checkout no `-Site` is needed — the script walks up from
   the current directory until it finds `wp-load.php`
-- `-Install` runs `npm install` + `composer install`. Local's bundled PHP ships with
-  openssl not enabled in its `php.ini` (composer TLS fails), so `-Install` copies the
-  ini to a temp file with openssl enabled and runs composer against it via `PHPRC`
+- `-Install` runs `npm install` + `composer install`. A bundled PHP with openssl
+  disabled in its `php.ini` (composer TLS fails, e.g. Local's build) gets a temp
+  ini with openssl enabled via `PHPRC`
   (environment restored afterwards; system PHP installs are used untouched)
 - Non-empty target dirs are refused without `-Force` (scaffold merges over existing
   files, keeps anything extra)
-- The site shell puts WP-CLI on PATH, so activation is one command:
+- Local's site shell puts WP-CLI on PATH, so activation is one command:
   `wp theme activate mytheme` / `wp plugin activate my-plugin` (or wp-admin:
   Appearance > Themes / Plugins). For themes, sync ACF field groups from `acf-json/`
   on the ACF → Sync page, then `npm run build`

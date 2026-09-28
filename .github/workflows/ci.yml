@@ -20,11 +20,15 @@ jobs:
       - name: Well-formedness
         # bun.lock is bun's text format: JSON-with-trailing-commas by design in
         # every bun version - never strict JSON. The lockfile step below is its
-        # real validation.
+        # real validation. tui.jsonc is JSON-with-comments: full-line //
+        # comments are stripped before jq (full-line only, so inline https://
+        # URLs survive). Block comments and trailing commas still fail — fail
+        # loud: add a real JSONC parser if the file ever needs them.
         run: |
-          for f in opencode.json tui.json tui.jsonc package.json; do
+          for f in opencode.json tui.json package.json; do
             jq empty "$f"
           done
+          sed -e 's/^[[:space:]]*\/\/.*$//' tui.jsonc | jq empty
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - name: Lockfile integrity
         run: bun install --frozen-lockfile --dry-run
@@ -89,6 +93,43 @@ jobs:
         run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix tst_ -Name "Test Plugin" -DryRun
       - name: scaffold.sh dry run (POSIX wrapper path)
         run: ./scaffold.sh -NewTheme "$RUNNER_TEMP/theme-sh" -Slug theme-sh -Prefix tst_ -Name "Test Theme" -DryRun
+      - name: Any-stack root dry runs (-WpRoot + plain-layout -Site)
+        shell: pwsh
+        run: |
+          New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-wp/wp-load.php" -Force
+          pwsh -NoProfile -File setup.ps1 -WpRoot "$env:RUNNER_TEMP/fake-wp" -Theme wproot-tst -Prefix tst_ -Name "Test WpRoot" -DryRun
+          New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-sites/plain-site/wp-load.php" -Force
+          pwsh -NoProfile -File setup.ps1 -Site plain-site -SitesDir "$env:RUNNER_TEMP/fake-sites" -Theme plainsite-tst -Prefix tst_ -Name "Test Plain Site" -DryRun
+
+  macos:
+    name: macOS structure & smoke (Apple proof)
+    runs-on: macos-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - name: setup.ps1 -Validate
+        shell: pwsh
+        run: pwsh -NoProfile -File setup.ps1 -Validate
+      - name: scaffold.sh syntax
+        run: sh -n scaffold.sh
+      - name: scaffold.sh executes
+        run: ./scaffold.sh -Validate
+      - name: Theme template dry run
+        shell: pwsh
+        run: pwsh -NoProfile -File setup.ps1 -NewTheme "$env:RUNNER_TEMP/theme-tst" -Slug theme-tst -Prefix tst_ -Name "Test Theme" -DryRun
+      - name: Plugin template dry run
+        shell: pwsh
+        run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix tst_ -Name "Test Plugin" -DryRun
+      - name: Any-stack root dry runs (-WpRoot + plain-layout -Site)
+        shell: pwsh
+        run: |
+          New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-wp/wp-load.php" -Force
+          pwsh -NoProfile -File setup.ps1 -WpRoot "$env:RUNNER_TEMP/fake-wp" -Theme wproot-tst -Prefix tst_ -Name "Test WpRoot" -DryRun
+          New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-sites/plain-site/wp-load.php" -Force
+          pwsh -NoProfile -File setup.ps1 -Site plain-site -SitesDir "$env:RUNNER_TEMP/fake-sites" -Theme plainsite-tst -Prefix tst_ -Name "Test Plain Site" -DryRun
 
   workflows:
     name: Workflow lint (actionlint + zizmor)

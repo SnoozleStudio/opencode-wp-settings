@@ -9,9 +9,14 @@ const GATE_CACHE_TTL_MS = 120_000;
  * `git commit` / `git push` — also the Windows `git.exe` form and the
  * `git -C <path> …` form (the option precedes the verb; without the optional
  * clause, `-C` in between would swallow the trigger and the gate would never
- * fire for the documented multi-repo path).
+ * fire for the documented multi-repo path). Interposed git flags
+ * (`--no-pager`, `-c key=value`, …) between `git` / `-C <path>` and the verb
+ * are tolerated — otherwise `git --no-pager commit` returns early, ungated.
+ * The flags fragment never matches `;`/`&`/`|` so chained commands cannot be
+ * swallowed into a flag.
  */
-const GIT_OP = /\bgit(\.exe)?(\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+))?\s+(push|commit)\b/i;
+const GIT_OP =
+	/\bgit(\.exe)?(\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+))?(?:\s+-[^\s;&|]+(?:\s+[^\s;&|]+)?)*?\s+(push|commit)\b/i;
 
 /**
  * Opt-out tokens only count as standalone, unquoted arguments. Quoted segments
@@ -20,14 +25,15 @@ const GIT_OP = /\bgit(\.exe)?(\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+))?\s+(push|comm
  */
 const SKIP_TOKEN = /(^|\s)(--no-verify|HUSKY=0|SKIP_GATE=1)(\s|$)/i;
 
-/** `git -C <path>` — the gate can resolve and verify the target repo. */
-const GIT_C = /\bgit(\.exe)?\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+)/i;
+/** `git -C <path>` — the gate can resolve and verify the target repo (flags may precede `-C`). */
+const GIT_C = /\bgit(\.exe)?(?:\s+-[^\s;&|]+(?:\s+[^\s;&|]+)?)*?\s+-C\s*("[^"]+"|'[^']+'|[^\s;&|]+)/i;
 
 /**
- * `cd` / `Set-Location` / `pushd` at a command boundary — the target repo
- * cannot be resolved reliably, so the gate skips with a warning.
+ * `cd` / `Set-Location` / `pushd` / `Push-Location` at a command boundary —
+ * the target repo cannot be resolved reliably, so the gate skips with a
+ * warning.
  */
-const DIR_CHANGE = /(^|[;&|]\s*)(cd|Set-Location|pushd)\s+/i;
+const DIR_CHANGE = /(^|[;&|]\s*)(cd|Set-Location|pushd|Push-Location)\s+/i;
 
 const hasBuildScript = (dir: string): boolean => {
 	try {
@@ -53,9 +59,9 @@ const isGatedProject = (dir: string): boolean =>
  * - the project is not a WordPress theme/plugin (no build script + no phpcs.xml)
  * - the command explicitly opts out (`--no-verify`, `HUSKY=0`, `SKIP_GATE=1` as
  *   standalone, unquoted tokens — mentions inside quotes never skip the gate)
- * - the command changes the working directory (`cd` / `Set-Location` / `pushd`) —
- *   the gate is scoped to the session directory; use `git -C <repo>` to gate
- *   another repo explicitly
+ * - the command changes the working directory (`cd` / `Set-Location` / `pushd` /
+ *   `Push-Location`) — the gate is scoped to the session directory; use
+ *   `git -C <repo>` to gate another repo explicitly
  * - the chain passed within the cache window for the same target repo at the
  *   same HEAD and working-tree state (per-target — one repo's green cache
  *   never green-lights another)

@@ -102,7 +102,7 @@ What's allowed/asked/denied and why:
 | `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*`, `npx -y @upstash/context7-mcp*`, `npx skills add*`, `npx skills update*`        | allow                                          | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
 | `bun run *`                                                                                                                                                   | allow                                          | same, for the Bun runtime (`bunx *` removed — unscoped remote code execution)                     |
 | `git status/diff/log/show/branch/blame/rev-parse/remote/stash/add/commit/push/pull/checkout <branch>`                                                         | allow                                          | read + normal workflow                                                                            |
-| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D *`, `git stash drop/clear`, `git push --force/-f` | **deny**                                       | irreversible history/work-tree damage                                                             |
+| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D/-d *`, `git stash drop/clear`, `git push --force/-f` | **deny**                                       | irreversible history/work-tree damage                                                             |
 | `composer install/dump-autoload/validate/show`                                                                                                                | allow                                          | toolchain                                                                                         |
 | `composer require/update`                                                                                                                                     | ask                                            | dependency changes need your eyes                                                                 |
 | `vendor/bin/phpcs/phpcbf/pint/phpstan`, `php -l`                                                                                                              | allow                                          | lint gates                                                                                        |
@@ -189,7 +189,8 @@ Behavioral details that matter:
   unquoted arguments — quoted segments are stripped first, so a commit message that
   merely mentions `SKIP_GATE=1` still gets gated.
 - **Scope:** the gate verifies the repo the command targets. `git -C <repo> …` resolves
-  and gates `<repo>`; commands that `cd` / `Set-Location` / `pushd` out of the session
+  and gates `<repo>` (flags may precede `-C`, e.g. `git --no-pager -C <repo> commit`);
+  commands that `cd` / `Set-Location` / `pushd` / `Push-Location` out of the session
   directory are exempt (target unresolvable) and skip with a warning — gate those repos
   with `git -C` explicitly.
 - **Windows:** commands run through `cmd.exe /c`, which parses `/` as a switch
@@ -521,26 +522,31 @@ known trap).
 | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `-Validate`                            | structure check: AGENTS.md/opencode.json present; every agent/skill/command has frontmatter + description; skill `name` matches directory; no plain-scalar description contains `: ` (colon+space — would break YAML parsing and kill the component's routing). Exit 1 on failure |
 | `-NewTheme <dir>` / `-NewPlugin <dir>` | scaffold into an explicit local directory (no WP root needed)                                                                                                                                                                                                                     |
-| `-Theme <slug>` / `-Plugin <slug>`     | scaffold into a WordPress root: walked-up root (site shell) or `-Site <name>`                                                                                                                                                                                                     |
-| `-Site <name>` / `-SitesDir <dir>`     | resolve `{Local Sites}\<name>\app\public`; `-SitesDir` overrides the sites root                                                                                                                                                                                                   |
-| `-Install`                             | `npm install` + `composer install` with the Local-PHP workaround                                                                                                                                                                                                                  |
+| `-Theme <slug>` / `-Plugin <slug>`     | scaffold into a WordPress root: `-WpRoot`, walked-up root (any checkout), or `-Site <name>`                                                                                                                                                                                          |
+| `-Site <name>` / `-SitesDir <dir>`     | resolve `{sites-dir}\<name>` with `wp-load.php` (plain layout), else `{sites-dir}\<name>\app\public` (Local layout); `-SitesDir` overrides the sites root (`$HOME\Local Sites` default)                                                                                              |
+| `-WpRoot <path>`                       | explicit WordPress root (any stack, remote mounts, non-standard layouts); wins over walk-up and `-Site`                                                                                                                                                                              |
+| `-Install`                             | `npm install` + `composer install`, with a temp-php.ini workaround when the PHP on PATH is a bundled build with openssl/mbstring disabled                                                                                                                                          |
 | `-Force`                               | scaffold over an existing non-empty target (keeps extra files)                                                                                                                                                                                                                    |
 | `-Slug` / `-Prefix` / `-Name`          | overrides; derived from the target leaf name otherwise                                                                                                                                                                                                                            |
 | `-DryRun`                              | render every file in memory, validate (no stray `{tokens}`, no reserved Windows names, JSON/XML parses), print what would be written — change nothing. A dry run that prints "would write" for a broken scaffold is a lie                                                         |
 
-### Root resolution & the Local workaround
+### Root resolution & the bundled-PHP workaround
 
-- `Resolve-WpRoot` walks up from cwd until `wp-load.php` — that's how the site shell
-  (which starts at `<site>\app\public`) needs no `-Site` argument.
-- `Resolve-LocalSiteRoot` requires `app\public` containing `wp-load.php` and lists
-  available sites when a name misses.
-- **Local's bundled PHP ships with openssl/mbstring disabled** in its `php.ini`, which
-  breaks `composer install` (TLS). `Invoke-ProjectInstall` detects Local's PHP by
-  matching `lightning-services` in the path, writes a temp `php.ini` with
-  `extension=openssl` + `extension=mbstring`, points `$env:PHPRC` at it, installs,
-  and restores the environment (including deleting the temp ini) in `finally`.
-  System PHP installs are used untouched.
-- `scaffold.cmd` is the Windows door: Local's Windows site shell opens
+- `Resolve-WpRoot` walks up from cwd until `wp-load.php` — that's how any checkout
+  (XAMPP htdocs, MAMP, Local's `<site>\app\public`, Linux, Docker volume) needs
+  no extra argument.
+- `Resolve-NamedSiteRoot` takes a `-Site` name under `-SitesDir` and accepts both
+  layouts: the site directory itself (XAMPP/MAMP/plain checkouts) or its
+  `app\public` child (Local). It lists available sites when a name misses. An
+  explicit `-WpRoot` wins over both the walk-up and `-Site`.
+- **Bundled PHP builds (e.g. Local's) may ship with openssl/mbstring disabled**
+  in their `php.ini`, which breaks `composer install` (TLS).
+  `Invoke-ProjectInstall` detects such a build by matching `lightning-services`
+  in the php path, writes a temp `php.ini` with `extension=openssl` +
+  `extension=mbstring`, points `$env:PHPRC` at it, installs, and restores the
+  environment (including deleting the temp ini) in `finally`. System PHP
+  installs are used untouched.
+- `scaffold.cmd` is the Windows door: a site shell on Windows may open
   **cmd.exe by default**, where `&`-call syntax and `$HOME` don't exist. The wrapper
   is a `@echo off` stub that forwards `%*` to
   `powershell -NoProfile -ExecutionPolicy Bypass -File …\setup.ps1` — works from
@@ -549,10 +555,11 @@ known trap).
   `pwsh -NoProfile -File "$(dirname "$0")/setup.ps1"` — the path resolves from the
   script's own location, so any checkout works (no hardcoded `%USERPROFILE%`).
 - Path building is platform-safe throughout (`Join-Path` chains only — no
-  backslash literals), so `-Site`, `-Theme` and `-Plugin` resolve identically on
-  Windows, macOS and Linux. Local's PHP detection (`lightning-services`) matches
-  both Windows and macOS installs; on Linux (Local unsupported) use
-  `-NewTheme`/`-NewPlugin` with explicit directories and system tooling.
+  backslash literals), so `-Site`, `-WpRoot`, `-Theme` and `-Plugin` resolve
+  identically on Windows, macOS and Linux. The bundled-PHP detection
+  (`lightning-services`) matches both Windows and macOS installs; on other
+  stacks (XAMPP/MAMP/system PHP, Linux) `-Install` runs plain
+  `npm`/`composer install` against the tooling on PATH.
 - Encoding discipline: files are written UTF-8 **without BOM**
   (`[System.IO.File]::WriteAllText` + `UTF8Encoding($false)`) — PowerShell 5.1's
   `Set-Content -Encoding UTF8` writes a BOM that breaks things; `Get-Content`
@@ -597,7 +604,9 @@ commands vs the gate's hardcoded steps), lockfile integrity
 (`bun install --frozen-lockfile --dry-run`), scaffold dry runs, and — per the
 official [GitHub Actions Workflow Standard](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/github-actions/) —
 workflow lint (actionlint 1.7.12 + zizmor 1.30.1) with every action SHA-pinned,
-on every push to `main` and every pull request. The README badge is the visible
+on every push to `main` and every pull request. Structure validation and the
+scaffold smoke tests additionally run on `macos-latest`, so macOS is machine-proven
+on every push — not assumed from the Linux run. The README badge is the visible
 proof; the semantic gate stays local in `proof-of-work.ts`.
 
 `/docs-check` remains the semantic companion to the script: description wording,

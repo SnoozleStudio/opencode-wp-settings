@@ -33,6 +33,7 @@
       "git clean *": "deny",
       "git reset --hard*": "deny",
       "git branch -D *": "deny",
+      "git branch -d *": "deny",
       "git stash drop*": "deny",
       "git stash clear*": "deny",
       "git push --force*": "deny",
