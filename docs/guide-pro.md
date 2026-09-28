@@ -155,15 +155,17 @@ Plugins observe and intercept the tool-execution pipeline. The SDK surface used 
 - `experimental.chat.system.transform` — inject into the system prompt
   (session-context status line)
 
-All three import the shared shell runner from `plugins/lib/run.ts` (`run()` +
-`isWin32()`); keep exec-behavior changes there, not in the plugins.
+All three import the shared shell runner from `plugins/lib/run.ts` (`run()`
+everywhere; `isWin32()` additionally in proof-of-work + phpcs-watch); keep
+exec-behavior changes there, not in the plugins.
 
 ### proof-of-work.ts — the commit gate
 
 The heart of the "never ship red" rule:
 
 ```ts
-// plugins/proof-of-work.ts (essence)
+// plugins/proof-of-work.ts (essence — trigger regex simplified; the real
+// GIT_OP also tolerates `git -C <repo>` and interposed flags like --no-pager)
 const gate = async (command: string): Promise<void> => {
   if (!/\bgit(\.exe)?\s+(push|commit)\b/i.test(command)) return; // only gate push/commit
   if (/(^|\s)(--no-verify|HUSKY=0|SKIP_GATE=1)(\s|$)/i.test(command)) return; // documented escapes
@@ -685,8 +687,9 @@ hub's [Agents table](README.md#agents-8) and mention the command in the guides.
 
 The 120s TTL in `plugins/proof-of-work.ts` is a trade-off: fast iterations in a big
 repo vs. stale-green risk. `GATE_CACHE_TTL_MS = 120_000` is the single knob; the
-`lastState` (porcelain output) guard means a changed tree invalidates the cache
-regardless of time. Extending it means editing the constant — and updating the
+per-target cache entry (keyed by `git rev-parse HEAD` + `git status --porcelain`)
+means a changed tree or a branch switch invalidates regardless of time. Extending
+it means editing the constant — and updating the
 hub's [Plugins table](README.md#plugins-3) + this guide's §4 description of the cache.
 
 ### Example D — docs-sync pass on this repo

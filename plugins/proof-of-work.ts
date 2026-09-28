@@ -56,7 +56,8 @@ const isGatedProject = (dir: string): boolean =>
  * the cc-settings "gate" tier — a non-zero exit cannot be ignored.
  *
  * Skipped when:
- * - the project is not a WordPress theme/plugin (no build script + no phpcs.xml)
+ * - the project is not a WordPress theme/plugin (no build script + neither
+ *   phpcs.xml nor composer.json)
  * - the command explicitly opts out (`--no-verify`, `HUSKY=0`, `SKIP_GATE=1` as
  *   standalone, unquoted tokens — mentions inside quotes never skip the gate)
  * - the command changes the working directory (`cd` / `Set-Location` / `pushd` /

@@ -50,6 +50,7 @@ Every push to `main` validates:
 - verification-chain consistency (docs vs gate plugin)
 - lockfile integrity
 - scaffold dry-run smoke tests (Linux + macOS runners)
+- workflow lint (actionlint + zizmor)
 
 ---
 
@@ -228,7 +229,9 @@ All 18 commands, with the skill/agent each invokes, are indexed in the
 ## Skills index
 
 - **WordPress**: `wp-plugin`, `wp-theme`, `wp-security-audit`, `wp-accessibility`,
-  `wp-performance`, `wp-i18n`
+  `wp-performance`, `wp-i18n`, plus the standards family: `wp-php-standards`,
+  `wp-js-standards`, `wp-css-standards`, `wp-html-standards`,
+  `wp-accessibility-standards`, `wp-github-actions-standards`
 - **Engineering**: `fix`, `verify`, `review`, `refactor`, `tdd`, `diagnosing-bugs`,
   `research`, `domain-modeling`
 - **Productivity**: `grill-me`, `grill-with-docs`, `to-spec`, `to-tickets`, `handoff`,

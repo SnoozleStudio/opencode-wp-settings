@@ -48,13 +48,13 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── commands/                18 slash commands (user-invoked workflows)
 ├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper + herdr-agent-state.js (herdr-managed)
 ├── docs/                    this hub + reference docs + the 3 guides
-├── tickets/                 working ticket lists (audit fixes, plans) — see docs/README.md § Tickets
+├── tickets/                 working ticket lists (audit fixes, plans) — see § Tickets below
 ├── templates/               scaffolding sources (theme/, plugin/)
-├── setup.ps1                validation + project scaffolding (cross-platform: Windows/macOS/Linux, Local-aware)
-├── scaffold.cmd             Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
+├── setup.ps1                validation + project scaffolding (cross-platform: Windows/macOS/Linux, stack-neutral)
+├── scaffold.cmd             Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell; any checkout incl. Local site shell)
 ├── scaffold.sh              POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 ├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
-└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, workflow lint (actionlint + zizmor)
+└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, macOS mirror, workflow lint (actionlint + zizmor)
 ```
 
 ### Tickets
@@ -63,8 +63,9 @@ Working ticket lists live in `tickets/` — one markdown file per initiative (e.
 `audit-fixes.md`), written in the to-tickets format (blocked-by/blocks/files/
 acceptance). They are tracking artifacts, not shipped components: a ticket file must
 be listed in the repository map above, but it needs no hub inventory row and no
-guide entry. Close tickets in the file with `- [x]` as they land; delete the file
-when the initiative is done.
+guide entry. Close tickets in the file with `- [x]` as they land; a fully-closed
+file is kept as audit history (do not delete — it is the only record of what the
+initiative proved).
 
 ---
 
@@ -100,8 +101,11 @@ lives here.
 ### Agents (8)
 
 Subagents in `agents/` are specialized workers OpenCode spawns with the
-[Task tool](https://opencode.ai/docs/agents/). Read-only agents cannot edit by
-permission; writers edit strictly within their briefing.
+[Task tool](https://opencode.ai/docs/agents/). Read-only agents cannot edit —
+`planner`/`reviewer` deny all write tools by permission; `explore`/
+`security-auditor` deny `edit` and restrain the rest at the prompt level
+(see [guide-pro.md §5](guide-pro.md#5-agents--the-delegation-decision) for the nuance);
+writers edit strictly within their briefing.
 
 | Agent            | File                                                        | Role                                                 | Read-only |
 | ---------------- | ----------------------------------------------------------- | ---------------------------------------------------- | --------- |
@@ -328,7 +332,8 @@ are TS files built against `@opencode-ai/plugin` (see
 | herdr agent state | [plugins/herdr-agent-state.js](../plugins/herdr-agent-state.js) | `chat.message`, `event`                        | herdr-installed pane integration (managed — do not edit); reports agent/session state to herdr over a named pipe when `HERDR_ENV=1`                                                                                                                   |
 
 All three hook plugins import the shared shell runner [plugins/lib/run.ts](../plugins/lib/run.ts)
-(`run()` + `isWin32()`) — change exec behavior there, not per plugin. `herdr-agent-state.js`
+(`run()` everywhere; `isWin32()` additionally in proof-of-work + phpcs-watch) — change
+exec behavior there, not per plugin. `herdr-agent-state.js`
 is a plain JS plugin installed and managed by herdr; reinstate/update overwrites it.
 
 ### Templates (2)
@@ -357,7 +362,7 @@ truth — adapt, don't reinvent.**
 | [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`)                                                                                                                                                                                                                                                                                  |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1)                     | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally                                                                                               |
 | [verify-chain-consistency.ps1](../scripts/verify-chain-consistency.ps1) | parses the chain from `docs/verification-chain.md` (the single source of truth) and compares it against the steps hardcoded in `plugins/proof-of-work.ts` — exit 1 on drift, so the doc and the gate can't silently diverge                                                                                                           |
-| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned per the WordPress GitHub Actions Workflow Standard |
+| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, macOS structure + smoke mirror (`macos-latest`), workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned per the WordPress GitHub Actions Workflow Standard |
 
 ---
 
