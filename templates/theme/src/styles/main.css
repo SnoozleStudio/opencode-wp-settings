@@ -6,12 +6,46 @@
  */
 
 @theme {
-  --color-ink: #111111;
-  --color-paper: #f5f3ee;
+	--color-ink: #111111;
+	--color-paper: #f5f3ee;
 
-  --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: 'Geist Mono', ui-monospace, monospace;
+	--font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
+	--font-mono: 'Geist Mono', ui-monospace, monospace;
 }
 
-/* Explicit content sources for PHP templates if auto-detection misses them */
-@source '../**/*.php';
+/* Explicit content sources for PHP templates if auto-detection misses them.
+ * Paths are relative to this stylesheet (src/styles/), so theme-root templates
+ * are two levels up. */
+@source '../../*.php';
+@source '../../configure/**/*.php';
+
+/* Accessibility: keep the skip link off-screen until it receives focus. */
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute !important;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.screen-reader-text:focus {
+	background-color: #fff;
+	clip: auto !important;
+	clip-path: none;
+	color: #111;
+	display: block;
+	font-size: 1rem;
+	height: auto;
+	left: 5px;
+	line-height: normal;
+	padding: 15px 23px 14px;
+	text-decoration: none;
+	top: 5px;
+	width: auto;
+	z-index: 100000;
+}

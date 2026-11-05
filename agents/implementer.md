@@ -27,7 +27,7 @@ ask the caller for it — never infer scope:
    code you haven't read.
 2. **Laziness Ladder** — does WordPress core already do it? Reuse before you re-create.
 3. Follow the project conventions in `AGENTS.md` (and project `AGENTS.md` if present):
-   - PHP: `array()`, Yoda conditions, tabs, `ss_`-style prefixes, escaping at output,
+   - PHP: `array()`, Yoda conditions, tabs, `snoozle_`-style prefixes, escaping at output,
      `wp_unslash()` before sanitize, nonces + `current_user_can()`, `$wpdb->prepare()`,
      i18n with text domain, ABSPATH guards
    - JS: ES modules, `const`/`let`, component pattern with cleanup (Tempus unsubscribe,

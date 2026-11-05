@@ -50,7 +50,7 @@ function Get-LinkTargets([string]$Content) {
 }
 
 function Get-HubItems([string]$Prefix) {
-	$content = Get-Content -LiteralPath $HubPath -Raw
+	$content = Get-Content -LiteralPath $HubPath -Raw -Encoding UTF8
 	$items = @()
 	$needle = "../" + $Prefix + "/"
 	foreach ($t in (Get-LinkTargets $content)) {
@@ -85,7 +85,7 @@ function Assert-SetMatch {
 function Assert-LinksResolve([string]$File) {
 	$inFence = $false
 	$lineNo = 0
-	foreach ($line in (Get-Content -LiteralPath $File)) {
+	foreach ($line in (Get-Content -LiteralPath $File -Encoding UTF8)) {
 		$lineNo++
 		if ($line -match '^\s*```') { $inFence = -not $inFence; continue }
 		if ($inFence) { continue }
@@ -152,7 +152,7 @@ $counts = @{
 	"templates" = $templates.Count
 }
 
-$hubContent = Get-Content -LiteralPath $HubPath -Raw
+$hubContent = Get-Content -LiteralPath $HubPath -Raw -Encoding UTF8
 foreach ($k in @("agents", "skills", "commands", "plugins", "templates")) {
 	$title = $k.Substring(0, 1).ToUpper() + $k.Substring(1)
 	$m = [regex]::Match($hubContent, "### " + $title + " \((\d+)\)")
@@ -165,7 +165,7 @@ foreach ($k in @("agents", "skills", "commands", "plugins", "templates")) {
 	}
 }
 
-$readmeContent = Get-Content -LiteralPath $ReadmePath -Raw
+$readmeContent = Get-Content -LiteralPath $ReadmePath -Raw -Encoding UTF8
 $patterns = @{
 	"agents"    = "agents/\s+(\d+) subagents"
 	"skills"    = "skills/\s+(\d+) skills"
@@ -186,7 +186,7 @@ foreach ($k in $patterns.Keys) {
 # --- 2b. Checks badge is measured: the count must match the CI jobs ---
 $wfPath = Join-Path $RepoRoot ".github\workflows\ci.yml"
 if (Test-Path $wfPath) {
-	$wfContent = Get-Content -LiteralPath $wfPath -Raw
+	$wfContent = Get-Content -LiteralPath $wfPath -Raw -Encoding UTF8
 	$jobsSection = ""
 	if ($wfContent -match "(?ms)^jobs:\r?\n(.*?)(?=^\S|\z)") { $jobsSection = $Matches[1] }
 	$jobCount = @([regex]::Matches($jobsSection, '(?m)^  [a-z0-9_-]+:$')).Count

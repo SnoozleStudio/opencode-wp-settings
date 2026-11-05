@@ -20,7 +20,7 @@ $RepoRoot = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $failures = New-Object System.Collections.Generic.List[string]
 
 function Get-DocChainCommands {
-	$doc = Get-Content -LiteralPath (Join-Path $RepoRoot "docs\verification-chain.md") -Raw
+	$doc = Get-Content -LiteralPath (Join-Path $RepoRoot "docs\verification-chain.md") -Raw -Encoding UTF8
 	$m = [regex]::Match($doc, '(?ms)```text\r?\n(.*?)```')
 	if (-not $m.Success) {
 		throw 'docs/verification-chain.md: no ```text code block found'
@@ -35,7 +35,7 @@ function Get-DocChainCommands {
 }
 
 function Get-PluginChainCommands {
-	$plugin = Get-Content -LiteralPath (Join-Path $RepoRoot "plugins\proof-of-work.ts") -Raw
+	$plugin = Get-Content -LiteralPath (Join-Path $RepoRoot "plugins\proof-of-work.ts") -Raw -Encoding UTF8
 	$commands = @()
 	foreach ($mm in [regex]::Matches($plugin, '\[\s*"[A-Za-z][\w:]*"\s*,\s*"([^"]+)"\s*,?\s*\]')) {
 		$commands += $mm.Groups[1].Value.Replace("\\", "/").Replace("\", "/").Trim()

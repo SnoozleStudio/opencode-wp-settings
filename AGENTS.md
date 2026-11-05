@@ -254,7 +254,7 @@ Default stack for Snoozle Studio WordPress work. Framework depth lives in the
 - **ESLint** + `@wordpress/eslint-plugin` (flat config) — JS standard lint gate;
   rides inside `format:all:check`; `.prettierrc` ships `useTabs: true` (WP
   JS/CSS/HTML standards mandate tabs)
-- **Husky** — pre-commit gate (format + lint + phpcs + phpstan)
+- **Husky** — pre-commit gate (build + format + lint + phpcs + phpstan)
 - **PHPUnit/wp-env** — not standard; lint + build is the proof-of-work
 
 Always check latest version before installing: `npm info <package>` / `composer show`.
@@ -275,7 +275,7 @@ The summary that must never be violated:
 ### Naming & Structure
 
 - Functions: lowercase `snake_case`, always prefixed with the project prefix (≥4 chars,
-  e.g. `ss_`, `snoozle_`) — never `wp_`, `__`, or `_` prefixes
+  e.g. `snoozle_`, `mytheme_`) — never `wp_`, `__`, or `_` prefixes
 - Classes: `Class_Name` with underscores, one class per file, file named
   `class-{class-name}.php`; namespace `Prefix\Module\Sub_Module` (uppercase words,
   underscores); `wp`/`WordPress` namespace reserved for core
@@ -631,7 +631,23 @@ Keep entries terse and factual — one line each.
   literal backslash-named dirs on POSIX (use `Join-Path` chains only), and
   `TrimStart('\')` left a leading `/` on POSIX relative paths (trim both
   separators). `scaffold.sh` (POSIX sh, `dirname`-based) is the macOS/Linux
-  counterpart of `scaffold.cmd` (which hardcodes `%USERPROFILE%`). Local PHP
+  counterpart of `scaffold.cmd` (which now resolves its own directory). Local PHP
   detection (`lightning-services` path match) already worked on macOS; Linux has
   no Local — explicit-dir scaffolding. CI smoke job now exercises `scaffold.sh`
   on Ubuntu as the cross-platform proof.
+- [2026-11-05] tooling: OpenCode 1.19.5 parses bash with tree-sitter and matches each
+  command node separately; the guide-pro "whole-string glob" residual was stale.
+  Permission rules are last-match-wins, not "most specific wins".
+- [2026-11-05] wordpress: WPCS PrefixAllGlobals has MIN_PREFIX_LENGTH = 4 (since 3.2);
+  setup.ps1 now rejects short and reserved (`wp`/`wordpress`/`php`) prefixes, and every
+  doc example uses a ≥4-char base. The scaffold CI smoke test uses `test_`.
+- [2026-11-05] tooling: template Prettier config had `useTabs: true` while template
+  sources were 2-space formatted, so every fresh scaffold failed
+  `npm run format:all:check`. Templates are now formatted with their own config and
+  ship `.prettierignore` for `dist/`, `vendor/`, `node_modules/`.
+- [2026-11-05] tooling: phpcs-watch rejected every Windows absolute path because
+  `SAFE_FILE_PATH` excluded `:`; it now normalizes to project-relative paths, parses
+  `apply_patch` `patchText` markers, and reads the `FOUND N ERRORS` summary.
+- [2026-11-05] wordpress: removed the empty, unwired nav-walker stub from the theme
+  template; numbered `nav__item--N` classes come from the `nav_menu_css_class` filter
+  in `configure/utilities.php`, and WordPress core supplies `aria-current`.

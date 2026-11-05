@@ -6,8 +6,13 @@ permission:
   bash:
     "*": ask
     "rg*": allow
+    "rg *--pre*": deny
+    "rg --pre*": deny
     "grep*": allow
     "Get-ChildItem*": allow
+    "Get-ChildItem *Env:*": deny
+    "Get-ChildItem *env:*": deny
+    "Get-ChildItem Env*": deny
     "Test-Path*": allow
     "git status*": allow
     "git log*": allow
@@ -16,9 +21,13 @@ permission:
     "git branch*": allow
     "git branch -D *": deny
     "git branch -d *": deny
+    "git branch -m*": deny
+    "git branch -M*": deny
+    "git branch -f*": deny
+    "git branch --delete*": deny
     "git rev-parse*": allow
     "git ls-files*": allow
-  webfetch: allow
+  webfetch: ask
 steps: 80
 color: info
 ---
@@ -41,7 +50,7 @@ never write code — you produce maps and findings for the calling agent.
    (`add_action`, `add_filter`, `require`, `import`).
 3. Prefer `grep`/`glob` for discovery; `read` with targeted offsets for depth. Don't read
    whole files when a section answers the question.
-4. For large outputs, write summaries to a scratch file and report the path.
+4. For large outputs, summarize in your final message; you cannot write scratch files.
 
 ## WordPress-specific tracing
 

@@ -48,7 +48,7 @@ Every push to `main` validates:
 - repository structure and frontmatter (Linux + macOS runners)
 - documentation inventory and internal links
 - verification-chain consistency (docs vs gate plugin)
-- lockfile integrity
+- lockfile integrity + plugin compile check
 - scaffold dry-run smoke tests (Linux + macOS runners)
 - workflow lint (actionlint + zizmor)
 
@@ -56,9 +56,10 @@ Every push to `main` validates:
 
 ## What you get
 
-- **No vibe coding, enforced** — a hook plugin blocks `git commit` and `git push`
-  until build, format, phpcs, and PHPStan are all green (escape hatch:
-  `--no-verify` / `SKIP_GATE=1` — never the norm)
+- **No vibe coding, enforced** — a hook plugin gates `git commit` and `git push` in
+  WordPress theme/plugin projects until build, format, phpcs, and PHPStan are green.
+  It is best-effort UX, not a security boundary; `--no-verify` / `SKIP_GATE=1` are the
+  documented escapes, never the norm.
 - **WordPress security practices encoded as workflow rules** — escaping at
   output, sanitization, nonces + capability checks, `$wpdb->prepare()`, with a
   dedicated security-auditor agent covering the full attack surface
@@ -153,7 +154,7 @@ This repo closes that gap with engineering discipline, not hope:
 ```
 AGENTS.md             Portable coding standards (guardrails, WP + front-end stack, git)
 LICENSE               MIT license (incl. upstream attribution: cc-settings, mattpocock/skills)
-opencode.json         Global config: permission allow/ask/deny lists, MCP servers
+opencode.json         Global config: permission allow/ask/deny lists, subagent depth, MCP servers
 tui.json / tui.jsonc   TUI plugins (subagent statusline; herdr session reporting)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
@@ -172,10 +173,10 @@ docs/                 Documentation hub + reference docs + 3 guides
 tickets/              Working ticket lists (audit fixes, plans)
 templates/            Scaffolding for new theme and plugin projects
 setup.ps1             Validation + project scaffolding (cross-platform: Windows/macOS/Linux, Local-aware)
-scaffold.cmd          Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell)
+scaffold.cmd          Windows wrapper for setup.ps1 (resolves its own directory; cmd, Git Bash, PowerShell)
 scaffold.sh           POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 scripts/              docs-inventory.ps1 (docs sync) + verify-chain-consistency.ps1 (chain vs gate)
-.github/              CI workflow (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, workflow lint (actionlint + zizmor)
+.github/              CI workflow (ci.yml): JSON, structure, docs inventory, chain consistency, plugin compile, smoke tests, workflow lint (actionlint + zizmor)
 ```
 
 ## How it works
@@ -257,8 +258,8 @@ the cc-settings / mattpocock lineage — is cited with source and license in the
 ## Scaffolding new projects
 
 ```powershell
-.\setup.ps1 -NewTheme ..\wp-content\themes\mytheme -Slug mytheme -Prefix mt_ -Name "My Theme"
-.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myp_ -Name "My Plugin"
+.\setup.ps1 -NewTheme ..\wp-content\themes\mytheme -Slug mytheme -Prefix mytheme_ -Name "My Theme"
+.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myplugin_ -Name "My Plugin"
 .\setup.ps1 -Validate
 ```
 
@@ -274,7 +275,7 @@ is the cmd-native `scaffold.cmd` wrapper — it forwards every argument to
 
 ```cmd
 :: From anywhere inside the checkout (root auto-detected)
-"%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mt_ -Name "My Theme"
+"%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mytheme_ -Name "My Theme"
 "%USERPROFILE%\.config\opencode\scaffold.cmd" -Plugin my-plugin -Install
 ```
 
@@ -285,7 +286,7 @@ Optionally register the config dir on your user PATH once — then it's a bare
 Prefer PowerShell? Use the direct form instead:
 
 ```powershell
-& "$HOME\.config\opencode\setup.ps1" -Theme mytheme -Prefix mt_ -Name "My Theme"
+& "$HOME\.config\opencode\setup.ps1" -Theme mytheme -Prefix mytheme_ -Name "My Theme"
 ```
 
 ### Local site shell
@@ -303,8 +304,8 @@ script's own location, so any checkout works):
 
 ```sh
 # From ~/.config/opencode
-./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mt_ -Name "My Theme"
-./scaffold.sh -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
+./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mytheme_ -Name "My Theme"
+./scaffold.sh -Theme mytheme -Prefix mytheme_ -Name "My Theme" -Install
 # Or call setup.ps1 directly
 pwsh -NoProfile -File "$HOME/.config/opencode/setup.ps1" -Site mysite -Theme mytheme -Install
 ```

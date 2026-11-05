@@ -23,7 +23,7 @@ plugin-slug/
 
 ## Non-negotiables
 
-1. **Prefix everything** — functions `plg_`, classes `Plg_Class`, namespaces
+1. **Prefix everything** — functions `myplugin_`, classes `Myplugin_Class`, namespaces
    `Prefix\Module`, options/transients/hook names all prefixed (≥4 chars). Never `wp_`,
    `__`, `_` prefixes. `function_exists` only for shared libraries.
 2. **Lifecycle contract** — activation: defaults, CPTs, `flush_rewrite_rules()`.

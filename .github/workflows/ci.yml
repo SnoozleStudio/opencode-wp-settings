@@ -30,8 +30,12 @@ jobs:
           done
           sed -e 's/^[[:space:]]*\/\/.*$//' tui.jsonc | jq empty
       - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.3.9
       - name: Lockfile integrity
         run: bun install --frozen-lockfile --dry-run
+      - name: Compile plugins
+        run: bun build plugins/proof-of-work.ts plugins/phpcs-watch.ts plugins/session-context.ts --target=node --outdir="$RUNNER_TEMP/plugin-build"
 
   structure:
     name: Structure & frontmatter
@@ -87,19 +91,19 @@ jobs:
           persist-credentials: false
       - name: Theme template dry run
         shell: pwsh
-        run: pwsh -NoProfile -File setup.ps1 -NewTheme "$env:RUNNER_TEMP/theme-tst" -Slug theme-tst -Prefix tst_ -Name "Test Theme" -DryRun
+        run: pwsh -NoProfile -File setup.ps1 -NewTheme "$env:RUNNER_TEMP/theme-tst" -Slug theme-tst -Prefix test_ -Name "Test Theme" -DryRun
       - name: Plugin template dry run
         shell: pwsh
-        run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix tst_ -Name "Test Plugin" -DryRun
+        run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix test_ -Name "Test Plugin" -DryRun
       - name: scaffold.sh dry run (POSIX wrapper path)
-        run: ./scaffold.sh -NewTheme "$RUNNER_TEMP/theme-sh" -Slug theme-sh -Prefix tst_ -Name "Test Theme" -DryRun
+        run: ./scaffold.sh -NewTheme "$RUNNER_TEMP/theme-sh" -Slug theme-sh -Prefix test_ -Name "Test Theme" -DryRun
       - name: Any-stack root dry runs (-WpRoot + plain-layout -Site)
         shell: pwsh
         run: |
           New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-wp/wp-load.php" -Force
-          pwsh -NoProfile -File setup.ps1 -WpRoot "$env:RUNNER_TEMP/fake-wp" -Theme wproot-tst -Prefix tst_ -Name "Test WpRoot" -DryRun
+          pwsh -NoProfile -File setup.ps1 -WpRoot "$env:RUNNER_TEMP/fake-wp" -Theme wproot-tst -Prefix test_ -Name "Test WpRoot" -DryRun
           New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-sites/plain-site/wp-load.php" -Force
-          pwsh -NoProfile -File setup.ps1 -Site plain-site -SitesDir "$env:RUNNER_TEMP/fake-sites" -Theme plainsite-tst -Prefix tst_ -Name "Test Plain Site" -DryRun
+          pwsh -NoProfile -File setup.ps1 -Site plain-site -SitesDir "$env:RUNNER_TEMP/fake-sites" -Theme plainsite-tst -Prefix test_ -Name "Test Plain Site" -DryRun
 
   macos:
     name: macOS structure & smoke (Apple proof)
@@ -119,17 +123,17 @@ jobs:
         run: ./scaffold.sh -Validate
       - name: Theme template dry run
         shell: pwsh
-        run: pwsh -NoProfile -File setup.ps1 -NewTheme "$env:RUNNER_TEMP/theme-tst" -Slug theme-tst -Prefix tst_ -Name "Test Theme" -DryRun
+        run: pwsh -NoProfile -File setup.ps1 -NewTheme "$env:RUNNER_TEMP/theme-tst" -Slug theme-tst -Prefix test_ -Name "Test Theme" -DryRun
       - name: Plugin template dry run
         shell: pwsh
-        run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix tst_ -Name "Test Plugin" -DryRun
+        run: pwsh -NoProfile -File setup.ps1 -NewPlugin "$env:RUNNER_TEMP/plugin-tst" -Slug plugin-tst -Prefix test_ -Name "Test Plugin" -DryRun
       - name: Any-stack root dry runs (-WpRoot + plain-layout -Site)
         shell: pwsh
         run: |
           New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-wp/wp-load.php" -Force
-          pwsh -NoProfile -File setup.ps1 -WpRoot "$env:RUNNER_TEMP/fake-wp" -Theme wproot-tst -Prefix tst_ -Name "Test WpRoot" -DryRun
+          pwsh -NoProfile -File setup.ps1 -WpRoot "$env:RUNNER_TEMP/fake-wp" -Theme wproot-tst -Prefix test_ -Name "Test WpRoot" -DryRun
           New-Item -ItemType File -Path "$env:RUNNER_TEMP/fake-sites/plain-site/wp-load.php" -Force
-          pwsh -NoProfile -File setup.ps1 -Site plain-site -SitesDir "$env:RUNNER_TEMP/fake-sites" -Theme plainsite-tst -Prefix tst_ -Name "Test Plain Site" -DryRun
+          pwsh -NoProfile -File setup.ps1 -Site plain-site -SitesDir "$env:RUNNER_TEMP/fake-sites" -Theme plainsite-tst -Prefix test_ -Name "Test Plain Site" -DryRun
 
   workflows:
     name: Workflow lint (actionlint + zizmor)
@@ -143,6 +147,7 @@ jobs:
       - name: Install actionlint
         run: |
           curl -fsSL https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz -o actionlint.tar.gz
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  actionlint.tar.gz" | sha256sum -c -
           tar -xzf actionlint.tar.gz
       - name: Run actionlint
         run: ./actionlint

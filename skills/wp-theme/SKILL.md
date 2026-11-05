@@ -22,14 +22,14 @@ theme-slug/
 ├── functions.php            # boot loader (load-order sensitive)
 ├── index.php / front-page.php / page.php / single.php / archive.php / 404.php ...
 ├── template-parts/          # content-{x}.php parts via get_template_part()
-├── configure/               # boot modules (utilities, nav-walker, configure, js-css, acf)
+├── configure/               # boot modules (utilities, configure, js-css, acf)
 ├── acf-json/                # ACF field group sync (save + load paths)
 ├── src/                     # Vite source (scripts/components/*.js, styles/main.css)
 ├── dist/                    # Vite build output (gitignored)
 ├── languages/               # load_theme_textdomain path
 ├── vendor/                  # composer dev tooling (phpcs, pint) — never runtime deps
 ├── package.json / vite.config.mjs / composer.json / phpcs.xml
-└── .husky/pre-commit        # format:all:check + phpcs + phpstan gate
+└── .husky/pre-commit        # build + format:all:check + phpcs + phpstan gate
 ```
 
 ## style.css header (required fields)
@@ -40,20 +40,20 @@ Tags, Domain Path.
 
 ## functions.php boot chain (order matters)
 
-1. `configure/utilities.php` — Vite manifest reader (`ss_get_vite_manifest()` pattern,
+1. `configure/utilities.php` — Vite manifest reader (`snoozle_get_vite_manifest()` pattern,
    static-cached), nav class filters
-2. `configure/nav-walker.php` — `Theme_Slug_Header_Nav_Walker extends Walker_Nav_Menu`
-3. `configure/configure.php` — `after_setup_theme`: menus, thumbnails, title-tag, html5,
+2. `configure/configure.php` — `after_setup_theme`: menus, thumbnails, title-tag, html5,
    textdomain, cleanup (remove emoji/embed/global styles, unused image sizes)
-4. `configure/js-css.php` — manifest-driven enqueue on `wp_enqueue_scripts`
-5. `configure/acf.php` — `acf-json/` save/load paths + `SS_THEME_DIR_PATH` constant
+3. `configure/js-css.php` — manifest-driven enqueue on `wp_enqueue_scripts`
+4. `configure/acf.php` — `acf-json/` save/load paths + `SS_THEME_DIR_PATH` constant
 
-Each file: `if ( ! defined( 'ABSPATH' ) ) { exit; }` guard; `ss_`-style prefixes;
+Each file: `if ( ! defined( 'ABSPATH' ) ) { exit; }` guard; `snoozle_`-style prefixes;
 `function_exists` guards where required.
 
 ## Enqueue (manifest-driven, Vite)
 
-- `vite.config.mjs`: `base` = `/wp-content/themes/{slug}/dist/`, `build.manifest: true`,
+- `vite.config.mjs`: `base` defaults to `/wp-content/themes/{slug}/dist/` (override with
+  `VITE_BASE` for subdirectory installs), `build.manifest: true`,
   entry `src/scripts/main.js`, code-splitting via `rolldownOptions`
 - PHP reads the manifest, enqueues the hashed entry with `['strategy' => 'defer']`,
   rewrites tag to `type="module"` via `script_loader_tag`

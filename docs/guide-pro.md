@@ -88,9 +88,10 @@ permission level, not by prompt discipline.
       "~/.npmrc": "deny",
       "…": "deny",
     },
-    "webfetch": "allow",
+    "webfetch": "ask",
     "skill": { "*": "allow" },
     "task": { "*": "allow" },
+    "chrome-devtools_*": "ask",
   },
 }
 ```
@@ -99,11 +100,12 @@ What's allowed/asked/denied and why:
 
 | Pattern                                                                                                                                                       | Verdict                                        | Rationale                                                                                         |
 | ------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------- |
-| `npm run *`, `npm install` (bare), `npm info *`, `npx prettier*`, `npx tsc*`, `npx -y @upstash/context7-mcp*`, `npx skills add*`, `npx skills update*`        | allow                                          | the verification chain and tooling must never friction-block; anything beyond a bare install asks |
+| `npm run *`, `npm info *`, `npx prettier *`, `npx tsc *`, `npx -y @upstash/context7-mcp*`                                                                     | allow                                          | the verification chain and tooling must never friction-block                                     |
+| `npm install*`, `composer install*`, `composer dump-autoload*`, `npx skills add/update*`                                                                       | ask                                            | install scripts and auto-loaded instructions execute third-party code                             |
 | `bun run *`                                                                                                                                                   | allow                                          | same, for the Bun runtime (`bunx *` removed — unscoped remote code execution)                     |
 | `git status/diff/log/show/branch/blame/rev-parse/remote/stash/add/commit/push/pull/checkout <branch>`                                                         | allow                                          | read + normal workflow                                                                            |
-| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D/-d *`, `git stash drop/clear`, `git push --force/-f` | **deny**                                       | irreversible history/work-tree damage                                                             |
-| `composer install/dump-autoload/validate/show`                                                                                                                | allow                                          | toolchain                                                                                         |
+| `git checkout -- *`, `git checkout .*`, `git restore *`, `git clean *`, `git reset --hard*`, `git branch -D/-d *`, `git stash drop/clear`, `git push --force/-f`, `git push *--force*`, `git push *+*`, `git branch *--delete*`, `git branch *-f *`, `git checkout HEAD -- *` | **deny** | irreversible history/work-tree damage |
+| `composer validate/show`                                                                                                                                      | allow                                          | toolchain                                                                                         |
 | `composer require/update`                                                                                                                                     | ask                                            | dependency changes need your eyes                                                                 |
 | `vendor/bin/phpcs/phpcbf/pint/phpstan`, `php -l`                                                                                                              | allow                                          | lint gates                                                                                        |
 | `wp *`                                                                                                                                                        | ask                                            | WP-CLI mutates the database/site                                                                  |
@@ -114,19 +116,19 @@ What's allowed/asked/denied and why:
 | `sudo *`                                                                                                                                                      | deny                                           | privilege boundary                                                                                |
 | `cat/type` on `~/.ssh/* ~/.aws/* ~/.gnupg/* ~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config`; `Get-Content` on `~/.npmrc ~/.netrc ~/.docker/config.json ~/.kube/config` (+ `$HOME`/`$env:USERPROFILE`/`C:/Users/*` variants) | deny | secret material — `Get-Content ~/.ssh/*` etc. fall through to the generic `ask` (still never auto-allowed) |
 | `cat/type/Get-Content $HOME/* $env:USERPROFILE/* C:/Users/*/.ssh/*`                                                                                           | deny                                           | win32 case variants of the secret paths                                                           |
-| `read`/`edit` of `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**`, `~/.npmrc`, `~/.netrc`, `~/.docker/config.json`, `~/.kube/config`                                   | deny                                           | secrets denied even on read                                                                       |
+| `read`/`edit` of `~/.ssh/**`, `~/.aws/**`, `~/.gnupg/**`, `~/.npmrc`, `~/.netrc`, `~/.docker/config.json`, `~/.kube/config`, `~/.local/share/opencode/auth.json`, GitHub CLI `hosts.yml`, `~/.git-credentials`, `.env*` | deny | secrets denied even on read; `.env.example` is allowed |
+| `edit` of `~/.config/opencode/**`                                                                                                                                 | ask                                            | a prompt-injected session cannot silently rewrite the permission matrix or the gate |
+| `webfetch`                                                                                                                                                      | ask                                            | outbound URL is an exfiltration channel; approve deliberately                                     |
+| `chrome-devtools_*`                                                                                                                                             | ask                                            | MCP tools are outside the read/edit/bash matrix; approve browser automation explicitly            |
 
-> Extending: add patterns by specificity. Broad `*` denies must come after the
-> specific allows — the most specific pattern wins per command.
+> Extending: rules are evaluated in order and **the last matching rule wins** (not
+> "most specific wins"). Put the broad `*` rule first and specific allows/denies after it.
 
-**Known residual — compound commands.** Patterns are whole-string globs: a command
-starting with an allowed prefix matches that allow even when it chains more
-(`npm run build && curl …` matches `npm run *`). This is a documented trade-off — the
-chained tail patterns (`curl … | bash`, `-o` writes) only apply when they match the
-whole string. Agents are instructed to keep compound commands minimal, and the
-destructive denies still fire when the chain itself starts with a denied form. Do
-not "fix" this with trailing-wildcard denies on every allow — they break legitimate
-compound commands (`npm run build && npm run format:all:check`).
+**Command matching.** OpenCode 1.19.5 parses the shell command (tree-sitter bash /
+PowerShell) and evaluates each parsed command separately, so a chained command is
+checked segment by segment (`npm run build && curl ...` matches both rules). There is
+no whole-string residual. Keep compound commands readable anyway — the gate and the
+approval prompt are easier to reason about when one command does one thing.
 
 ---
 
@@ -159,21 +161,26 @@ All three import the shared shell runner from `plugins/lib/run.ts` (`run()`
 everywhere; `isWin32()` additionally in proof-of-work + phpcs-watch); keep
 exec-behavior changes there, not in the plugins.
 
+**Trust boundary:** the gate and phpcs-watch execute the target repository's own
+`npm`/`phpcs` binaries with the inherited environment. Treat a checkout you have not
+reviewed as code execution: inspect `package.json` scripts before committing, and do
+not run the gate in a repository you do not trust.
+
 ### proof-of-work.ts — the commit gate
 
 The heart of the "never ship red" rule:
 
 ```ts
-// plugins/proof-of-work.ts (essence — trigger regex simplified; the real
-// GIT_OP also tolerates `git -C <repo>` and interposed flags like --no-pager)
+// plugins/proof-of-work.ts (essence -- the real trigger masks quoted segments,
+// treats -C case-sensitively, and gates alias commands too)
 const gate = async (command: string): Promise<void> => {
-  if (!/\bgit(\.exe)?\s+(push|commit)\b/i.test(command)) return; // only gate push/commit
-  if (/(^|\s)(--no-verify|HUSKY=0|SKIP_GATE=1)(\s|$)/i.test(command)) return; // documented escapes
-  const target = resolveTarget(command); // git -C <repo> honored; bare cd chains exempt
+  if (!triggersGate(command)) return; // push/commit, aliases, git -C <repo>, interposed flags
+  if (skipToken(command)) return; // --no-verify / HUSKY=0 / SKIP_GATE=1 (standalone, unquoted)
+  const target = resolveTarget(command); // git -C <repo> honored; cd . still gates
   if (!isGatedProject(target)) return; // needs build script + phpcs.xml/composer.json
-  const result = await runChain(target); // build → format:all:check → phpcs → phpstan
+  const result = await runChain(target); // build -> format:all:check -> phpcs -> phpstan
   if (!result.ok)
-    throw new Error(/* "proof-of-work: verification chain failed at …" */);
+    throw new Error(/* "proof-of-work: verification chain failed at ..." */);
 };
 ```
 
@@ -183,18 +190,19 @@ Behavioral details that matter:
   a `build` script in `package.json` AND `phpcs.xml` or `composer.json`. Plain repos
   are untouched.
 - **Cache window:** a green chain is cached 120s **per target repo**, keyed by
-  `git rev-parse HEAD` + `git status --porcelain`. Two repos — or two branches of
-  the same repo — can never share a green cache; an unchanged tree at the same
-  commit is the only thing that skips a re-run.
+  `HEAD` plus a SHA-1 of `git diff HEAD --binary` and every untracked file's content.
+  Two repos — or two branches of the same repo — can never share a green cache;
+  editing an already-dirty file changes the hash, so the chain re-runs.
 - **Escapes:** `--no-verify`, `HUSKY=0`, `SKIP_GATE=1` are explicit opt-outs — the
   escape hatch, not the norm (README guardrails). They only count as standalone,
   unquoted arguments — quoted segments are stripped first, so a commit message that
   merely mentions `SKIP_GATE=1` still gets gated.
-- **Scope:** the gate verifies the repo the command targets. `git -C <repo> …` resolves
-  and gates `<repo>` (flags may precede `-C`, e.g. `git --no-pager -C <repo> commit`);
-  commands that `cd` / `Set-Location` / `pushd` / `Push-Location` out of the session
-  directory are exempt (target unresolvable) and skip with a warning — gate those repos
-  with `git -C` explicitly.
+- **Scope:** the gate verifies the repo the command targets. `git -C <repo> ...`
+  resolves and gates `<repo>` (flags may precede `-C`, e.g. `git --no-pager -C <repo>
+  commit`). `-C` is case-sensitive: `-c key=value` does not become a target. Alias
+  commands (`git -c alias.p=push p`), `~`/`$HOME` targets, and a no-op `cd .` are
+  gated; a `cd` to a *different* directory skips with a warning — gate that repo with
+  `git -C` explicitly.
 - **Windows:** commands run through `cmd.exe /c`, which parses `/` as a switch
   separator — the canonical `vendor/bin/phpcs` form cannot execute there (it splits
   into the command `vendor` plus a switch). The gate rewrites `vendor/bin/<tool>` to
@@ -213,16 +221,22 @@ single-file phpcs pass:
 "tool.execute.after": async (input, output) => {
     if (!["edit", "write", "apply_patch"].includes(input.tool)) return;
     if (!gated()) return;                       // phpcs.xml + phpcs binary present
-    const filePath = String(input.args?.filePath ?? input.args?.path ?? input.args?.file ?? "");
-    if (!filePath.endsWith(".php")) return;
-    const result = await lintFile(filePath);
-    // clean  → output.metadata.phpcs = { status: "clean" }, title prefixed "phpcs ✓"
-    // fail   → metadata gets { status, errors, report }, title prefixed "phpcs ⚠ N error(s)"
+    const raw = input.tool === "apply_patch"
+        ? patchPaths(String(input.args?.patchText ?? ""))   // *** Update/Add File: / Move to:
+        : [String(input.args?.filePath ?? input.args?.path ?? input.args?.file ?? "")];
+    const files = raw.map((p) => normalizeToProject(directory, p)).filter(Boolean);
+    for (const file of files) { /* lintFile(file) -> metadata { status, errors, report } */ }
 };
 ```
 
 The point: **lint feedback arrives with the edit**, not at commit time. The agent
 sees "phpcs ⚠ 3 error(s)" in the tool title and fixes before moving on.
+
+**Paths and patches:** `edit`/`write` pass absolute paths on Windows; the plugin
+resolves them against the project and lints a project-relative path (cmd
+metacharacters are rejected and `..` escapes refused). `apply_patch` passes
+`patchText`, so the plugin parses its `*** Update File:`, `*** Add File:`, and
+`*** Move to:` markers. The error count comes from PHPCS's `FOUND N ERRORS` summary.
 
 **Cooldown:** a _clean_ lint of a file is cached 2s per file — rapid repeated edits of
 the same file don't re-lint until the window passes. A _failed_ lint always re-lints,
@@ -291,9 +305,8 @@ execution-order/lifecycle-hook feature from OpenCode — don't rely on filename 
 
 Eight subagents, three flavors:
 
-**Readers (write-restraint by permission where the config denies, by instruction
-otherwise — explore and security-auditor deny only `edit`, so their
-`write`/`apply_patch` restraint is prompt-level):**
+**Readers (file edits denied by the `edit` permission, which also covers
+`write`/`apply_patch`; bash is an explicit read-only allowlist or `ask`):**
 
 | Agent            | depth    | Use for                                                    |
 | ---------------- | -------- | ---------------------------------------------------------- |
@@ -315,6 +328,11 @@ otherwise — explore and security-auditor deny only `edit`, so their
 | Agent   | depth     | Use for                                                  |
 | ------- | --------- | -------------------------------------------------------- |
 | maestro | 200 steps | 3+ parallel workstreams, phased execution, quality gates |
+
+`maestro` is a subagent, so it can only spawn explore/implementer/reviewer when
+`subagent_depth` is at least 2 — OpenCode defaults to 1, which prevents subagents
+from launching subagents. `opencode.json` sets `"subagent_depth": 2`; raise it to 3
+if a maestro slice itself needs an orchestrator.
 
 ### The Briefing Gate (implementer)
 
@@ -460,29 +478,38 @@ does semantic substitution (namespaces, class names, text domains).
 
 ### Token table (setup.ps1 `Resolve-Args`)
 
-| Token                             | Becomes                            | Example (`-Slug my-plugin -Prefix myp_ -Name "My Plugin"`) |
+| Token                             | Becomes                            | Example (`-Slug my-plugin -Prefix myplugin_ -Name "My Plugin"`) |
 | --------------------------------- | ---------------------------------- | ---------------------------------------------------------- |
 | `{plugin_slug}` / `{plugin-slug}` | slug                               | `my-plugin`                                                |
 | `{plugin_name}`                   | display name                       | `My Plugin`                                                |
 | `{theme_slug}` / `{theme-slug}`   | slug (theme scaffolds)             | `my-theme`                                                 |
 | `{theme_name}`                    | display name (theme scaffolds)     | `My Theme`                                                 |
 | `{text_domain}`                   | slug (text domain must match slug) | `my-plugin`                                                |
-| `{prefix}`                        | prefix, trailing `_` stripped      | `myp`                                                      |
-| `{PREFIX}`                        | prefix upper                       | `MYP`                                                      |
-| `{Prefix}`                        | prefix title-cased                 | `Myp`                                                      |
+| `{prefix}`                        | prefix, trailing `_` stripped      | `myplugin`                                                 |
+| `{PREFIX}`                        | prefix upper                       | `MYPLUGIN`                                                 |
+| `{Prefix}`                        | prefix title-cased                 | `Myplugin`                                                 |
 | `{description}`                   | placeholder description            | `Initial description.`                                     |
 
 Prefix derivation rule: first 4 letters of the slug minus dashes + `_`
-(`my-plugin` → `myp_`); explicit `-Prefix` overrides. Tokens are a
+(`my-plugin` → `mypl_`); explicit `-Prefix` overrides and must also be ≥4
+characters after the trailing underscore. Tokens are a
 `Dictionary[string,string]` (PowerShell 5.1 hashtables are case-insensitive — a
 known trap).
 
 ### Extending a template
 
 - Theme boot chain is **load-order sensitive**: `functions.php` requires
-  `configure/utilities.php` → `nav-walker.php` → `configure.php` → `js-css.php` →
-  `acf.php`. New boot modules join in order; `nav-walker.php` is a fixed filename
-  (the WPCS file-name sniff fires at line 0 — suppressed with `phpcs:disable`).
+  `configure/utilities.php` → `configure.php` → `js-css.php` → `acf.php`. New boot
+  modules join in order. Nav item classes (`nav__item` + numbered `nav__item--N`)
+  come from the `nav_menu_css_class` filter in `utilities.php`; core supplies
+  `aria-current`.
+- **Husky needs a git root.** `npm install` runs `prepare: husky`, but Husky only
+  installs hooks when `.git` exists in the project directory. A scaffold into a fresh
+  directory warns and tells you to `git init` + re-run `npm install`; do that before
+  relying on the local pre-commit gate.
+- **Template formatting is checked.** Template sources are formatted with their own
+  Prettier config (tabs), and `.prettierignore` excludes `dist/`, `vendor/`, and
+  `node_modules/`, so a fresh scaffold passes `npm run format:all:check`.
 - New sections in a live theme: read one existing section first (house pattern),
   then PHP + ACF + escaped output, a `src/scripts/components/{name}.js` component
   (element guard → reduced-motion gate → Tempus → cleanup returned), wire into
@@ -501,8 +528,9 @@ known trap).
   and `public/js/public.js` are plain files enqueued as-is, and `npm run build`
   is a documented no-op (`exit 0`) so the proof-of-work gate's four-step chain
   runs for plugin projects too (the gate requires a `build` script).
-- Both templates ship a `.husky/pre-commit` gate (format:all:check + phpcs +
-  phpstan); the `prepare: husky` script installs the hooks on `npm install`.
+- Both templates ship a `.husky/pre-commit` gate (build + format:all:check +
+  phpcs + phpstan); the `prepare: husky` script installs the hooks on `npm install`
+  only when the project root is a git repository (run `git init` first).
 - Both templates ship `eslint.config.mjs` (flat config, `@wordpress/eslint-plugin`
   v27 — the JS standard lint gate, wired into `format:all:check`) and
   `.github/workflows/ci.yml` (the four-step verification chain in CI, with
@@ -687,8 +715,9 @@ hub's [Agents table](README.md#agents-8) and mention the command in the guides.
 
 The 120s TTL in `plugins/proof-of-work.ts` is a trade-off: fast iterations in a big
 repo vs. stale-green risk. `GATE_CACHE_TTL_MS = 120_000` is the single knob; the
-per-target cache entry (keyed by `git rev-parse HEAD` + `git status --porcelain`)
-means a changed tree or a branch switch invalidates regardless of time. Extending
+per-target cache entry (keyed by `HEAD` plus a content hash of `git diff HEAD
+--binary` and untracked files) means a changed file or branch switch invalidates
+regardless of time. Extending
 it means editing the constant — and updating the
 hub's [Plugins table](README.md#plugins-3) + this guide's §4 description of the cache.
 

@@ -16,11 +16,11 @@ Source: `templates/plugin/`. Copy the tree, then substitute the placeholder slug
 
 1. Rename files/directories containing `{plugin-slug}` (and `{plugin_slug}` in file
    contents) → the plugin slug (dashes)
-2. Replace text-domain, prefix (`plg_`-style, ≥4 chars), namespace, class names
+2. Replace text-domain, prefix (`myplugin_`-style, ≥4 chars), namespace, class names
 3. Ensure the main file header is complete (Plugin Name, Description, Version,
    Requires at least, Requires PHP, Author, License, Text Domain, Domain Path)
 4. `uninstall.php` guarded by `WP_UNINSTALL_PLUGIN`
-5. Run `composer install` + `npm install`, then the verification chain
+5. Run `git init` (standalone project), `composer install` + `npm install`, then the verification chain
 
 ## Greenfield WordPress classic theme
 
@@ -28,14 +28,15 @@ Source: `templates/theme/`. Same substitution flow:
 
 1. `style.css` header: Theme Name, Author, Description, Version, Requires at least,
    Tested up to, Requires PHP, License, Text Domain (slug with dashes)
-2. `functions.php` boot chain: utilities → nav-walker → configure → js-css → acf
+2. `functions.php` boot chain: utilities → configure → js-css → acf
    (load-order sensitive — do not reorder; `configure/acf.php` ships always with
    the save/load filters wired, only `acf-json/` is optional)
-3. `vite.config.mjs` with `base` set to `/wp-content/themes/{slug}/dist/`
+3. `vite.config.mjs` with `base` defaulting to `/wp-content/themes/{slug}/dist/`;
+   set `VITE_BASE` for a WordPress install under a subdirectory
 4. ACF is optional as a runtime plugin: `front-page.php` guards `get_field()` and
    runs without it — but do NOT remove or skip `configure/acf.php`, the boot chain
    requires it unconditionally
-5. Run `npm install`, `composer install`, then the verification chain
+5. Run `git init` (standalone project), `npm install`, `composer install`, then the verification chain
 
 ## New section in an existing theme
 

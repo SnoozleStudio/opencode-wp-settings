@@ -64,13 +64,29 @@ if ( ! function_exists( '{prefix}_get_vite_manifest' ) ) {
 
 if ( ! function_exists( '{prefix}_add_li_class' ) ) {
 	/**
-	 * Add a class to every nav menu <li>.
+	 * Add base and numbered classes to every nav menu <li>.
 	 *
-	 * @param string[] $classes List of classes.
+	 * @param string[] $classes   List of classes.
+	 * @param WP_Post  $menu_item Menu item data object.
+	 * @param stdClass $args      An object of wp_nav_menu() arguments.
+	 * @param int      $depth     Depth of menu item.
 	 * @return string[]
 	 */
-	function {prefix}_add_li_class( $classes ) {
+	function {prefix}_add_li_class( $classes, $menu_item, $args, $depth ) {
+		static $menu_key = '';
+		static $index    = 0;
+
+		$args_array     = (array) $args;
+		$theme_location = isset( $args_array['theme_location'] ) && is_string( $args_array['theme_location'] ) ? $args_array['theme_location'] : '';
+		$key            = spl_object_id( $args ) . '|' . $theme_location;
+		if ( 0 === $depth && $key !== $menu_key ) {
+			$menu_key = $key;
+			$index    = 0;
+		}
+
+		++$index;
 		$classes[] = 'nav__item';
+		$classes[] = 'nav__item--' . $index;
 
 		return $classes;
 	}
@@ -90,5 +106,5 @@ if ( ! function_exists( '{prefix}_add_link_class' ) ) {
 	}
 }
 
-add_filter( 'nav_menu_css_class', '{prefix}_add_li_class' );
+add_filter( 'nav_menu_css_class', '{prefix}_add_li_class', 10, 4 );
 add_filter( 'nav_menu_link_attributes', '{prefix}_add_link_class' );

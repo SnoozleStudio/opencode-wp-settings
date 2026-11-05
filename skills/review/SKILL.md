@@ -26,7 +26,7 @@ the other.
    **Spec axis** — against the originating ask/spec:
    - Does the diff do what was asked? Missing edge cases, incomplete error paths,
      scope creep
-3. Run `vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` and report its
+3. Run `php vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M` and report its
    findings verbatim — don't paraphrase them away
 4. Verdict: APPROVE / APPROVE WITH NITS / REQUEST CHANGES, with numbered findings
    (file:line, severity, concrete fix)

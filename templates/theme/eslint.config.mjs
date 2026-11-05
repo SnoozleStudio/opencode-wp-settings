@@ -18,6 +18,7 @@ export default [
 				ResizeObserver: 'readonly',
 				getComputedStyle: 'readonly',
 				console: 'readonly',
+				process: 'readonly',
 			},
 		},
 	},

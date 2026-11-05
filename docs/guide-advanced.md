@@ -93,13 +93,14 @@ The three hook plugins each cache so they don't burn I/O on every tool call:
 
 | Plugin | Cache | Effect |
 |---|---|---|
-| proof-of-work | 120s per target repo (HEAD + tree state) | a green cache is scoped to one repo at one commit; another repo or branch always re-runs |
+| proof-of-work | 120s per target repo (HEAD + working-tree content hash) | a green cache is scoped to one repo and one exact working-tree state |
 | session-context | 30s | git state line refreshed at most every 30s |
 | phpcs-watch | 2s per file (clean only) | rapid re-edits of a clean file skip the inline lint |
 
 Raise the proof-of-work cache for very slow chains (a heavy build + phpstan on a
-big theme) — but remember the cache is **state-aware**: it compares `git status
---porcelain`, so a changed tree always re-runs the chain. Lower phpcs-watch's
+big theme) — but remember the cache is **content-aware**: it hashes
+`git diff HEAD --binary` plus untracked file contents, so a changed tree always
+re-runs the chain. Lower phpcs-watch's
 cooldown to 0 if you want every edit linted (the cooldown never blocks the commit
 gate, only the inline hint).
 

@@ -1,6 +1,6 @@
 import type { Plugin } from "@opencode-ai/plugin";
 import { existsSync } from "node:fs";
-import { join } from "node:path";
+import { isAbsolute, join, relative, resolve } from "node:path";
 import { isWin32, run } from "./lib/run";
 
 const MAX_REPORT_LINES = 24;
@@ -14,11 +14,25 @@ const MAX_REPORT_LINES = 24;
 const LINT_COOLDOWN_MS = 2_000;
 
 /**
- * Paths are interpolated into a `cmd.exe /c` string. Reject anything carrying
- * cmd metacharacters or quotes up front — a hostile file name must never
- * reach the shell. Spaces are rejected too (they would split the argument).
+ * Paths are interpolated into a `cmd.exe /c` string. Reject cmd
+ * metacharacters and quotes up front; spaces are allowed because the path is
+ * quoted. Drive letters are allowed so Windows absolute paths work.
  */
-const SAFE_FILE_PATH = /^[\w\-./\\]+$/;
+const SAFE_FILE_PATH = /^[A-Za-z0-9 _\-.:\\/]+$/;
+
+const extractPatchPaths = (patchText: string): string[] => {
+	const paths = new Set<string>();
+	for (const pattern of [
+		/^\*\*\* (?:Update|Add) File: (.+)$/gm,
+		/^\*\*\* Move to: (.+)$/gm,
+	]) {
+		for (const match of patchText.matchAll(pattern)) {
+			const value = match[1].trim();
+			if (value) paths.add(value);
+		}
+	}
+	return [...paths];
+};
 
 /**
  * phpcs-watch: after every edit to a `.php` file in a gated project, run a
@@ -43,6 +57,15 @@ export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 	const gated = (): boolean =>
 		existsSync(join(directory, "phpcs.xml")) && phpcsBin() !== null;
 
+	const normalize = (raw: string): string | null => {
+		if (raw === "" || !SAFE_FILE_PATH.test(raw)) return null;
+		const absolute = isAbsolute(raw) ? resolve(raw) : resolve(directory, raw);
+		const rel = relative(directory, absolute);
+		if (rel === "" || rel.startsWith("..") || isAbsolute(rel)) return null;
+		if (!rel.endsWith(".php")) return null;
+		return rel;
+	};
+
 	const lintFile = async (filePath: string): Promise<{ errors: number; report: string }> => {
 		const bin = phpcsBin();
 		if (!bin) return { errors: 0, report: "" };
@@ -51,12 +74,12 @@ export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 			directory
 		);
 		if (out.exitCode === 0) return { errors: 0, report: "" };
-		const report = out.stdout;
-		const errors = (report.match(/^\s*(\d+)\s*ERRORS?\b/im) ??
-			report.match(/ERRORS?\s+(\d+)/im) ??
-			[])[1] ?? "1";
+		const report = out.stdout.length > 0 ? out.stdout : out.stderr;
+		const matched =
+			report.match(/\bFOUND\s+(\d+)\s+ERRORS?\b/i) ?? report.match(/\b(\d+)\s+ERRORS?\b/i);
+		const errors = matched ? Number.parseInt(matched[1], 10) || 1 : 1;
 		return {
-			errors: Number.parseInt(String(errors), 10) || 1,
+			errors,
 			report: report.split("\n").slice(0, MAX_REPORT_LINES).join("\n"),
 		};
 	};
@@ -68,30 +91,45 @@ export const PhpcsWatch = async ({ directory }: Parameters<Plugin>[0]) => {
 		) => {
 			if (!["edit", "write", "apply_patch"].includes(input.tool)) return;
 			if (!gated()) return;
-			const filePath = String(
-				input.args?.filePath ?? input.args?.path ?? input.args?.file ?? ""
-			);
-			if (!filePath.endsWith(".php")) return;
-			if (!SAFE_FILE_PATH.test(filePath)) {
-				output.metadata.phpcs = {
-					status: "skipped",
-					reason: "unsafe path (rejected before reaching the shell)",
-				};
-				return;
+
+			const rawPaths =
+				input.tool === "apply_patch"
+					? extractPatchPaths(String(input.args?.patchText ?? ""))
+					: [String(input.args?.filePath ?? input.args?.path ?? input.args?.file ?? "")];
+			const targets = [
+				...new Set(
+					rawPaths.map(normalize).filter((item): item is string => item !== null)
+				),
+			];
+			if (targets.length === 0) return;
+
+			let failure: { file: string; errors: number; report: string } | null = null;
+			for (const file of targets) {
+				const previous = lastLint.get(file);
+				if (previous && previous.clean && Date.now() - previous.at < LINT_COOLDOWN_MS) continue;
+				const result = await lintFile(file);
+				lastLint.set(file, { at: Date.now(), clean: result.errors === 0 });
+				if (result.errors > 0) {
+					failure = { file, errors: result.errors, report: result.report };
+					break;
+				}
 			}
-			const previous = lastLint.get(filePath);
-			if (previous && previous.clean && Date.now() - previous.at < LINT_COOLDOWN_MS) return;
-			const result = await lintFile(filePath);
-			lastLint.set(filePath, { at: Date.now(), clean: result.errors === 0 });
-			if (result.errors === 0) {
+
+			if (!failure) {
 				output.metadata.phpcs = { status: "clean" };
 				if (!output.title.startsWith("phpcs")) {
 					output.title = `phpcs ✓ ${output.title}`;
 				}
 				return;
 			}
-			output.metadata.phpcs = { status: "fail", errors: result.errors, report: result.report };
-			output.title = `phpcs ⚠ ${result.errors} error(s) — ${output.title}`;
+
+			output.metadata.phpcs = {
+				status: "fail",
+				file: failure.file,
+				errors: failure.errors,
+				report: failure.report,
+			};
+			output.title = `phpcs ⚠ ${failure.errors} error(s) — ${output.title}`;
 		},
 	};
 };

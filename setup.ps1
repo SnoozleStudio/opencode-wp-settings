@@ -70,7 +70,8 @@ Platform notes:
 	name (for -Theme/-Plugin: the slug itself).
 
 .PARAMETER Prefix
-	Function/class prefix (e.g. "ss_"). Default: first 4 letters of slug + "_".
+	Function/class prefix (e.g. "snoozle_"). WPCS requires at least 4 characters
+	after stripping the trailing underscore. Default: first 4 letters of slug + "_".
 
 .PARAMETER Name
 	Human-readable project name. Default: slug title-cased.
@@ -80,15 +81,15 @@ Platform notes:
 
 .EXAMPLE
 	.\setup.ps1 -Validate
-	.\setup.ps1 -NewTheme ..\wp-content\themes\ss -Slug ss -Prefix ss_ -Name "Snoozle Studio"
-	.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myp_ -Name "My Plugin"
+	.\setup.ps1 -NewTheme ..\wp-content\themes\snoozle -Slug snoozle -Prefix snoozle_ -Name "Snoozle Studio"
+	.\setup.ps1 -NewPlugin .\my-plugin -Slug my-plugin -Prefix myplugin_ -Name "My Plugin"
 	# From a site shell on Windows (cmd.exe by default - use scaffold.cmd):
-	scaffold.cmd -Theme mytheme -Prefix mt_ -Name "My Theme"
+	scaffold.cmd -Theme mytheme -Prefix mytheme_ -Name "My Theme"
 	scaffold.cmd -Plugin my-plugin -Install
 	# From inside any WordPress checkout (XAMPP htdocs, MAMP, Local site shell, Linux):
-	.\setup.ps1 -Theme mytheme -Prefix mt_ -Name "My Theme"
+	.\setup.ps1 -Theme mytheme -Prefix mytheme_ -Name "My Theme"
 	# macOS/Linux (POSIX shell; repo at ~/.config/opencode):
-	./scaffold.sh -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
+	./scaffold.sh -Theme mytheme -Prefix mytheme_ -Name "My Theme" -Install
 	# From anywhere, targeting a site by name (plain dir or Local app/public layout):
 	.\setup.ps1 -Site mysite -Theme mytheme -Install
 	# From anywhere, targeting an explicit root (any stack, remote mounts):
@@ -122,7 +123,7 @@ function Write-Warn([string]$Message) { Write-Host "    WARN: $Message" -Foregro
 function Write-Fail([string]$Message) { Write-Host "    FAIL: $Message" -ForegroundColor Red }
 
 function Test-Frontmatter([string]$File, [string]$Kind, [string]$DirName) {
-	$content = Get-Content -LiteralPath $File -Raw -ErrorAction SilentlyContinue
+	$content = Get-Content -LiteralPath $File -Raw -Encoding UTF8 -ErrorAction SilentlyContinue
 	if (-not $content) { Write-Fail "${Kind} $File is empty or unreadable"; return $false }
 	if ($content -notmatch '^---\r?\n') { Write-Fail "${Kind} $File has no frontmatter"; return $false }
 	if ($content -notmatch '(?m)^description:\s*.+') { Write-Fail "${Kind} $File has no description"; return $false }
@@ -165,6 +166,33 @@ function Invoke-Validate {
 	Write-Host "Validation OK." -ForegroundColor Green
 }
 
+function Assert-RenderedFile([string]$Relative, [string]$Dest, [string]$Content) {
+	# Validate BEFORE anything is written: no stray placeholders, no reserved
+	# Windows names, JSON/XML files parse. Both -DryRun and the real write path
+	# run this, so a broken scaffold can never be written silently.
+	$stray = [regex]::Match($Content, '\{[a-zA-Z_][a-zA-Z0-9_-]*\}')
+	if ($stray.Success) {
+		throw "Scaffold validation failed: stray placeholder '$($stray.Value)' in $Relative"
+	}
+	$leaf = Split-Path $Dest -Leaf
+	if ($leaf -match '^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)') {
+		throw "Scaffold validation failed: '$leaf' is a reserved Windows file name"
+	}
+	if ($Relative.EndsWith(".json")) {
+		try {
+			[void](ConvertFrom-Json -InputObject $Content -ErrorAction Stop)
+		} catch {
+			throw "Scaffold validation failed: $Relative is not valid JSON"
+		}
+	} elseif ($Relative.EndsWith(".xml")) {
+		try {
+			[void]([xml]$Content)
+		} catch {
+			throw "Scaffold validation failed: $Relative is not valid XML"
+		}
+	}
+}
+
 function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Tokens) {
 	Write-Step "Scaffolding from $Source"
 	$items = Get-ChildItem -LiteralPath $Source -Recurse -Force
@@ -179,43 +207,26 @@ function Expand-Template([string]$Source, [string]$Destination, [hashtable]$Toke
 			continue
 		}
 		if ($DryRun) {
-			# Render in memory and validate BEFORE anything would be written:
-			# no stray placeholders, no reserved Windows names, JSON/XML files
-			# parse. A dry run that prints "would write" for a broken scaffold
-			# is a lie.
-			$content = Get-Content -LiteralPath $item.FullName -Raw
+			$content = Get-Content -LiteralPath $item.FullName -Raw -Encoding UTF8
 			foreach ($key in $Tokens.Keys) {
 				$content = $content.Replace($key, $Tokens[$key])
 			}
-			$stray = [regex]::Match($content, '\{[a-zA-Z_][a-zA-Z0-9_-]*\}')
-			if ($stray.Success) {
-				throw "Dry-run validation failed: stray placeholder '$($stray.Value)' in $relative"
-			}
-			$leaf = Split-Path $dest -Leaf
-			if ($leaf -match '^(CON|PRN|AUX|NUL|COM[1-9]|LPT[1-9])(\.|$)') {
-				throw "Dry-run validation failed: '$leaf' is a reserved Windows file name"
-			}
-			if ($relative.EndsWith(".json")) {
-				try {
-					[void](ConvertFrom-Json -InputObject $content -ErrorAction Stop)
-				} catch {
-					throw "Dry-run validation failed: $relative is not valid JSON"
-				}
-			} elseif ($relative.EndsWith(".xml")) {
-				try {
-					[void]([xml]$content)
-				} catch {
-					throw "Dry-run validation failed: $relative is not valid XML"
-				}
-			}
+			Assert-RenderedFile $relative $dest $content
 			Write-Ok "would write $relative"
 			continue
 		}
+		if (Test-Path -LiteralPath $dest) {
+			$existing = Get-Item -LiteralPath $dest -Force
+			if ($existing.Attributes -band [System.IO.FileAttributes]::ReparsePoint) {
+				throw "Refusing to write through a symlink/reparse point: $relative"
+			}
+		}
 		New-Item -ItemType Directory -Path (Split-Path $dest -Parent) -Force | Out-Null
-		$content = Get-Content -LiteralPath $item.FullName -Raw
+		$content = Get-Content -LiteralPath $item.FullName -Raw -Encoding UTF8
 		foreach ($key in $Tokens.Keys) {
 			$content = $content.Replace($key, $Tokens[$key])
 		}
+		Assert-RenderedFile $relative $dest $content
 		$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 		[System.IO.File]::WriteAllText($dest, $content, $utf8NoBom)
 		Write-Ok "wrote $relative"
@@ -239,7 +250,10 @@ function Resolve-Args([string]$Target, [string]$Kind) {
 	if (-not $Slug) { $script:Slug = Split-Path $Target -Leaf }
 	if (-not $Prefix) {
 		$letters = ($Slug -replace '-', '')
-		$script:Prefix = $letters.Substring(0, [Math]::Min(4, $letters.Length)) + "_"
+		if ($letters.Length -lt 4) {
+			throw "Cannot derive a 4-character prefix from slug '$Slug' - pass -Prefix with at least 4 characters (e.g. 'myco_')."
+		}
+		$script:Prefix = $letters.Substring(0, 4) + "_"
 	}
 	if (-not $Name) { $script:Name = (Get-Culture).TextInfo.ToTitleCase(($Slug -replace '-', ' ')) }
 
@@ -249,16 +263,24 @@ function Resolve-Args([string]$Target, [string]$Kind) {
 	if ($script:Slug -notmatch '^[a-z0-9][a-z0-9-]*$') {
 		throw "Invalid slug '$script:Slug' - use lowercase letters, digits and hyphens only."
 	}
-	if ($script:Prefix -notmatch '^[a-z_][a-z0-9_]*$') {
-		throw "Invalid prefix '$script:Prefix' - use lowercase letters, digits and underscores only."
+	if ($script:Prefix -notmatch '^[a-z][a-z0-9_]*$') {
+		throw "Invalid prefix '$script:Prefix' - use lowercase letters, digits and underscores only, starting with a letter."
 	}
 	if ($script:Name -notmatch '^[\w .\-]+$') {
 		throw "Invalid name '$script:Name' - use letters, digits, spaces, dots and hyphens only."
 	}
 
 	# The prefix token carries no trailing underscore: templates use
-	# {prefix}_function_name, so prefix "tst_" yields "tst_function_name".
+	# {prefix}_function_name, so prefix "myco_" yields "myco_function_name".
+	# WPCS 3.2+ requires prefixes of at least 4 characters and reserves
+	# wp/wordpress/php - reject those here so a scaffold never starts red.
 	$base = $Prefix.TrimEnd("_")
+	if ($base.Length -lt 4) {
+		throw "Prefix '$Prefix' is too short: WPCS requires at least 4 characters after the trailing underscore (e.g. 'myco_')."
+	}
+	if (@('wp', 'wordpress', 'php') -contains $base.ToLowerInvariant()) {
+		throw "Prefix '$Prefix' is reserved by WordPress/WPCS - choose a project-specific prefix."
+	}
 	$script:Tokens = New-Object "System.Collections.Generic.Dictionary[string,string]"
 	$script:Tokens.Add(("{" + $Kind + "_slug}"), $Slug)
 	$script:Tokens.Add(("{" + $Kind + "-slug}"), $Slug)
@@ -335,6 +357,9 @@ function Assert-EmptyTarget([string]$Target) {
 
 function Invoke-ProjectInstall([string]$Dir) {
 	Write-Step "Installing dependencies in $Dir"
+	if (-not (Test-Path (Join-Path $Dir ".git"))) {
+		Write-Warn "No .git in $Dir - Husky will not install the pre-commit hook. Run 'git init' and 'npm install' again to enable it."
+	}
 	Push-Location $Dir
 	try {
 		if (Get-Command npm -ErrorAction SilentlyContinue) {
@@ -359,7 +384,7 @@ function Invoke-ProjectInstall([string]$Dir) {
 			$phpDir = Split-Path $phpExe.Source -Parent
 			$origIni = Join-Path $phpDir "php.ini"
 			$workaround = "`r`n; setup.ps1 workaround: Local's bundled PHP ships with openssl/mbstring disabled`r`nextension=openssl`r`nextension=mbstring`r`n"
-			$content = if (Test-Path -LiteralPath $origIni) { (Get-Content -LiteralPath $origIni -Raw) + $workaround } else { $workaround }
+			$content = if (Test-Path -LiteralPath $origIni) { (Get-Content -LiteralPath $origIni -Raw -Encoding UTF8) + $workaround } else { $workaround }
 			$tempIni = Join-Path $env:TEMP ("local-php-" + [guid]::NewGuid().ToString("N") + ".ini")
 			[System.IO.File]::WriteAllText($tempIni, $content, (New-Object System.Text.UTF8Encoding($false)))
 			$env:PHPRC = $tempIni
@@ -403,8 +428,12 @@ elseif ($Plugin) {
 
 Resolve-Args $TargetPath $Kind
 Assert-EmptyTarget $TargetPath
-New-Item -ItemType Directory -Path $TargetPath -Force | Out-Null
-$ResolvedTarget = (Resolve-Path -LiteralPath $TargetPath).Path
+if (-not $DryRun) {
+	New-Item -ItemType Directory -Path $TargetPath -Force | Out-Null
+	$ResolvedTarget = (Resolve-Path -LiteralPath $TargetPath).Path
+} else {
+	$ResolvedTarget = [System.IO.Path]::GetFullPath($TargetPath)
+}
 Expand-Template "$RepoRoot\templates\$Kind" $ResolvedTarget $Tokens
 
 if ($Install -and -not $DryRun) {
@@ -414,14 +443,21 @@ if ($Install -and -not $DryRun) {
 if (-not $DryRun) {
 	Write-Step "Next steps"
 	Write-Host "  1. cd $ResolvedTarget"
+	$step = 2
 	if (-not $Install) {
-		Write-Host "  2. npm install"
-		Write-Host "  3. composer install"
-		Write-Host "  4. Edit style.css/readme.txt metadata and ACF field groups"
-		Write-Host "  5. Activate in wp-admin, then run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M / vendor/bin/phpstan analyse --no-progress --memory-limit=1G"
-	} else {
-		Write-Host "  2. Activate in wp-admin (themes: Appearance > Themes; plugins: Plugins)"
-		Write-Host "     ACF field groups load from acf-json/ on the ACF Sync page"
-		Write-Host "  3. Run: npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M / vendor/bin/phpstan analyse --no-progress --memory-limit=1G"
+		Write-Host "  $step. npm install"; $step++
+		Write-Host "  $step. composer install"; $step++
 	}
+	if (-not (Test-Path (Join-Path $ResolvedTarget ".git"))) {
+		Write-Host "  $step. git init (required to install the Husky pre-commit hook)"; $step++
+		Write-Host "     then re-run npm install to install the hook"
+	}
+	if ($Kind -eq "theme") {
+		Write-Host "  $step. Edit style.css metadata and ACF field groups"; $step++
+	} else {
+		Write-Host "  $step. Edit the plugin header and readme.txt metadata"; $step++
+	}
+	Write-Host "  $step. Activate in wp-admin, then run the verification chain:"
+	Write-Host "     npm run build / npm run format:all:check / vendor/bin/phpcs --standard=phpcs.xml -d memory_limit=1024M / vendor/bin/phpstan analyse --no-progress --memory-limit=1G"
+	Write-Host "     On Windows PowerShell/cmd use: php vendor/bin/phpcs ... / php vendor/bin/phpstan ..."
 }

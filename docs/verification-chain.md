@@ -19,6 +19,11 @@ Note: ESLint rides inside `format:all:check` (`npm run format:check && npm run l
 npm run format:php:check`) — the chain stays four steps, the gate and the consistency
 script are unchanged.
 
+Windows note: in PowerShell/cmd, run `php vendor/bin/phpcs ...` and
+`php vendor/bin/phpstan ...`. The extensionless composer bins cannot execute directly
+there; the `proof-of-work` plugin rewrites them to `vendor\bin\<tool>.bat` when it runs
+the chain, but a manual invocation needs the `php` prefix.
+
 ## Rules
 
 1. **Run all four, in order** — build → format:all:check → phpcs → phpstan. An
@@ -38,5 +43,6 @@ script are unchanged.
 - Before every commit or push in a WordPress theme/plugin project
 - On demand: `/check` (chain only) or `/ship` (chain → review → commit)
 
-The templates' `.husky/pre-commit` runs format:all:check + phpcs + phpstan as the
-local gate; the chain above is the full picture.
+The templates' `.husky/pre-commit` runs the full chain — build + format:all:check +
+phpcs + phpstan. It only installs when the project root is a git repository
+(`git init` first); the `proof-of-work` plugin is the independent commit gate.

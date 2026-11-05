@@ -25,14 +25,29 @@ export const run = async (cmd: string, cwd: string): Promise<RunResult> => {
 		const { stdout, stderr } = await execFileAsync(
 			isWin32() ? "cmd.exe" : "/bin/sh",
 			[isWin32() ? "/c" : "-c", cmd],
-			{ cwd, encoding: "utf8" }
+			{
+				cwd,
+				encoding: "utf8",
+				maxBuffer: 32 * 1024 * 1024,
+				timeout: 10 * 60 * 1000,
+				windowsHide: true,
+			}
 		);
 		return { stdout, stderr, exitCode: 0 };
 	} catch (error) {
-		const err = error as { stdout?: string; stderr?: string; code?: number | string };
+		const err = error as {
+			stdout?: string;
+			stderr?: string;
+			code?: number | string;
+			killed?: boolean;
+			signal?: string;
+		};
+		const stderr = typeof err.stderr === "string" ? err.stderr : "";
 		return {
 			stdout: typeof err.stdout === "string" ? err.stdout : "",
-			stderr: typeof err.stderr === "string" ? err.stderr : "",
+			stderr: err.killed
+				? `${stderr}\n[run] command timed out or was killed (${err.signal ?? "unknown signal"})`
+				: stderr,
 			exitCode: typeof err.code === "number" ? err.code : 1,
 		};
 	}

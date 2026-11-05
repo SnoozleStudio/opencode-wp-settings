@@ -2,7 +2,7 @@
  * {plugin_name} front-end behaviour.
  */
 (() => {
-  'use strict';
+	'use strict';
 
-  // Front-end behaviour goes here.
+	// Front-end behaviour goes here.
 })();

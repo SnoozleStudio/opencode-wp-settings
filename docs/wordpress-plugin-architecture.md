@@ -35,7 +35,7 @@ Plugin Name, Plugin URI, Description (<140 chars), Version (semver-compatible wi
 
 ## Naming collision prevention
 
-- Prefix everything global: functions `plg_`, classes `Plg_Class`, namespaces,
+- Prefix everything global: functions `myplugin_`, classes `Myplugin_Class`, namespaces,
   options, transients, hooks, tables — ≥4 chars, not a common English word
 - Forbidden prefixes: `__`, `_`, `wp_`, `WordPress`, sub-ecosystem prefixes
 - `if ( ! function_exists() )` only for shared libraries, not general practice
@@ -53,17 +53,17 @@ Plugin Name, Plugin URI, Description (<140 chars), Version (semver-compatible wi
 render via `settings_fields()` + `do_settings_sections()`; never echo raw options.
 
 ### AJAX
-`add_action( 'wp_ajax_plg_action', ... )` / `wp_ajax_nopriv_` → `check_ajax_referer()` +
+`add_action( 'wp_ajax_myplugin_action', ... )` / `wp_ajax_nopriv_` → `check_ajax_referer()` +
 `current_user_can()`; always `wp_send_json_*` with `wp_die()`.
 
 ### REST (on `rest_api_init`)
 ```php
 register_rest_route(
-    'plg/v1',
+    'myplugin/v1',
     '/items/(?P<id>[\d]+)',
     array(
         'methods'             => WP_REST_Server::READABLE,
-        'callback'            => 'plg_rest_get_item',
+        'callback'            => 'myplugin_rest_get_item',
         'permission_callback' => static function () { return current_user_can( 'edit_posts' ); },
         'args'                => array(
             'id' => array(

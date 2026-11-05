@@ -113,6 +113,10 @@ class {Prefix}_Plugin {
 			return new WP_Error( 'rest_item_not_found', __( 'Item not found.', '{text_domain}' ), array( 'status' => 404 ) );
 		}
 
+		if ( ! current_user_can( 'read_post', $item->ID ) ) {
+			return new WP_Error( 'rest_item_forbidden', __( 'You cannot read this item.', '{text_domain}' ), array( 'status' => 403 ) );
+		}
+
 		return rest_ensure_response(
 			array(
 				'id'    => $item->ID,

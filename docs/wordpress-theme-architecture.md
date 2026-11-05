@@ -38,12 +38,11 @@ Child themes add `Template: parent-slug`. Minimum theme: `index.php` + `style.cs
 
 `functions.php` is a loader only, order is load-order-sensitive:
 
-1. `configure/utilities.php` — manifest reader, nav class filters
-2. `configure/nav-walker.php` — `Theme_Slug_Header_Nav_Walker extends Walker_Nav_Menu`
-   (numbered items, `aria-current="page"`)
-3. `configure/configure.php` — `after_setup_theme`, menus, cleanup
-4. `configure/js-css.php` — enqueues (manifest-driven)
-5. `configure/acf.php` — `acf-json/` save/load paths
+1. `configure/utilities.php` — manifest reader, nav classes (`nav__item`,
+   numbered `nav__item--N` via `nav_menu_css_class`)
+2. `configure/configure.php` — `after_setup_theme`, menus, cleanup
+3. `configure/js-css.php` — enqueues (manifest-driven)
+4. `configure/acf.php` — `acf-json/` save/load paths
 
 Each file: ABSPATH guard, prefixed functions, `function_exists` guards.
 

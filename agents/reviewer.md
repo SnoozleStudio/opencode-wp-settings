@@ -3,8 +3,36 @@ description: Reviewer subagent that reviews diffs on two axes — Standards (doe
 mode: subagent
 permission:
   edit: deny
-  write: deny
-  apply_patch: deny
+  bash:
+    "*": ask
+    "rg*": allow
+    "rg *--pre*": deny
+    "rg --pre*": deny
+    "grep*": allow
+    "Get-ChildItem*": allow
+    "Get-ChildItem *Env:*": deny
+    "Get-ChildItem *env:*": deny
+    "Get-ChildItem Env*": deny
+    "Test-Path*": allow
+    "git status*": allow
+    "git log*": allow
+    "git diff*": allow
+    "git show*": allow
+    "git branch*": allow
+    "git branch -D *": deny
+    "git branch -d *": deny
+    "git branch -m*": deny
+    "git branch -M*": deny
+    "git branch -f*": deny
+    "git branch --delete*": deny
+    "git rev-parse*": allow
+    "git ls-files*": allow
+    "vendor/bin/phpcs*": allow
+    "vendor/bin/phpstan*": allow
+    "php vendor/bin/phpcs*": allow
+    "php vendor/bin/phpstan*": allow
+    "php -l *": allow
+  webfetch: ask
 steps: 60
 color: primary
 ---
@@ -37,7 +65,7 @@ Check the diff against the project's conventions. For WordPress code, specifical
   reduced-motion gates, no `var`
 - **A11y**: skip link, aria attributes, labels, contrast, keyboard operability
 
-Run `vendor/bin/phpcs --standard=phpcs.xml` if available — report its findings, don't
+Run `php vendor/bin/phpcs --standard=phpcs.xml` if available — report its findings, don't
 paraphrase them away.
 
 ## Axis 2 — Spec

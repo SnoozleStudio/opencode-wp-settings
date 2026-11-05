@@ -8,13 +8,14 @@ add the dependency when the feature lands (Three.js always via dynamic
 
 ## Vite 8 for WordPress
 
-- `base`: absolute theme/plugin path — `/wp-content/themes/{slug}/dist/` — or font/asset
-  URLs break (learned the hard way)
+- `base`: defaults to the absolute theme/plugin path — `/wp-content/themes/{slug}/dist/`
+  — or font/asset URLs break. For a WordPress install under a subdirectory, override it
+  at build time with `VITE_BASE=/blog/wp-content/themes/{slug}/dist/`.
 - `build.manifest: true` → `.vite/manifest.json` consumed by PHP enqueue
 - **`rolldownOptions`** is the current key — `build.rollupOptions` is a deprecated alias
   (Vite 8 is Rolldown-based)
 - Code splitting: automatic via `import()`; group vendor chunks via
-  `rolldownOptions.codeSplitting.groups`; keep chunks ≤ ~300KB
+  `rolldownOptions.output.codeSplitting.groups`; keep chunks ≤ ~300KB
 - `build.chunkSizeWarningLimit` (default 500 kB) — raise deliberately for Three.js or
   dynamic-import it instead
 - `emptyOutDir: true` default only when `dist/` is inside root (it is — fine)

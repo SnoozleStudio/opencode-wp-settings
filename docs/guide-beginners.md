@@ -190,13 +190,13 @@ This is deliberate — it prevents building the wrong thing.
 **You say:** (from Local's site shell, i.e. right-click your Local site → _Site Shell_)
 
 ```
-"%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mt_ -Name "My Theme" -Install
+"%USERPROFILE%\.config\opencode\scaffold.cmd" -Theme mytheme -Prefix mytheme_ -Name "My Theme" -Install
 ```
 
 On macOS/Linux (from `~/.config/opencode`):
 
 ```
-./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mt_ -Name "My Theme" -Install
+./scaffold.sh -NewTheme ./mytheme -Slug mytheme -Prefix mytheme_ -Name "My Theme" -Install
 ```
 
 **What happens:** `scaffold.cmd` (Windows) / `scaffold.sh` (macOS/Linux) forwards to
@@ -208,7 +208,8 @@ having openssl disabled), and prints next steps.
 
 **What you get:** a complete enterprise theme skeleton — style.css header, functions.php
 boot chain, Vite + Tailwind v4, acf-json save/load wiring, phpcs gate. Then: activate it, sync ACF field
-groups, run the verification chain.
+groups, run the verification chain. If this is a standalone project, run `git init` so the
+Husky pre-commit hook installs (setup.ps1 warns when `.git` is missing).
 
 > From any directory (no site shell): `& "$HOME\.config\opencode\setup.ps1" -Site mysite -Theme mytheme -Install`
 > In OpenCode itself, `/theme mytheme` does the same via the scaffolder agent.

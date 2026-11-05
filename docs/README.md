@@ -54,7 +54,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── scaffold.cmd             Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell; any checkout incl. Local site shell)
 ├── scaffold.sh              POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 ├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
-└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, smoke tests, macOS mirror, workflow lint (actionlint + zizmor)
+└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, plugin compile, smoke tests, macOS mirror, workflow lint (actionlint + zizmor)
 ```
 
 ### Tickets
@@ -102,8 +102,10 @@ lives here.
 
 Subagents in `agents/` are specialized workers OpenCode spawns with the
 [Task tool](https://opencode.ai/docs/agents/). Read-only agents cannot edit —
-`planner`/`reviewer` deny all write tools by permission; `explore`/
-`security-auditor` deny `edit` and restrain the rest at the prompt level
+`planner`/`reviewer` deny `edit` and run a read-only bash allowlist (git
+diff/log/show/status, rg/grep, phpcs/phpstan); `explore` denies `edit`, denies
+`rg --pre` and `Get-ChildItem Env:`, and asks for `webfetch`; `security-auditor`
+denies `edit` and asks for every bash command
 (see [guide-pro.md §5](guide-pro.md#5-agents--the-delegation-decision) for the nuance);
 writers edit strictly within their briefing.
 
@@ -217,7 +219,7 @@ particles and not adopted (see AGENTS.md learnings log).
 
 | Name | Source | License | Notes |
 | ---- | ------ | ------- | ----- |
-| opencode-subagent-statusline (resolved 1.3.0) | [Joaquinvesapa/sub-agent-statusline](https://github.com/Joaquinvesapa/sub-agent-statusline) | MIT | unpinned in `tui.json` — resolves at install |
+| opencode-subagent-statusline (pinned 0.7.2) | [Joaquinvesapa/sub-agent-statusline](https://github.com/Joaquinvesapa/sub-agent-statusline) | MIT | pinned in `tui.json` — bump deliberately |
 | herdr (opencode integration v10) | [herdr.dev](https://herdr.dev) · [herdrdev/herdr](https://github.com/herdrdev/herdr) | Apache-2.0 | the runtime that owns this terminal; installs two **managed** files — `herdr-tui-session.js` and `plugins/herdr-agent-state.js` — reinstalled/overwritten by herdr, never edit |
 
 **Tooling CLIs**
@@ -326,8 +328,8 @@ are TS files built against `@opencode-ai/plugin` (see
 
 | Plugin          | File                                                        | Hooks                                         | Behavior                                                                                                                                                                              |
 | --------------- | ----------------------------------------------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Proof of work   | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts)     | `tool.execute.before` (bash)                  | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only; session-directory scoped — `git -C <repo>` honored, bare `cd` chains exempt) |
-| phpcs-watch     | [plugins/phpcs-watch.ts](../plugins/phpcs-watch.ts)         | `tool.execute.after` (edit/write/apply_patch) | single-file phpcs pass after every `.php` edit; surfaces findings inline                                                                                                              |
+| Proof of work   | [plugins/proof-of-work.ts](../plugins/proof-of-work.ts)     | `tool.execute.before` (bash)                  | blocks `git push`/`git commit` until build + format + phpcs + phpstan are green (gated WP projects only; `git -C` honored, `-c`/`-C` distinguished, aliases and `cd .` gated; cache keyed by HEAD + working-tree content hash) |
+| phpcs-watch     | [plugins/phpcs-watch.ts](../plugins/phpcs-watch.ts)         | `tool.execute.after` (edit/write/apply_patch) | single-file phpcs pass after every `.php` edit; normalizes Windows absolute paths, parses `apply_patch` patchText markers, surfaces findings inline |
 | Session context | [plugins/session-context.ts](../plugins/session-context.ts) | `experimental.chat.system.transform`          | appends "Git state: branch, N uncommitted file(s)" to the system prompt                                                                                                               |
 | herdr agent state | [plugins/herdr-agent-state.js](../plugins/herdr-agent-state.js) | `chat.message`, `event`                        | herdr-installed pane integration (managed — do not edit); reports agent/session state to herdr over a named pipe when `HERDR_ENV=1`                                                                                                                   |
 
@@ -346,23 +348,23 @@ truth — adapt, don't reinvent.**
 
 | Template | Directory                               | Produces                                                                                                                                                                                                                                                                                                                                   |
 | -------- | --------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Theme    | [templates/theme](../templates/theme)   | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → nav-walker → configure → js-css → acf), acf-json save/load wiring, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs), eslint.config.mjs (flat, @wordpress/eslint-plugin), `.github/workflows/ci.yml` (verification chain, standard-compliant pins) |
+| Theme    | [templates/theme](../templates/theme)   | Vite + Tailwind v4 classic theme: style.css header, functions.php boot chain (utilities → configure → js-css → acf), acf-json save/load wiring, runnable src/ example component (hero.js — GSAP intro + Tempus parallax, cleanup returned), ACF-optional front page (guarded `get_field()`), .husky, phpstan.neon (ACF stubs), eslint.config.mjs (flat, @wordpress/eslint-plugin), `.github/workflows/ci.yml` (verification chain, standard-compliant pins) |
 | Plugin   | [templates/plugin](../templates/plugin) | classic plugin: main-file header, activation/deactivation rewrite hooks, uninstall.php, admin/includes/public split with a working settings page (register_setting + example field), shipped public.css/public.js assets, .husky pre-commit gate, phpcs.xml, composer.json, phpstan.neon, eslint.config.mjs (flat, @wordpress/eslint-plugin), `.github/workflows/ci.yml` (verification chain, standard-compliant pins)                                                                                                                   |
 
 ### Scripts & config
 
 | File                                                                    | Purpose                                                                                                                                                                                                                                                                                                                               |
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| [setup.ps1](../setup.ps1)                                               | `-Validate` repo structure/frontmatter (incl. the YAML colon-space guard — `: ` in a plain-scalar description breaks parsing); `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into any WordPress checkout (walk-up for `wp-load.php`, `-Site <name>` with plain or `app/public` layout auto-detect, or explicit `-WpRoot`); `-Install` npm+composer (temp-php.ini openssl workaround for bundled PHP builds with openssl/mbstring disabled); `-Force`, `-DryRun`. Cross-platform: Windows PowerShell 5.1+ and pwsh 7+ (macOS/Linux); stack-neutral (XAMPP/MAMP/Local/Linux/Docker) |
-| [scaffold.cmd](../scaffold.cmd)                                         | Windows wrapper (cmd/Git Bash/PowerShell) forwarding to setup.ps1 — the entry point from Local's site shell |
-| [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets deny, `node -e` deny), MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                                                                                                                                                                     |
-| [tui.json](../tui.json)                                                 | TUI plugin `opencode-subagent-statusline`                                                                                                                                                                                                                                                                                             |
+| [setup.ps1](../setup.ps1)                                               | `-Validate` repo structure/frontmatter (incl. the YAML colon-space guard — `: ` in a plain-scalar description breaks parsing); `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into any WordPress checkout (walk-up for `wp-load.php`, `-Site <name>` with plain or `app/public` layout auto-detect, or explicit `-WpRoot`); `-Install` npm+composer (temp-php.ini openssl workaround for bundled PHP builds with openssl/mbstring disabled); validates the prefix (≥4 chars, not `wp`/`wordpress`/`php`), validates every rendered file on real writes too, reads templates as UTF-8, and `-DryRun` changes nothing. Cross-platform: Windows PowerShell 5.1+ and pwsh 7+ (macOS/Linux); stack-neutral (XAMPP/MAMP/Local/Linux/Docker) |
+| [scaffold.cmd](../scaffold.cmd)                                         | Windows wrapper (cmd/Git Bash/PowerShell) forwarding to the setup.ps1 next to it — works from any checkout, including Local's site shell |
+| [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets + credential-store denies, `node -e` deny, installs/skill updates ask, `webfetch` + `chrome-devtools_*` ask, config-repo edits ask), `subagent_depth: 2` for maestro, MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                       |
+| [tui.json](../tui.json)                                                 | TUI plugin `opencode-subagent-statusline@0.7.2` (pinned)                                                                                                                                                                                                                                                                              |
 | [tui.jsonc](../tui.jsonc)                                               | herdr TUI integration (`./herdr-tui-session.js` — session selection reporting; installed/managed by herdr)                                                                                                                                                                                                                             |
 | [package.json](../package.json) / [bun.lock](../bun.lock)               | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq)                                                                                                                                                                             |
 | [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`)                                                                                                                                                                                                                                                                                  |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1)                     | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally                                                                                               |
 | [verify-chain-consistency.ps1](../scripts/verify-chain-consistency.ps1) | parses the chain from `docs/verification-chain.md` (the single source of truth) and compares it against the steps hardcoded in `plugins/proof-of-work.ts` — exit 1 on drift, so the doc and the gate can't silently diverge                                                                                                           |
-| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, macOS structure + smoke mirror (`macos-latest`), workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned per the WordPress GitHub Actions Workflow Standard |
+| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, plugin compile (`bun build`), `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, macOS structure + smoke mirror (`macos-latest`), workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned, actionlint verified by SHA-256, Bun pinned to 1.3.9 per the WordPress GitHub Actions Workflow Standard |
 
 ---
 
@@ -404,7 +406,7 @@ Plugin wiring (run inside the OpenCode process):
 
 ```
 edit a .php file ──► phpcs-watch: single-file phpcs pass, inline findings
-git push/commit  ──► proof-of-work: chain gate (skips non-WP projects; --no-verify/SKIP_GATE=1 as standalone tokens; git -C honored, bare cd chains exempt)
+git push/commit  ──► proof-of-work: chain gate (skips non-WP projects; --no-verify/SKIP_GATE=1 as standalone tokens; git -C honored, a cd to another directory warns)
 every session    ──► session-context: git state line appended to system prompt
 ```
 
