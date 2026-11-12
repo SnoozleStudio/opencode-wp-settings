@@ -48,9 +48,12 @@ project/.opencode/             ← project-scoped agents/skills/commands — ext
 - `tui.json` loads the TUI plugin `opencode-subagent-statusline` (subagent status in
   the terminal UI). `tui.jsonc` + `herdr-tui-session.js` (root) are the herdr TUI
   integration — installed and managed by herdr, not edited here.
-- `plugins/*.ts` are the three hook plugins; `plugins/herdr-agent-state.js` is a
-  herdr-installed JS plugin reporting agent state to the herdr pane (also managed,
-  do not edit).
+- `plugins/*.ts` are the three hook plugins; `plugins/lib/run.ts` is the shared shell
+  runner and `plugins/lib/gate.ts` holds the proof-of-work trigger/skip/target
+  helpers. OpenCode v1 treats **every named export in a plugin file as a plugin
+  factory** — `proof-of-work.ts` exports only `ProofOfWork`; keep test helpers in
+  `lib/`. `plugins/herdr-agent-state.js` is a herdr-installed JS plugin reporting
+  agent state to the herdr pane (also managed, do not edit).
 
 **Security model in one line:** the AI may run many things without asking, may ask on
 sensitive ones, and **cannot** touch secrets or destructive git operations — at the
@@ -130,6 +133,21 @@ checked segment by segment (`npm run build && curl ...` matches both rules). The
 no whole-string residual. Keep compound commands readable anyway — the gate and the
 approval prompt are easier to reason about when one command does one thing.
 
+### Ambient instructions
+
+`opencode.json` also sets:
+
+```json
+"instructions": ["~/.config/opencode/docs/README.md"]
+```
+
+OpenCode v1 combines instruction files with `AGENTS.md`. Relative instruction paths
+are resolved with `globUp` from the **current project/worktree**, not from the global
+config directory, so the `~/` form is required for a global config. The hub is the
+index (~4.2k words / ~6k tokens per session): every other doc under `docs/` is linked
+from it, and `AGENTS.md` tells the agent to read the matching doc on demand. Do not switch
+this to `docs/*.md` unless you accept ~25–35k tokens and rewrite the on-demand rule.
+
 ---
 
 ## 3. MCP servers
@@ -159,7 +177,9 @@ Plugins observe and intercept the tool-execution pipeline. The SDK surface used 
 
 All three import the shared shell runner from `plugins/lib/run.ts` (`run()`
 everywhere; `isWin32()` additionally in proof-of-work + phpcs-watch); keep
-exec-behavior changes there, not in the plugins.
+exec-behavior changes there, not in the plugins. The gate's pure helpers live in
+`plugins/lib/gate.ts` — never export them from `proof-of-work.ts`, because the v1
+plugin loader invokes every named export as a plugin factory.
 
 **Trust boundary:** the gate and phpcs-watch execute the target repository's own
 `npm`/`phpcs` binaries with the inherited environment. Treat a checkout you have not

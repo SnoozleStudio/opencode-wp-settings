@@ -12,6 +12,11 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 > - I'm tuning agent budgets, skill routing, or plugin caches → [Level 3 Guide](guide-advanced.md)
 > - I need a specific reference → use the indexes below
 
+> **Ambient index.** `opencode.json` loads this hub via
+> `"instructions": ["~/.config/opencode/docs/README.md"]`. It is the map, not the
+> full reference set: read the specific doc it links **on demand**, and resolve
+> relative links against this directory.
+
 ---
 
 ## Contents
@@ -46,7 +51,7 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── agents/                  8 subagents (specialized workers OpenCode spawns)
 ├── skills/                  44 skills (reusable disciplines; auto-matched by description)
 ├── commands/                18 slash commands (user-invoked workflows)
-├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` helper + herdr-agent-state.js (herdr-managed)
+├── plugins/                 3 hook plugins (proof-of-work gate, phpcs-watch, session-context) + shared `lib/run.ts` + `lib/gate.ts` helpers + herdr-agent-state.js (herdr-managed)
 ├── docs/                    this hub + reference docs + the 3 guides
 ├── tickets/                 working ticket lists (audit fixes, plans) — see § Tickets below
 ├── templates/               scaffolding sources (theme/, plugin/)
@@ -72,9 +77,9 @@ initiative proved).
 
 ## Reference docs index
 
-Every reference doc, what it governs, and who loads it. Skills load their docs
-**on demand** (see [Dependency map](#dependency-map)) — SKILL.md stays lean, the depth
-lives here.
+Every reference doc, what it governs, and who loads it. This hub is ambient via
+`opencode.json`; the docs it links load **on demand** (see
+[Dependency map](#dependency-map)) — SKILL.md stays lean, the depth lives here.
 
 | Doc                                                                  | Governs                                                                        | Loaded by                               | Read it when                                      |
 | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ | --------------------------------------- | ------------------------------------------------- |
@@ -336,8 +341,11 @@ are TS files built against `@opencode-ai/plugin` (see
 
 All three hook plugins import the shared shell runner [plugins/lib/run.ts](../plugins/lib/run.ts)
 (`run()` everywhere; `isWin32()` additionally in proof-of-work + phpcs-watch) — change
-exec behavior there, not per plugin. `herdr-agent-state.js`
-is a plain JS plugin installed and managed by herdr; reinstate/update overwrites it.
+exec behavior there, not per plugin. The gate's pure trigger/skip/target helpers live
+in [plugins/lib/gate.ts](../plugins/lib/gate.ts); `plugins/proof-of-work.ts` exports
+**only** `ProofOfWork`, because OpenCode v1 treats every named export in a plugin file
+as a plugin factory. `herdr-agent-state.js` is a plain JS plugin installed and managed
+by herdr; reinstate/update overwrites it.
 
 ### Templates (2)
 
@@ -358,7 +366,7 @@ truth — adapt, don't reinvent.**
 | ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [setup.ps1](../setup.ps1)                                               | `-Validate` repo structure/frontmatter (incl. the YAML colon-space guard — `: ` in a plain-scalar description breaks parsing); `-NewTheme`/`-NewPlugin` local dirs; `-Theme`/`-Plugin` into any WordPress checkout (walk-up for `wp-load.php`, `-Site <name>` with plain or `app/public` layout auto-detect, or explicit `-WpRoot`); `-Install` npm+composer (temp-php.ini openssl workaround for bundled PHP builds with openssl/mbstring disabled); validates the prefix (≥4 chars, not `wp`/`wordpress`/`php`), validates every rendered file on real writes too, reads templates as UTF-8, and `-DryRun` changes nothing. Cross-platform: Windows PowerShell 5.1+ and pwsh 7+ (macOS/Linux); stack-neutral (XAMPP/MAMP/Local/Linux/Docker) |
 | [scaffold.cmd](../scaffold.cmd)                                         | Windows wrapper (cmd/Git Bash/PowerShell) forwarding to the setup.ps1 next to it — works from any checkout, including Local's site shell |
-| [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets + credential-store denies, `node -e` deny, installs/skill updates ask, `webfetch` + `chrome-devtools_*` ask, config-repo edits ask), `subagent_depth: 2` for maestro, MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                       |
+| [opencode.json](../opencode.json)                                       | permission matrix (bash allowlist/ask/deny, secrets + credential-store denies, `node -e` deny, installs/skill updates ask, `webfetch` + `chrome-devtools_*` ask, config-repo edits ask), `subagent_depth: 2` for maestro, ambient instructions `~/.config/opencode/docs/README.md`, MCP servers: context7 + chrome-devtools (both enabled, version-pinned)                                                                        |
 | [tui.json](../tui.json)                                                 | TUI plugin `opencode-subagent-statusline@0.7.2` (pinned)                                                                                                                                                                                                                                                                              |
 | [tui.jsonc](../tui.jsonc)                                               | herdr TUI integration (`./herdr-tui-session.js` — session selection reporting; installed/managed by herdr)                                                                                                                                                                                                                             |
 | [package.json](../package.json) / [bun.lock](../bun.lock)               | runtime dependency `@opencode-ai/plugin` for `plugins/*.ts`; bun.lock is bun's text format (JSON-with-trailing-commas — validated by bun in CI, never jq)                                                                                                                                                                             |

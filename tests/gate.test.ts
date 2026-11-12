@@ -5,9 +5,16 @@ import {
 	isGateCandidate,
 	isGateSkip,
 	resolveGateTarget,
-} from "../plugins/proof-of-work";
+} from "../plugins/lib/gate";
+import * as proofOfWorkPlugin from "../plugins/proof-of-work";
 
 const dir = join(homedir(), "fake-project");
+
+describe("plugin module shape", () => {
+	test("exports only the plugin factory", () => {
+		expect(Object.keys(proofOfWorkPlugin)).toEqual(["ProofOfWork"]);
+	});
+});
 
 describe("gate trigger", () => {
 	test("push/commit trigger", () => {

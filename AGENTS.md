@@ -454,6 +454,15 @@ full output in context.
 Place critical information at the **beginning** and **end** of context. The middle
 receives less attention (lost-in-middle effect).
 
+### Documentation Loading
+
+`opencode.json` loads `~/.config/opencode/docs/README.md` as ambient instructions.
+That file is the **index**, not the full reference set: every other doc under
+`~/.config/opencode/docs/` is linked from it. Read the specific doc a task needs
+**on demand** — do not preload the whole `docs/` tree. Resolve the hub's relative
+links against `~/.config/opencode/docs/`, and treat a loaded doc as mandatory
+guidance for that task.
+
 ---
 
 ## Knowledge Routing
@@ -655,3 +664,13 @@ Keep entries terse and factual — one line each.
   `(\.exe)?` non-capturing shifted the `git -C` target to group 1, so `resolveGateTarget`
   silently read `undefined`. `tests/gate.test.ts` (run by CI) now pins trigger, skip,
   `-C`/`-c`, quoted-message, `~`, and `cd` behavior.
+- [2026-11-05] tooling: OpenCode v1 resolves relative `opencode.json` `instructions`
+  paths with `globUp` from the current project/worktree, not from the global config
+  directory — a global config must use `~/...` (or an absolute path). The docs hub is
+  ambient via `~/.config/opencode/docs/README.md`; reference docs stay on demand.
+- [2026-11-05] tooling: OpenCode v1 invokes every named export in `plugins/*.ts` as a
+  plugin factory. Exporting test helpers (`isGateCandidate`, …) from
+  `proof-of-work.ts` made the loader call them with `{ directory }`, so
+  `command.replace` threw and the gate silently failed to load. Pure helpers live in
+  `plugins/lib/gate.ts`; `proof-of-work.ts` exports only `ProofOfWork`, and
+  `tests/gate.test.ts` pins the export shape.

@@ -104,7 +104,15 @@ re-runs the chain. Lower phpcs-watch's
 cooldown to 0 if you want every edit linted (the cooldown never blocks the commit
 gate, only the inline hint).
 
-## 6. This repo is not gated
+## 6. Ambient docs and context
+
+`opencode.json` loads `~/.config/opencode/docs/README.md` as ambient instructions —
+roughly 4.2k words (~6k tokens) in every session. Keep it as the index: the hub links
+every reference doc, and `AGENTS.md` reads the matching doc on demand. Replacing it
+with `docs/*.md` (~25–35k tokens) is a deliberate context trade, not a free upgrade;
+if context pressure appears, narrow the instruction file rather than expanding it.
+
+## 7. This repo is not gated
 
 `proof-of-work` gates only projects with a `build` script **and** `phpcs.xml` or
 `composer.json` (see [guide-pro § 4](guide-pro.md#4-plugins)). This config repo has

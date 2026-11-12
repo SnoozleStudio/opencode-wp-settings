@@ -66,8 +66,9 @@ Every push to `main` validates:
 - **Scaffolding that starts compliant** — one command scaffolds a classic theme or
   plugin that passes Theme/Plugin Review from the first file: WPCS templates, the
   template-hierarchy boot chain, and Vite/Tailwind wired in
-- **An AI that knows your stack** — GSAP, Lenis, Tempus, and Tailwind discipline
-  loaded on demand via skills, so the front end meets the same bar as the back end
+- **An AI that knows your stack** — the docs hub is ambient via `opencode.json`
+  instructions, and the reference docs load on demand via skills, so the front end
+  meets the same bar as the back end
 
 ## Quick start in 3 steps
 
@@ -154,7 +155,7 @@ This repo closes that gap with engineering discipline, not hope:
 ```
 AGENTS.md             Portable coding standards (guardrails, WP + front-end stack, git)
 LICENSE               MIT license (incl. upstream attribution: cc-settings, mattpocock/skills)
-opencode.json         Global config: permission allow/ask/deny lists, subagent depth, MCP servers
+opencode.json         Global config: permission allow/ask/deny lists, subagent depth, ambient docs index, MCP servers
 tui.json / tui.jsonc   TUI plugins (subagent statusline; herdr session reporting)
 agents/               8 subagents (explore, implementer, planner, reviewer,
                       security-auditor, tester, scaffolder, maestro)
@@ -168,6 +169,7 @@ commands/             18 slash commands (/fix /build /review /verify /ship /audi
                       /docs-check /plugin /theme /section /phpcs /check /grill ...)
 plugins/              3 hook plugins (proof-of-work gate, phpcs-watch, session-context)
                       + plugins/lib/run.ts (shared shell runner)
+                      + plugins/lib/gate.ts (trigger/skip/target helpers)
                       + herdr-agent-state.js (herdr-installed, managed)
 docs/                 Documentation hub + reference docs + 3 guides
 tickets/              Working ticket lists (audit fixes, plans)
