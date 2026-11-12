@@ -1,5 +1,6 @@
 # Level 3 Guide — Tuning the Config (Advanced)
 
+> **OpenCode v1 only** — tested with OpenCode `1.19.5`; v2 is a different contract.
 > For when the defaults are working and you want to tune: agent depth budgets, skill
 > routing, plugin cache windows. Prereqs: read [Level 1 Guide](guide-beginners.md) and
 > [Level 2 Guide](guide-pro.md). Changes to this repo must be synced with the

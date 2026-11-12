@@ -17,6 +17,15 @@ and never leaks unescaped output, raw SQL, or missing capability checks.
 
 ---
 
+## Compatibility
+
+This repo targets **OpenCode v1** — tested with OpenCode `1.19.5` and
+`@opencode-ai/plugin` `1.18.33`. The config shape, plugin export contract, and
+`instructions` resolution are v1 behavior. OpenCode v2 has a different surface;
+migrate deliberately. The `AGENTS.md` standards themselves stay portable.
+
+---
+
 ## Getting Started
 
 1. **Read this file** — it's the baseline for how we work

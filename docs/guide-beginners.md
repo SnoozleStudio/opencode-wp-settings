@@ -8,9 +8,9 @@ before you commit.
 You don't need to know how agents, skills, or plugins work to use this. You need to
 know how to ask. This guide teaches you that, with copy-paste-ready prompts.
 
-> Prereqs: OpenCode installed and running in a WordPress project. Read the
-> [README](../README.md) first for install. Want the internals instead?
-> [Level 2 Guide](guide-pro.md).
+> Prereqs: **OpenCode v1** installed (tested on 1.19.5) and running in a WordPress
+> project. OpenCode v2 is not supported. Read the [README](../README.md) first for
+> install. Want the internals instead? [Level 2 Guide](guide-pro.md).
 
 ---
 

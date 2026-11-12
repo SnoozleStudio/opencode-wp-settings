@@ -5,6 +5,10 @@ and reference doc, what it does, and how they fit together. If a file in this re
 moves, changes, or appears, **this page and the guides are where it must be reflected**
 (see [Documentation Contract](#documentation-contract)).
 
+> [!IMPORTANT]
+> **OpenCode v1 only.** Tested with OpenCode `1.19.5` and `@opencode-ai/plugin`
+> `1.18.33`. OpenCode v2 uses a different config/plugin contract; migrate deliberately.
+
 > **Reading paths**
 >
 > - I'm new to AI-assisted WordPress work → [Level 1 Guide](guide-beginners.md)

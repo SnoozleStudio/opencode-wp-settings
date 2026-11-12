@@ -4,9 +4,9 @@ You know WordPress and you want to know how this machine works, and how to exten
 This guide covers the internals of every layer, authoring examples for each component
 type, and the discipline that keeps it all honest.
 
-> Prereqs: read [Level 1 Guide](guide-beginners.md) and the
-> [Documentation hub](README.md). Everything here is verified against the actual
-> files in this repo — link, then read.
+> Prereqs: **OpenCode v1** (tested on 1.19.5; v2 is not supported), then read
+> [Level 1 Guide](guide-beginners.md) and the [Documentation hub](README.md).
+> Everything here is verified against the actual files in this repo — link, then read.
 
 ---
 

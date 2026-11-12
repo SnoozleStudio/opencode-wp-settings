@@ -9,8 +9,13 @@ verification, and reusable development workflows.
 ![CI](https://github.com/SnoozleStudio/opencode-wp-settings/actions/workflows/ci.yml/badge.svg)
 ![Checks](https://img.shields.io/badge/checks-7-green.svg)
 ![MIT](https://img.shields.io/badge/License-MIT-green.svg)
-![OpenCode](https://img.shields.io/badge/OpenCode-Config-purple.svg)
+![OpenCode v1](https://img.shields.io/badge/OpenCode-v1-purple.svg)
 ![WordPress](https://img.shields.io/badge/WordPress-7.0-blue.svg)
+
+> [!IMPORTANT]
+> **OpenCode v1 only.** Tested with OpenCode `1.19.5` and `@opencode-ai/plugin`
+> `1.18.33`. OpenCode v2 has a different config and plugin surface; do not install
+> this repo under v2 without a deliberate migration.
 
 Start with the [Level 1 Guide](docs/guide-beginners.md) →
 
@@ -72,8 +77,9 @@ Every push to `main` validates:
 
 ## Quick start in 3 steps
 
-1. **Install** — clone into your OpenCode config dir (or copy the files in; if the
-   directory already exists, clone into a temp folder and merge):
+1. **Install (OpenCode v1 required — tested on 1.19.5)** — clone into your OpenCode
+   config dir (or copy the files in; if the directory already exists, clone into a
+   temp folder and merge):
 
    ```powershell
    git clone https://github.com/SnoozleStudio/opencode-wp-settings.git "$HOME\.config\opencode"
