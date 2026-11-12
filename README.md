@@ -48,7 +48,7 @@ Every push to `main` validates:
 - repository structure and frontmatter (Linux + macOS runners)
 - documentation inventory and internal links
 - verification-chain consistency (docs vs gate plugin)
-- lockfile integrity + plugin compile check
+- lockfile integrity + plugin compile check + gate unit tests
 - scaffold dry-run smoke tests (Linux + macOS runners)
 - workflow lint (actionlint + zizmor)
 
@@ -176,7 +176,8 @@ setup.ps1             Validation + project scaffolding (cross-platform: Windows/
 scaffold.cmd          Windows wrapper for setup.ps1 (resolves its own directory; cmd, Git Bash, PowerShell)
 scaffold.sh           POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 scripts/              docs-inventory.ps1 (docs sync) + verify-chain-consistency.ps1 (chain vs gate)
-.github/              CI workflow (ci.yml): JSON, structure, docs inventory, chain consistency, plugin compile, smoke tests, workflow lint (actionlint + zizmor)
+.github/              CI workflow (ci.yml): JSON, structure, docs inventory, chain consistency, plugin compile + gate tests, smoke tests, workflow lint (actionlint + zizmor)
+tests/                Bun unit tests for the proof-of-work gate (trigger/skip/target)
 ```
 
 ## How it works

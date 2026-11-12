@@ -211,6 +211,9 @@ Behavioral details that matter:
 - **PHPStan step:** whole-project analysis, run after phpcs with
   `--no-progress --memory-limit=1G`; per-edit "phpstan-watch" is deliberately not
   wired up — partial-file analysis on a half-saved tree produces false positives.
+- **Tests:** `tests/gate.test.ts` covers trigger detection, skip tokens, `-C` vs `-c`,
+  quoted commit messages, `~` expansion, and `cd` handling (`bun test tests`); CI runs
+  it after `bun build`.
 
 ### phpcs-watch.ts — lint at edit time
 

@@ -86,6 +86,73 @@ const isGatedProject = (dir: string): boolean =>
  *   same HEAD and working-tree content (per-target — one repo's green cache
  *   never green-lights another)
  */
+const quotedRanges = (command: string): Array<[number, number]> => {
+	const ranges: Array<[number, number]> = [];
+	let start = -1;
+	let quote = "";
+	for (let i = 0; i < command.length; i++) {
+		const char = command[i];
+		if (start === -1) {
+			if (char === '"' || char === "'") {
+				start = i;
+				quote = char;
+			}
+		} else if (char === quote) {
+			ranges.push([start, i]);
+			start = -1;
+			quote = "";
+		}
+	}
+	if (start !== -1) ranges.push([start, command.length]);
+	return ranges;
+};
+
+const matchOutsideQuotes = (regex: RegExp, command: string): RegExpExecArray | null => {
+	const ranges = quotedRanges(command);
+	const global = new RegExp(regex.source, regex.flags.includes("g") ? regex.flags : `${regex.flags}g`);
+	let match: RegExpExecArray | null;
+	while ((match = global.exec(command))) {
+		if (!ranges.some(([start, end]) => match!.index > start && match!.index < end)) {
+			return match;
+		}
+		global.lastIndex = match.index + 1;
+	}
+	return null;
+};
+
+export const isGateCandidate = (command: string): boolean => {
+	// Mask quoted segments so `rg "git commit"` does not fire the gate, but
+	// keep a placeholder so `git -C "<path>" commit` still matches.
+	const masked = command.replace(/"[^"]*"|'[^']*'/g, '"x"');
+	return GIT_OP.test(masked) || GIT_ALIAS.test(command);
+};
+
+export const isGateSkip = (command: string): boolean =>
+	SKIP_TOKEN.test(command.replace(/"[^"]*"|'[^']*'/g, ""));
+
+export const resolveGateTarget = (
+	command: string,
+	dir: string
+): { skip: boolean; target: string } => {
+	const cMatch = matchOutsideQuotes(GIT_C, command);
+	if (cMatch) {
+		const expanded = expandTarget(cMatch[1]);
+		return { skip: false, target: isAbsolute(expanded) ? expanded : join(dir, expanded) };
+	}
+
+	const dMatch = matchOutsideQuotes(DIR_CHANGE, command);
+	if (dMatch) {
+		const cdTarget = expandTarget(dMatch[2]);
+		const resolved = isAbsolute(cdTarget) ? cdTarget : join(dir, cdTarget);
+		const normalize = (p: string) => p.replace(/[\\/]+$/, "");
+		if (normalize(resolved) !== normalize(dir)) {
+			return { skip: true, target: dir };
+		}
+	}
+
+	return { skip: false, target: dir };
+};
+
 export const ProofOfWork = async ({ directory }: Parameters<Plugin>[0]) => {
 	const gateCache = new Map<string, { at: number; state: string }>();
 
@@ -138,34 +205,18 @@ export const ProofOfWork = async ({ directory }: Parameters<Plugin>[0]) => {
 	};
 
 	const gate = async (command: string): Promise<void> => {
-		// Mask quoted segments for trigger detection so `rg "git commit"` does
-		// not fire the gate, but keep a placeholder so `git -C "<path>" commit`
-		// still matches. SKIP_TOKEN uses the stripped form.
-		const masked = command.replace(/"[^"]*"|'[^']*'/g, '"x"');
-		const stripped = command.replace(/"[^"]*"|'[^']*'/g, "");
-		if (!GIT_OP.test(masked) && !GIT_ALIAS.test(command)) return;
-		if (SKIP_TOKEN.test(stripped)) return;
+		if (!isGateCandidate(command)) return;
+		if (isGateSkip(command)) return;
 
-		let target = directory;
-		const cMatch = command.match(GIT_C);
-		if (cMatch) {
-			target = expandTarget(cMatch[2]);
-			target = isAbsolute(target) ? target : join(directory, target);
-		} else {
-			const dMatch = command.match(DIR_CHANGE);
-			if (dMatch) {
-				const cdTarget = expandTarget(dMatch[2]);
-				const resolved = isAbsolute(cdTarget) ? cdTarget : join(directory, cdTarget);
-				const normalize = (p: string) => p.replace(/[\\/]+$/, "");
-				if (normalize(resolved) !== normalize(directory)) {
-					console.warn(
-						"proof-of-work: gate skipped — the command changes the working directory. " +
-							"The gate is scoped to the session directory; use `git -C <repo>` to gate another repo."
-					);
-					return;
-				}
-			}
+		const resolved = resolveGateTarget(command, directory);
+		if (resolved.skip) {
+			console.warn(
+				"proof-of-work: gate skipped — the command changes the working directory. " +
+					"The gate is scoped to the session directory; use `git -C <repo>` to gate another repo."
+			);
+			return;
 		}
+		const target = resolved.target;
 
 		if (!isGatedProject(target)) return;
 

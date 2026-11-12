@@ -36,6 +36,8 @@ jobs:
         run: bun install --frozen-lockfile --dry-run
       - name: Compile plugins
         run: bun build plugins/proof-of-work.ts plugins/phpcs-watch.ts plugins/session-context.ts --target=node --outdir="$RUNNER_TEMP/plugin-build"
+      - name: Gate unit tests
+        run: bun test tests
 
   structure:
     name: Structure & frontmatter

@@ -651,3 +651,7 @@ Keep entries terse and factual — one line each.
 - [2026-11-05] wordpress: removed the empty, unwired nav-walker stub from the theme
   template; numbered `nav__item--N` classes come from the `nav_menu_css_class` filter
   in `configure/utilities.php`, and WordPress core supplies `aria-current`.
+- [2026-11-05] tooling: proof-of-work regex capture groups are load-bearing — making
+  `(\.exe)?` non-capturing shifted the `git -C` target to group 1, so `resolveGateTarget`
+  silently read `undefined`. `tests/gate.test.ts` (run by CI) now pins trigger, skip,
+  `-C`/`-c`, quoted-message, `~`, and `cd` behavior.

@@ -54,7 +54,8 @@ moves, changes, or appears, **this page and the guides are where it must be refl
 ├── scaffold.cmd             Windows wrapper for setup.ps1 (cmd, Git Bash, PowerShell; any checkout incl. Local site shell)
 ├── scaffold.sh              POSIX wrapper for setup.ps1 (macOS/Linux, via pwsh)
 ├── scripts/                 docs-inventory.ps1, verify-chain-consistency.ps1 — deterministic docs-sync checks (CI + local)
-└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, plugin compile, smoke tests, macOS mirror, workflow lint (actionlint + zizmor)
+├── tests/                   Bun unit tests for the proof-of-work gate (trigger/skip/target)
+└── .github/workflows/       CI (ci.yml): JSON, structure, docs inventory, chain consistency, plugin compile + gate tests, smoke tests, macOS mirror, workflow lint (actionlint + zizmor)
 ```
 
 ### Tickets
@@ -364,7 +365,7 @@ truth — adapt, don't reinvent.**
 | [.gitignore](../.gitignore)                                             | repo hygiene (never commit `node_modules/`, `.env*`)                                                                                                                                                                                                                                                                                  |
 | [docs-inventory.ps1](../scripts/docs-inventory.ps1)                     | deterministic port of the `/docs-check` mechanical subset: hub inventory vs filesystem (both directions), README/hub counts, internal markdown links, CI job count vs the README checks badge; exit 1 on drift — runs in CI and locally                                                                                               |
 | [verify-chain-consistency.ps1](../scripts/verify-chain-consistency.ps1) | parses the chain from `docs/verification-chain.md` (the single source of truth) and compares it against the steps hardcoded in `plugins/proof-of-work.ts` — exit 1 on drift, so the doc and the gate can't silently diverge                                                                                                           |
-| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, plugin compile (`bun build`), `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, macOS structure + smoke mirror (`macos-latest`), workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned, actionlint verified by SHA-256, Bun pinned to 1.3.9 per the WordPress GitHub Actions Workflow Standard |
+| [ci.yml](../.github/workflows/ci.yml)                                   | GitHub Actions (push to main + PRs): JSON well-formedness, plugin compile (`bun build`) + gate unit tests (`bun test tests`), `setup.ps1 -Validate`, `scripts/docs-inventory.ps1`, `scripts/verify-chain-consistency.ps1`, scaffold dry-run smoke tests, macOS structure + smoke mirror (`macos-latest`), workflow lint (actionlint 1.7.12 + zizmor 1.30.1); every action SHA-pinned, actionlint verified by SHA-256, Bun pinned to 1.3.9 per the WordPress GitHub Actions Workflow Standard |
 
 ---
 
